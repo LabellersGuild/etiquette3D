@@ -1,0 +1,41 @@
+#***********************************************************
+#This is how your makefile should look like
+#Because we all have different IDE I suggest that for now, 
+#Makefile are in the gitignore
+#***********************************************************
+
+CSRCS=main.cpp
+
+CFLAGS =  -c -O3 -DNDEBUG -fPIC
+
+INCLUDE = -I. -I/usr/include/ -I/usr/include/X11/ -I/usr/local/include/GL 
+INCOSG = -I/usr/local/include
+LDLIBS = -lm -ldl -lGL -lGLU -lpthread -lXext -lX11
+
+LDFLAGS =  -L. -L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib
+#insert here all the osg libraries you need
+LDOSG = -L/usr/local/lib64 -losg -losgViewer -losgSim -losgText -losgDB -losgGA
+
+CC = g++
+SRCDIR = src
+BUILDDIR = build
+
+EXE=main
+
+SRCEXT = cpp
+SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
+	
+all: $(EXE)
+
+$(EXE): $(OBJECTS) 
+	g++ -o bin/$(EXE) $(OBJECTS) $(INCLUDE) $(INCOSG) $(LDFLAGS) $(LDLIBS) $(LDOSG)
+
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ $< 
+
+
+
+clean:
+	rm -rf *.o

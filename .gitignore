@@ -1,0 +1,6 @@
+Makefile
+Makefile~
+.gitignore~
+*.uml
+/build/
+/bin/
