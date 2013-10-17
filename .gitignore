@@ -4,3 +4,4 @@ Makefile~
 *.uml
 /build/
 /bin/
+/nbproject/

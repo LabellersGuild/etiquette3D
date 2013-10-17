@@ -33,12 +33,11 @@ int main()
    // TODO : change the file name
    // If you want to see the names of the nodes, write "names" instead of "" in the next line.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
-    model = dynamic_cast<osg::Group*>
-//    erreur lors de l'input d'une variable string
-//    cout << "Entrer le path du fichier .citygml :" << endl;
-//    string pathFile;
-//    cin >> pathFile;
-    (osgDB::readNodeFile("/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml", options));
+    //    erreur lors de l'input d'une variable string
+    cout << "Entrer le path du fichier .citygml :" << endl;
+    string pathFile;
+    cin >> pathFile;
+    model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
    if (! model )
@@ -50,10 +49,10 @@ int main()
     // Find the node with its ID :
     // TODO : you can change the ID you are looking for
     //    erreur lors de l'input d'une variable string
-//    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-//    string idNode;
-//    cin >> idNode;
-  lgNode findNode("ID_276003000001240");
+    cout << "Entrer l'id du noeud à étiquetter :" << endl;
+    string idNode;
+    cin >> idNode;
+  lgNode findNode(idNode);
   model->accept(findNode);
 
     // Add this group node to the root
