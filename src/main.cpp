@@ -60,7 +60,30 @@ int main()
    root->addChild(model);
 
    osg::Node* rootModel = findNode.getFirst();
+   //try to transform a vec3
+   //warning, transposed matrice
+   osg::MatrixList ml = rootModel->getWorldMatrices();
+   int size = ml.size();
+   std::cout << "il y a " << size << " matrices de transfo" << endl;
+   for(int i=0;i<4;i++){
+       for(int j=0;j<4;j++){
+           std::cout << ml[0](j,i) << "\t";
+       }
+       std::cout << "\n";
+   }
 
+    
+    osg::Vec3 testVect = osg::Vec3(0, 0, 15);
+    osg::Vec4 vec3etendu = osg::Vec4(testVect.x(), testVect.y(), testVect.z(), 1);
+    std::cout << vec3etendu.x() << endl;
+    std::cout << vec3etendu.y() << endl;
+    std::cout << vec3etendu.z() << endl;
+    std::cout << vec3etendu.w() << endl;
+    osg::Vec4 transformedVect = vec3etendu*ml[0];
+    std::cout << transformedVect.x() << endl;
+    std::cout << transformedVect.y() << endl;
+    std::cout << transformedVect.z() << endl;
+    std::cout << transformedVect.w() << endl;
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
    addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName());
