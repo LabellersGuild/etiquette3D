@@ -4,6 +4,7 @@
 #include <osgViewer/Viewer>
 #include <osgSim/MultiSwitch>
 #include "../include/lgNode.h"
+#include "../include/lgLabel.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -82,7 +83,7 @@ bool addTextLabel(osg::Group* g, std::string name_id, std::string name)
       return false;
    }
    osg::Geode* textLabelGeode = new osg::Geode();
-   osgText::Text* textOne = new osgText::Text();
+   lgLabel* textOne = new lgLabel();
    g->addChild(textLabelGeode);
    textLabelGeode->addDrawable(textOne);
 
