@@ -8,7 +8,7 @@
 #ifndef LGLABEL_H
 #define	LGLABEL_H
 
-#include "lgNode.h"
+#include "lgNodeVisitor.h"
 #include <osgText/Text>
 
 class lgLabel : public osgText::Text {
@@ -22,6 +22,7 @@ class lgLabel : public osgText::Text {
         //getters and setters
         void setLinkNode(osg::ref_ptr<lgNode> aNode);
         osg::ref_ptr<lgNode> getLinkNode();
+        void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
         osg::Vec3 getPostion();
         void setPostion(osg::Vec3 relativePosition);
