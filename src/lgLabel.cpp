@@ -35,13 +35,13 @@ osg::ref_ptr<lgNode> lgLabel::getLinkNode() {
 //calculate the absolute position thanks to the position of linknode
 void lgLabel::calcAbsolutePosition() {
     if(this->getLinkNode() ){
-        osg::Vec4 extendedPosition = osg::Vec4(this->position, 1);
+        osg::Vec4 extendedPosition = osg::Vec4(this->getPosition(), 1);
         //getting the list of transposed transformation matrices, from node to root
         osg::MatrixList matricesList = this->getLinkNode()->getWorldMatrices();
         for (int i=0;i<matricesList.size();i++){
             extendedPosition = extendedPosition*matricesList[i];
         }
-        
+        this->absolutePosition = osg::Vec3(extendedPosition.x(),extendedPosition.y(),extendedPosition.z());
     }
 }
 
@@ -54,12 +54,10 @@ osg::Vec3 lgLabel::getAbsolutePosition() {
     }
 }
 
-osg::Vec3 lgLabel::getPostion() {
-    return this->position;
-}
 
-void lgLabel::setPostion(osg::Vec3 relativePosition) {
-    this->absolutePosition = relativePosition;
+void lgLabel::setPosition(osg::Vec3 relativePosition) {
+    osgText::Text::setPosition(relativePosition);
+    this->calcAbsolutePosition();
 }
 
 std::string lgLabel::getLabelType(){

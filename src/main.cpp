@@ -16,7 +16,7 @@
 
 using namespace std;
 
-bool addTextLabel(osg::Group* g, std::string nom_id, std::string nom);
+bool addTextLabel(osg::Group* g, std::string nom_id, std::string nom, osg::ref_ptr<lgNode>);
 
 
 /// I don't use a makefile, but only Code::Blocks.
@@ -61,6 +61,7 @@ int main()
    root->addChild(model);
 
    osg::Node* rootModel = findNode.getFirst();
+   osg::ref_ptr<lgNode> rootNode = (lgNode*) rootModel;
    //try to transform a vec3
    //warning, transposed matrice, from nood to root
    osg::MatrixList ml = rootModel->getWorldMatrices();
@@ -87,7 +88,7 @@ int main()
     std::cout << transformedVect.w() << endl;
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
-   addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName());
+   addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName(), rootNode);
 
    viewer.setSceneData( root );
    viewer.setCameraManipulator(new osgGA::TrackballManipulator());
@@ -99,7 +100,7 @@ int main()
    }
 }
 
-bool addTextLabel(osg::Group* g, std::string name_id, std::string name)
+bool addTextLabel(osg::Group* g, std::string name_id, std::string name, osg::ref_ptr<lgNode> rootNode)
 {
    if (!g)
    {
@@ -117,12 +118,20 @@ bool addTextLabel(osg::Group* g, std::string name_id, std::string name)
    textOne->setText(name, osgText::String::ENCODING_UTF8 );
    textOne->setAxisAlignment(osgText::Text::SCREEN);
    textOne->setColor( osg::Vec4(192.0f/255.0f,0,0,1.0f) );
-   textOne->setPosition( osg::Vec3(0,0,15) );
+   textOne->setPosition( osg::Vec3(0,0,25) );
    textOne->setDrawMode(osgText::Text::TEXT |
                              osgText::Text::ALIGNMENT |
                                 osgText::Text::BOUNDINGBOX);
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
-
+   cout << "textOne position" << endl;
+   cout << textOne->getPosition().x() << endl;
+   cout << textOne->getPosition().y() << endl;
+   cout << textOne->getPosition().z() << endl;
+   textOne->setLinkNode(rootNode);
+   cout << "textOne absolute position" << endl;
+   cout << textOne->getAbsolutePosition().x() << endl;
+   cout << textOne->getAbsolutePosition().y() << endl;
+   cout << textOne->getAbsolutePosition().z() << endl;
    return true;
 }

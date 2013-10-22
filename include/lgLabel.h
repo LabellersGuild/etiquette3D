@@ -25,8 +25,7 @@ class lgLabel : public osgText::Text {
         osg::ref_ptr<lgNode> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
-        osg::Vec3 getPostion();
-        void setPostion(osg::Vec3 relativePosition);
+        void setPosition(osg::Vec3 relativePosition);
         std::string getLabelType();
         void setLabelType(std::string labelType);
         bool getInternal();
@@ -38,7 +37,6 @@ class lgLabel : public osgText::Text {
         int priority;
         std::string labelType;
         bool internal; //true if we have an internal label, to be developed
-        osg::Vec3 position; //relative position to linkNode
 };
 
 #endif	/* LGLABEL_H */
