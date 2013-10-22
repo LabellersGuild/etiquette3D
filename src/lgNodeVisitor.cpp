@@ -1,4 +1,4 @@
-#include "../include/lgNode.h"
+#include "../include/lgNodeVisitor.h"
 
 // Default constructor - initialize the name to ""
 lgNodeVisitor::lgNodeVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),

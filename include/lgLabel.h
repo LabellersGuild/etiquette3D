@@ -9,6 +9,7 @@
 #define	LGLABEL_H
 
 #include "lgNodeVisitor.h"
+#include "lgNode.h"
 #include <osgText/Text>
 
 class lgLabel : public osgText::Text {

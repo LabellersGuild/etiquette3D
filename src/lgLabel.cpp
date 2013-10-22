@@ -34,7 +34,7 @@ osg::ref_ptr<lgNode> lgLabel::getLinkNode() {
 
 //calculate the absolute position thanks to the position of linknode
 void lgLabel::calcAbsolutePosition() {
-    if(this->getLinkNode() && this->position){
+    if(this->getLinkNode() ){
         osg::Vec4 extendedPosition = osg::Vec4(this->position, 1);
         //getting the list of transposed transformation matrices, from node to root
         osg::MatrixList matricesList = this->getLinkNode()->getWorldMatrices();
@@ -50,7 +50,7 @@ osg::Vec3 lgLabel::getAbsolutePosition() {
         this->calcAbsolutePosition();
         return this->absolutePosition;
     } else {
-        return NULL;
+        return osg::Vec3(0,0,0);
     }
 }
 

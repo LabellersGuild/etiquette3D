@@ -5,7 +5,7 @@
  * Created on October 22, 2013, 9:55 AM
  */
 
-#include "lgNode.h"
+#include "../include/lgNode.h"
 
 lgNode::lgNode() {
 }

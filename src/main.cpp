@@ -4,6 +4,7 @@
 #include <osgViewer/Viewer>
 #include <osgSim/MultiSwitch>
 #include "../include/lgNodeVisitor.h"
+#include "../include/lgNode.h"
 #include "../include/lgLabel.h"
 #include <osgGA/TrackballManipulator>
 

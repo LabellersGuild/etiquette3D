@@ -7,6 +7,11 @@
 
 #ifndef LGNODE_H
 #define	LGNODE_H
+#include <osg/NodeVisitor>
+#include <osg/Node>
+
+#include <iostream>
+#include <vector>
 
 class lgNode : public osg::Node {
 public:
