@@ -3,7 +3,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgViewer/Viewer>
 #include <osgSim/MultiSwitch>
-#include "../include/lgNode.h"
+#include "../include/lgNodeVisitor.h"
 #include "../include/lgLabel.h"
 #include <osgGA/TrackballManipulator>
 
@@ -53,7 +53,7 @@ int main()
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode;
     cin >> idNode;
-  lgNode findNode(idNode);
+  lgNodeVisitor findNode(idNode);
   model->accept(findNode);
 
     // Add this group node to the root
@@ -61,7 +61,7 @@ int main()
 
    osg::Node* rootModel = findNode.getFirst();
    //try to transform a vec3
-   //warning, transposed matrice
+   //warning, transposed matrice, from nood to root
    osg::MatrixList ml = rootModel->getWorldMatrices();
    int size = ml.size();
    std::cout << "il y a " << size << " matrices de transfo" << endl;
