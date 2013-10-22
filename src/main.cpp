@@ -58,7 +58,7 @@ int main()
   model->accept(findNode);
 
     // Add this group node to the root
-   root->addChild(model);
+  root->addChild(model);
 
    osg::Node* rootModel = findNode.getFirst();
    osg::ref_ptr<lgNode> rootNode = (lgNode*) rootModel;
@@ -124,6 +124,8 @@ bool addTextLabel(osg::Group* g, std::string name_id, std::string name, osg::ref
                                 osgText::Text::BOUNDINGBOX);
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
+   
+   //testing that we can have absolute position
    cout << "textOne position" << endl;
    cout << textOne->getPosition().x() << endl;
    cout << textOne->getPosition().y() << endl;

@@ -28,6 +28,11 @@ void lgLabel::setLinkNode(osg::ref_ptr<lgNode> aNode){
     this->linkNode = aNode;
 }
 
+void lgLabel::setLinkNode(osg::Node* aNode){
+    osg::ref_ptr<lgNode> aLgNode = (lgNode*) aNode;
+    this->linkNode = aLgNode;
+}
+
 osg::ref_ptr<lgNode> lgLabel::getLinkNode() {
     return this->linkNode;
 }

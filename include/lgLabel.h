@@ -22,6 +22,7 @@ class lgLabel : public osgText::Text {
         
         //getters and setters
         void setLinkNode(osg::ref_ptr<lgNode> aNode);
+        void setLinkNode(osg::Node* aNode);
         osg::ref_ptr<lgNode> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
