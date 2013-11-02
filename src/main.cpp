@@ -16,7 +16,7 @@
 
 using namespace std;
 
-bool addTextLabel(osg::Group* g, std::string nom_id, std::string nom, osg::ref_ptr<lgNode>);
+bool addTextLabel(osg::Geode* g, std::string nom_id, std::string nom);
 
 
 /// I don't use a makefile, but only Code::Blocks.
@@ -58,12 +58,11 @@ int main()
     model->accept(findNode);
 
     // Add this group node to the root
-    //root->addChild(model);
+    root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
     osg::Node* rootModel = findNode.getFirst();
     osg::ref_ptr<osg::Node> rootNode = (osg::Node*) rootModel;
     osg::Group* groupe = (osg::Group*) rootModel;
-    root->addChild(groupe);
     rootNode = (osg::Node*) groupe->getChild(0);
     std::cout << "le node trouvé a " << groupe->getNumChildren() << " noeuds fils" <<endl;
     bool fin = false;
@@ -77,51 +76,9 @@ int main()
         }
     }
     osg::Geode* myGeode = (osg::Geode*) rootNode.get();
-    if(myGeode){
-        std::cout << "La géode a " << myGeode->getNumDrawables() << " drawables fils" << endl;
-        if (myGeode->getNumDrawables() > 0) {
-            osg::Drawable* myDrawable = myGeode->getDrawable(0);
-            osg::Geometry* myGeom = (osg::Geometry*) myGeode->getDrawable(0);
-            std::cout << "La géométrie a " << myGeom->getNumPrimitiveSets() << " primitives sets" << endl;
-            std::cout << "La géométrie a " << myGeom->getVertexArray()->getType() << " vertices" << endl;
-            osg::Vec3Array* arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
-            std::cout << "Vecteur 1 : " << arrayVertex->at(0).x() << arrayVertex->at(0).y() << arrayVertex->at(0).z() << endl;
-            lgLabel* newLabel = new lgLabel();
-            newLabel->setText("Hello");
-            newLabel->setAxisAlignment(osgText::Text::SCREEN);
-            newLabel->setPosition( osg::Vec3(arrayVertex->at(0).x(),arrayVertex->at(0).y(),arrayVertex->at(0).z()+5) );
-            newLabel->setCharacterSize(4);
-            myGeode->addDrawable(newLabel);
-            
-        }
-    }
-    //try to transform a vec3
-    //warning, transposed matrice, from nood to root
-    osg::MatrixList ml = rootNode->getWorldMatrices();
-    int size = ml.size();
-    std::cout << "il y a " << size << " matrices de transfo" << endl;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            std::cout << ml[0](j, i) << "\t";
-        }
-        std::cout << "\n";
-    }
-
-    osg::Vec3 testVect = osg::Vec3(0, 0, 15);
-    osg::Vec4 vec3etendu = osg::Vec4(testVect.x(), testVect.y(), testVect.z(), 1);
-    std::cout << vec3etendu.x() << endl;
-    std::cout << vec3etendu.y() << endl;
-    std::cout << vec3etendu.z() << endl;
-    std::cout << vec3etendu.w() << endl;
-    osg::Vec4 transformedVect = vec3etendu*ml[0];
-    std::cout << transformedVect.x() << endl;
-    std::cout << transformedVect.y() << endl;
-    std::cout << transformedVect.z() << endl;
-    std::cout << transformedVect.w() << endl;
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
-   osg::ref_ptr<lgNode> rootNode2 = (lgNode*) rootModel;
-   addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName(), rootNode2);
+   addTextLabel(myGeode,rootModel->getName(),rootModel->getName());
 
    viewer.setSceneData( root );
    viewer.setCameraManipulator(new osgGA::TrackballManipulator());
@@ -133,7 +90,7 @@ int main()
    }
 }
 
-bool addTextLabel(osg::Group* g, std::string name_id, std::string name, osg::ref_ptr<lgNode> rootNode)
+bool addTextLabel(osg::Geode* g, std::string name_id, std::string name)
 {
    if (!g)
    {
@@ -142,16 +99,20 @@ bool addTextLabel(osg::Group* g, std::string name_id, std::string name, osg::ref
    }
    osg::Geode* textLabelGeode = new osg::Geode();
    lgLabel* textOne = new lgLabel();
-   g->addChild(textLabelGeode);
-   textLabelGeode->addDrawable(textOne);
-
+   
+   //we get the first drawable of the node
+   osg::Geometry* myGeom = (osg::Geometry*) g->getDrawable(0);
+   //le vertex array est le tableau des sommets de la géométrie cible
+   osg::Vec3Array* arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
+   
+   g->addDrawable(textOne);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
    //textOne->setFont("/home/tbrunel/T�l�chargements/OSG_data/OSG_data/fonts/arial.ttf");
    textOne->setText(name, osgText::String::ENCODING_UTF8 );
    textOne->setAxisAlignment(osgText::Text::SCREEN);
    textOne->setColor( osg::Vec4(192.0f/255.0f,0,0,1.0f) );
-   textOne->setPosition( osg::Vec3(0,0,25) );
+   textOne->setPosition( osg::Vec3(arrayVertex->at(0).x(),arrayVertex->at(0).y(),arrayVertex->at(0).z()+25) );
    textOne->setDrawMode(osgText::Text::TEXT |
                              osgText::Text::ALIGNMENT |
                                 osgText::Text::BOUNDINGBOX);
@@ -163,7 +124,7 @@ bool addTextLabel(osg::Group* g, std::string name_id, std::string name, osg::ref
    cout << textOne->getPosition().x() << endl;
    cout << textOne->getPosition().y() << endl;
    cout << textOne->getPosition().z() << endl;
-   textOne->setLinkNode(rootNode);
+   textOne->setLinkNode(g);
    cout << "textOne absolute position" << endl;
    cout << textOne->getAbsolutePosition().x() << endl;
    cout << textOne->getAbsolutePosition().y() << endl;
