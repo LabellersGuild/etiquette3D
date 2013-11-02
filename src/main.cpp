@@ -54,27 +54,59 @@ int main()
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode;
     cin >> idNode;
-  lgNodeVisitor findNode(idNode);
-  model->accept(findNode);
+    lgNodeVisitor findNode(idNode);
+    model->accept(findNode);
 
     // Add this group node to the root
-  root->addChild(model);
+    //root->addChild(model);
+    cout << findNode.getNodeList().size() << endl;
+    osg::Node* rootModel = findNode.getFirst();
+    osg::ref_ptr<osg::Node> rootNode = (osg::Node*) rootModel;
+    osg::Group* groupe = (osg::Group*) rootModel;
+    root->addChild(groupe);
+    rootNode = (osg::Node*) groupe->getChild(0);
+    std::cout << "le node trouvé a " << groupe->getNumChildren() << " noeuds fils" <<endl;
+    bool fin = false;
+    while (fin == false){
+        groupe = (osg::Group*) rootNode.get();
+        std::cout << "le node fils a " << groupe->getNumChildren() << " noeuds fils" <<endl;
+        if(groupe->getNumChildren()<1){
+            fin = true;
+        } else {
+            rootNode = (osg::Node*) groupe->getChild(0); 
+        }
+    }
+    osg::Geode* myGeode = (osg::Geode*) rootNode.get();
+    if(myGeode){
+        std::cout << "La géode a " << myGeode->getNumDrawables() << " drawables fils" << endl;
+        if (myGeode->getNumDrawables() > 0) {
+            osg::Drawable* myDrawable = myGeode->getDrawable(0);
+            osg::Geometry* myGeom = (osg::Geometry*) myGeode->getDrawable(0);
+            std::cout << "La géométrie a " << myGeom->getNumPrimitiveSets() << " primitives sets" << endl;
+            std::cout << "La géométrie a " << myGeom->getVertexArray()->getType() << " vertices" << endl;
+            osg::Vec3Array* arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
+            std::cout << "Vecteur 1 : " << arrayVertex->at(0).x() << arrayVertex->at(0).y() << arrayVertex->at(0).z() << endl;
+            lgLabel* newLabel = new lgLabel();
+            newLabel->setText("Hello");
+            newLabel->setAxisAlignment(osgText::Text::SCREEN);
+            newLabel->setPosition( osg::Vec3(arrayVertex->at(0).x(),arrayVertex->at(0).y(),arrayVertex->at(0).z()+5) );
+            newLabel->setCharacterSize(4);
+            myGeode->addDrawable(newLabel);
+            
+        }
+    }
+    //try to transform a vec3
+    //warning, transposed matrice, from nood to root
+    osg::MatrixList ml = rootNode->getWorldMatrices();
+    int size = ml.size();
+    std::cout << "il y a " << size << " matrices de transfo" << endl;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            std::cout << ml[0](j, i) << "\t";
+        }
+        std::cout << "\n";
+    }
 
-   osg::Node* rootModel = findNode.getFirst();
-   osg::ref_ptr<lgNode> rootNode = (lgNode*) rootModel;
-   //try to transform a vec3
-   //warning, transposed matrice, from nood to root
-   osg::MatrixList ml = rootModel->getWorldMatrices();
-   int size = ml.size();
-   std::cout << "il y a " << size << " matrices de transfo" << endl;
-   for(int i=0;i<4;i++){
-       for(int j=0;j<4;j++){
-           std::cout << ml[0](j,i) << "\t";
-       }
-       std::cout << "\n";
-   }
-
-    
     osg::Vec3 testVect = osg::Vec3(0, 0, 15);
     osg::Vec4 vec3etendu = osg::Vec4(testVect.x(), testVect.y(), testVect.z(), 1);
     std::cout << vec3etendu.x() << endl;
@@ -88,7 +120,8 @@ int main()
     std::cout << transformedVect.w() << endl;
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
-   addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName(), rootNode);
+   osg::ref_ptr<lgNode> rootNode2 = (lgNode*) rootModel;
+   addTextLabel((osg::Group*)rootModel,rootModel->getName(),rootModel->getName(), rootNode2);
 
    viewer.setSceneData( root );
    viewer.setCameraManipulator(new osgGA::TrackballManipulator());

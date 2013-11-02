@@ -26,11 +26,19 @@ void lgNodeVisitor::apply(osg::Node &searchNode)
     }
     else
     {
-       if (searchNode.getName() == searchForName)
-       {
-          foundNodeList.push_back(&searchNode);
-       }
-       traverse(searchNode);
+       if (searchNode.getName() == searchForName) {
+            foundNodeList.push_back(&searchNode);
+//            osg::MatrixList ml = (searchNode).getWorldMatrices();
+//            int size = ml.size();
+//            std::cout << "il y a " << size << " matrices de transfo" << std::endl;
+//            for (int i = 0; i < 4; i++) {
+//                for (int j = 0; j < 4; j++) {
+//                    std::cout << ml[0](j, i) << "\t";
+//                }
+//                std::cout << "\n";
+//            }
+        }
+        traverse(searchNode);
     }
 }
 
@@ -41,7 +49,11 @@ void lgNodeVisitor::setNameToFind(const std::string &searchName)
    foundNodeList.clear();
 }
 
-osg::Node* lgNodeVisitor::getFirst()
-{
-   return *(foundNodeList.begin());
+osg::Node* lgNodeVisitor::getFirst() {
+    return (foundNodeList.at(0));
+}
+
+osg::Node* lgNodeVisitor::getLast() {
+    int taille = foundNodeList.size();
+    return (foundNodeList.at(taille-1));
 }

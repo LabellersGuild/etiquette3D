@@ -19,6 +19,7 @@ public:
    void setNameToFind(const std::string &name);
 
    osg::Node* getFirst();
+   osg::Node* getLast();
 
    typedef std::vector<osg::Node*> nodeListType;
 
