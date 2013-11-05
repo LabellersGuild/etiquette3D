@@ -4,6 +4,7 @@
 #include <osgViewer/Viewer>
 #include <osgSim/MultiSwitch>
 #include "../include/lgNodeVisitor.h"
+#include "../include/lgNodeOverseer.h"
 #include "../include/lgNode.h"
 #include "../include/lgLabel.h"
 #include <osgGA/TrackballManipulator>
@@ -54,7 +55,7 @@ int main()
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode;
     cin >> idNode;
-    lgNodeVisitor findNode(idNode);
+    lgNodeOverseer findNode(idNode);
     model->accept(findNode);
 
     // Add this group node to the root
