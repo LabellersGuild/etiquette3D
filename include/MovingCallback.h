@@ -13,12 +13,11 @@ using namespace osg;
 
 class MovingCallback : public NodeCallback
 {
-public:
-    MovingCallback(osgViewer::Viewer* viewer, Vec3Array* HUDvertices) : view(viewer), HUDBackgroundVertices(HUDvertices) {};
-    virtual void operator()(Node* node, NodeVisitor* nv)  ;
-protected :
-    osgViewer::Viewer* view;
-    Vec3Array* HUDBackgroundVertices;
+    public:
+        MovingCallback(osgViewer::Viewer* viewer) : view(viewer) {};
+        virtual void operator()(Node* node, NodeVisitor* nv)  ;
+    protected :
+        ref_ptr<osgViewer::Viewer> view;
 };
 
 #endif // MOVINGCALLBACK_H_INCLUDED

@@ -27,14 +27,15 @@ bool PickHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
                 model = (dynamic_cast<MatrixTransform*> (result.drawable->getParent(0)->getParent(0)));
 
                 // Create and set up a state set
-                StateSet* stateSet = new StateSet();
-                model->setStateSet(stateSet);
+                ref_ptr<StateSet> stateSet = new StateSet;
+                model->setStateSet(stateSet.get());
+
                 // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
                 stateSet->setMode(GL_DEPTH_TEST,StateAttribute::OFF);
                 stateSet->setRenderingHint( StateSet::TRANSPARENT_BIN );
 
                 //Bounding box :
-                osgText::Text* label = dynamic_cast<osgText::Text*>(result.drawable.get());
+                ref_ptr<osgText::Text> label = dynamic_cast<osgText::Text*>(result.drawable.get());
                 label->setDrawMode(3);
 
                 // Need to make sure this geometry is draw last. RenderBins are handled in numerical order so set bin number to 11

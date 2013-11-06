@@ -11,11 +11,11 @@ using namespace osg;
 
 class PickHandler : public osgGA::GUIEventHandler
 {
-public:
-    virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
-    PickHandler(ref_ptr<MatrixTransform> m) : model(m) {};
-protected:
-    ref_ptr<MatrixTransform> model;
+    public:
+        virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
+        PickHandler(ref_ptr<MatrixTransform> m) : model(m) {};
+    protected:
+        ref_ptr<MatrixTransform> model;
 };
 
 #endif // PICKHANDLER_H_INCLUDED

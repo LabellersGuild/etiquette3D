@@ -56,44 +56,34 @@ void MovingCallback::operator()(Node* node, NodeVisitor* nv)
     */}
 
     //With a polytope :
+     /// TO DO : Problems with the bounds of the polytope
     {
-
         //Bounding box of the label :
         BoundingBox bbox = dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0)->getBound();
        // std::cout << "label1 : xMax = " << bbox.xMax() << " xMin = " << bbox.xMin() << " yMax = " << bbox.yMax() << " yMin = " << bbox.yMin() << " zMax = " << bbox.zMax() << " zMin = " << bbox.zMin() << std::endl;
-        /// TO DO : the bounding box does not represent the place taken by the label on the screen. Find a way to know the bounding box of the label according to the window.
-        ///Try to use the projection matrix and a PolytopeIntersector
 
+        //Matrix to change world coordinates in windows coordinates
         Matrix modelView = view->getCamera()->getViewMatrix();
         Matrix projection = view->getCamera()->getProjectionMatrix();
         Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
         Matrix MVPW = modelView * projection * window;
 
+        //Projection of the bounding box of the label :
         Vec3 screenxMin = (center + Vec3(bbox.xMin(),0,0)) * MVPW;
         Vec3 screenxMax = (center + Vec3(bbox.xMax(),0,0)) * MVPW;
         Vec3 screenyMin = (center + Vec3(0,bbox.yMin(),0)) * MVPW;
         Vec3 screenyMax = (center + Vec3(0,bbox.yMax(),0)) * MVPW;
         Vec3 screenzMin = (center + Vec3(0,0,bbox.zMin())) * MVPW;
         Vec3 screenzMax = (center + Vec3(0,0,bbox.zMax())) * MVPW;
-
         //std::cout << "(" << screenxMin[0] <<" , " << screenxMin[1] << ")("<<screenxMax[0] << " , " <<screenxMax[1] <<")("<< screenyMin[0] << " , " << screenyMin[1] << ")(" << screenyMax[0] << " , "<<screenyMax[1]<<")(" << screenzMin[0] << " , " << screenzMin[1] << ")("<< screenzMax[0] <<" , " << screenzMax[1] << ")" <<std::endl;
 
+        // The bounds of the polytope are determined by the largest rectangle including the projection of the bbox
         int maxX = myMax(screenxMin[0], screenxMax[0], screenyMin[0], screenyMax[0], screenzMin[0], screenzMax[0]);
         int minX = myMin(screenxMin[0], screenxMax[0], screenyMin[0], screenyMax[0], screenzMin[0], screenzMax[0]);
         int maxY = myMax(screenxMin[1], screenxMax[1], screenyMin[1], screenyMax[1], screenzMin[1], screenzMax[1]);
         int minY = myMin(screenxMin[1], screenxMax[1], screenyMin[1], screenyMax[1], screenzMin[1], screenzMax[1]);
-
-        //std :: cout << screenCenter[0] << " , " << screenCenter[1] << " , " << screenCenter[2] << std::endl;
-        std::cout << "minX = "<<minX<<" minY= "<<minY<<" maxX = "<<maxX<<" maxY "<<maxY<<std::endl;
-
-
-        /// 2 problems : update not done correctly, and the minY/maxY are correct only when the camera is perfectly on the Y axis (maybe ??).
-        /*
-        *HUDBackgroundVertices)[0] = Vec3(   960, 646,-1);
-        (*HUDBackgroundVertices)[1] = Vec3(   1096,  646,-1);
-        (*HUDBackgroundVertices)[2] = Vec3(   1096,  678,-1);
-        (*HUDBackgroundVertices)[3] = Vec3(   960,  678,-1);
-        */
+        //std::cout << "minX = "<<minX<<" minY= "<<minY<<" maxX = "<<maxX<<" maxY "<<maxY<<std::endl;
+        /// TO DO ? the minY/maxY are correct only when the camera is perfectly on the Y axis
 
         //Save the current matrixTransform
         Matrix matrixTransform= dynamic_cast<MatrixTransform*>(node)->getMatrix();
@@ -107,14 +97,30 @@ void MovingCallback::operator()(Node* node, NodeVisitor* nv)
         if ( intersector->containsIntersections())
         {
            osgUtil::PolytopeIntersector::Intersection result = *(intersector->getIntersections().begin());
-            if (! result.drawable->isSameKindAs(new osgText::Text()))
+           ref_ptr<osgText::Text> currentLabel = dynamic_cast<osgText::Text*> (dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
+            if (result.drawable != currentLabel)
             {
                 dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,0.3));
             }
-            //If not, lower the node
+            //If not, lower it
+            /// TO DO : the label is not fully lowered if there is a building on the back
             else if (center[2]>0)
             {
+                // look below the label if we can lower it :
                 dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,-0.3));
+                ref_ptr<osgUtil::PolytopeIntersector> intersectorBelow = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX, minY-20, maxX, minY);
+                osgUtil::IntersectionVisitor ivBelow( intersectorBelow.get() );
+                view->getCamera()->accept( ivBelow );
+                if (intersectorBelow->containsIntersections())
+                {
+                    osgUtil::PolytopeIntersector::Intersection resultBelow = *(intersectorBelow->getIntersections().begin());             /// TO DO : the label is not fully lowered if there is a building on the back
+                    // Check if we still see the label
+                    if (resultBelow.drawable != currentLabel)
+                    {
+                        //if not, put the precious position
+                        dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform);
+                    }
+                }
             }
         }
         else
@@ -123,7 +129,6 @@ void MovingCallback::operator()(Node* node, NodeVisitor* nv)
         }
 
     }
-
     //Allow OSG to continue the node traversal
     traverse(node, nv);
 }
