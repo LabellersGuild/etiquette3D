@@ -100,15 +100,15 @@ void MovingCallback::operator()(Node* node, NodeVisitor* nv)
            ref_ptr<osgText::Text> currentLabel = dynamic_cast<osgText::Text*> (dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
             if (result.drawable != currentLabel)
             {
-                dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,0.3));
+                dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,1));
             }
             //If not, lower it
             /// TO DO : the label is not fully lowered if there is a building on the back
             else if (center[2]>0)
             {
                 // look below the label if we can lower it :
-                dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,-0.3));
-                ref_ptr<osgUtil::PolytopeIntersector> intersectorBelow = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX, minY-20, maxX, minY);
+                dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,-1));
+                ref_ptr<osgUtil::PolytopeIntersector> intersectorBelow = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX, minY-30, maxX, maxY);
                 osgUtil::IntersectionVisitor ivBelow( intersectorBelow.get() );
                 view->getCamera()->accept( ivBelow );
                 if (intersectorBelow->containsIntersections())
