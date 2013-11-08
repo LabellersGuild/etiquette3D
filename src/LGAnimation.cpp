@@ -1,8 +1,8 @@
-#include "../include/MovingCallback.h"
+#include "../include/LGAnimation.h"
 
 using namespace osg;
 
-int myMax(int a, int b, int c, int d, int e, int f){
+int LGAnimation::myMax(int a, int b, int c, int d, int e, int f){
     int max1 = a > b ? a : b;
     int max2 = c > d ? c : d;
     int max3 = e > f ?  e : f;
@@ -11,7 +11,7 @@ int myMax(int a, int b, int c, int d, int e, int f){
     return result;
 }
 
-int myMin(int a, int b, int c, int d, int e, int f){
+int LGAnimation::myMin(int a, int b, int c, int d, int e, int f){
     int min1 = a < b ? a : b;
     int min2 = c < d ? c : d;
     int min3 = e < f ?  e : f;
@@ -20,7 +20,7 @@ int myMin(int a, int b, int c, int d, int e, int f){
     return result;
 }
 
-void MovingCallback::operator()(Node* node, NodeVisitor* nv)
+void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
     // Find the world coordinates of the node :
     Matrix worldMatrix = node->getWorldMatrices()[0];
@@ -132,4 +132,3 @@ void MovingCallback::operator()(Node* node, NodeVisitor* nv)
     //Allow OSG to continue the node traversal
     traverse(node, nv);
 }
-
