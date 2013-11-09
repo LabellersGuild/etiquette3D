@@ -22,7 +22,6 @@
 class LGAnimation : public osg::NodeCallback
 {
     public:
-
         /* Constructeur
          * Arguments : viewer : osgViewer::Viewer* : l'objet viewer du programme principal
          */
@@ -53,7 +52,7 @@ class LGAnimation : public osg::NodeCallback
          * - int Xmaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
          * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
          */
-        bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum, int Yminimum, int Xmaximum, int Ymaximum);
+        bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
 
     protected :
 

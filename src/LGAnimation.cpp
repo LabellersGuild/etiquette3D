@@ -19,25 +19,6 @@ using namespace osg;
   */
 void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
-    // Find the world coordinates of the node :
-    Matrix worldMatrix = node->getWorldMatrices()[0];
-    Vec3 center = Vec3(worldMatrix(3,0), worldMatrix(3,1), worldMatrix(3,2));
-
-    if (!isFree(node, nv))
-    {
-        translateLabel(node, 0, 0, 1);
-    }
-    else if (center[2]>0)
-    {
-        //Look if below the label is free space
-        if (isFree(node, nv, 0,30,0,0))
-        {
-            translateLabel(node, 0, 0, -1);
-        }
-    }
-
-    //Allow OSG to continue the node traversal
-    traverse(node, nv);
 }
 
 /* Fonction qui permet de déplacer l'étiquette.
@@ -62,7 +43,7 @@ void LGAnimation::translateLabel(Node* node, int x, int y, int z)
  * - int Xmaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
  * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
 */
-bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0)
+bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum, int Yminimum, int Xmaximum, int Ymaximum)
 {
      // Find the world coordinates of the node :
     Matrix worldMatrix = node->getWorldMatrices()[0];

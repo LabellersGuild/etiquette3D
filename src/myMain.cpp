@@ -14,6 +14,7 @@
 
 #include "../include/LGAnimation.h"
 #include "../include/LGInteraction.h"
+#include "../include/myLGAnimation.h"
 
 using namespace std;
 using namespace osg;
@@ -57,7 +58,7 @@ int main()
 
     //Label 1 setup :
     mtLabel1->setMatrix(Matrixd::translate(0,-12,5));
-    mtLabel1->setUpdateCallback( new LGAnimation(&viewer)); //link the LGAnimation to the label
+    mtLabel1->setUpdateCallback( new myLGAnimation(&viewer)); //link the LGAnimation to the label
     label1->setText("Label 1", osgText::String::ENCODING_UTF8 );
     label1->setAxisAlignment(osgText::Text::SCREEN);
     label1->setAlignment(osgText::Text::CENTER_BOTTOM); // To center the label on the node
@@ -75,7 +76,7 @@ int main()
 
     //Label 2 setup :
     mtLabel2->setMatrix(Matrixd::translate(25,10,5));
-    mtLabel2->setUpdateCallback( new LGAnimation(&viewer));
+    mtLabel2->setUpdateCallback( new myLGAnimation(&viewer));
     mtLabel2->addChild(geodeLabel2.get());
     label2->setText("Label 2", osgText::String::ENCODING_UTF8 );
     label2->setAxisAlignment(osgText::Text::SCREEN);
