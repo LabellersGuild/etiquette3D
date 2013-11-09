@@ -21,6 +21,8 @@ int main()
     ref_ptr<MatrixTransform> mtLabel2 = new MatrixTransform;
     ref_ptr<Geode> geodeLabel2 = new Geode;
     ref_ptr<osgText::Text> label2 = new osgText::Text;
+    ref_ptr<Geode> geodeInfoLabel2 = new Geode;
+    ref_ptr<osgText::Text> infoLabel2 = new osgText::Text;
 
     //loading citygml model :
     ref_ptr<osgDB::ReaderWriter::Options> options = new osgDB::ReaderWriter::Options("");
@@ -36,7 +38,10 @@ int main()
     mtLabel1->addChild(geodeLabel1.get());
     geodeLabel1->addDrawable(label1.get());
     root->addChild(mtLabel2.get());
+    mtLabel2->addChild(geodeLabel2.get());
+    mtLabel2->addChild(geodeInfoLabel2.get());
     geodeLabel2->addDrawable(label2.get());
+    geodeInfoLabel2->addDrawable(infoLabel2.get());
     root->addChild(citygmlModel.get());
 
     //List of the labels :
@@ -72,8 +77,17 @@ int main()
     label2->setFontResolution(64,64);
    	label2->setBackdropType(osgText::Text::DROP_SHADOW_BOTTOM_CENTER);
     label2->setColorGradientMode(osgText::Text::OVERALL);
-    label2->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+    label2->setDrawMode(osgText::Text::TEXT /*| osgText::Text::ALIGNMENT*/);
     listLabels.push_back(label2);
+
+    //Info label of label 2:
+    infoLabel2->setText("More info \n about label 2", osgText::String::ENCODING_UTF8 );
+    infoLabel2->setAxisAlignment(osgText::Text::SCREEN);
+    infoLabel2->setAlignment(osgText::Text::CENTER_BOTTOM);
+    infoLabel2->setCharacterSize(2);
+    infoLabel2->setDrawMode(0); // Hidden by default
+    label2->setText("label 2 \n ...");
+    geodeInfoLabel2->setNodeMask( 0x1 );
 
     // Citygml model setup
     citygmlModel->setMatrix(Matrixd::translate(-20,-20,0));

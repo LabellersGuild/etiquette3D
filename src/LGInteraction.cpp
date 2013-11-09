@@ -4,6 +4,8 @@
 
 using namespace osg;
 
+LGInteraction::LGInteraction(std::vector<osgText::Text*> l) : listLabels(l) {};
+
 bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
 {
     if (ea.getEventType()==osgGA::GUIEventAdapter::RELEASE && ea.getButton()==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON && ea.getModKeyMask()&osgGA::GUIEventAdapter::MODKEY_CTRL )
@@ -14,6 +16,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
         {
             ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector( osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
             osgUtil::IntersectionVisitor iv( intersector.get() );
+            iv.setTraversalMask( ~0x1 );
 
             viewer->getCamera()->accept( iv );
             if ( intersector->containsIntersections() )
@@ -141,8 +144,43 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                         selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
                 }
                 break;
-
-                default:
+            case 'l' : case 'L' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    stateset->setMode(GL_FOG, osg::StateAttribute::ON);
+                }
+                break;
+            case 'm' : case 'M' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    stateset->setMode(GL_FOG, osg::StateAttribute::OFF);
+                }
+                break;
+            case 'i' : case 'I' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    // hasInfoLabel()
+                  if (dynamic_cast<Group*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getNumChildren()>1)
+                  {
+                      ref_ptr<osgText::Text> infoLabel = dynamic_cast<osgText::Text*>(dynamic_cast<Geode*>(dynamic_cast<Group*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getChild(1))->getDrawable(0));
+                      if (infoLabel->getDrawMode()==0)
+                      {
+                          infoLabel->setDrawMode(osgText::Text::TEXT);
+                          selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()+Vec3(0,0,infoLabel->getBound().zMax()));
+                      }
+                      else
+                      {
+                           infoLabel->setDrawMode(0);
+                           selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()-Vec3(0,0,infoLabel->getBound().zMax()));
+                      }
+                  }
+                }
+                break;
+            default:
                 break;
             }
             break;

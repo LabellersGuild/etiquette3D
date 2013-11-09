@@ -68,13 +68,29 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
         Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
         Matrix MVPW = modelView * projection * window;
 
-        //Projection of the bounding box of the label :
+         //Projection of the bounding box of the label :
         Vec3 screenxMin = (center + Vec3(bbox.xMin(),0,0)) * MVPW;
         Vec3 screenxMax = (center + Vec3(bbox.xMax(),0,0)) * MVPW;
         Vec3 screenyMin = (center + Vec3(0,bbox.yMin(),0)) * MVPW;
         Vec3 screenyMax = (center + Vec3(0,bbox.yMax(),0)) * MVPW;
         Vec3 screenzMin = (center + Vec3(0,0,bbox.zMin())) * MVPW;
         Vec3 screenzMax = (center + Vec3(0,0,bbox.zMax())) * MVPW;
+
+        // If info label :
+        if (dynamic_cast<Group*>(node)->getNumChildren()>1)
+        {
+            if (dynamic_cast<osgText::Text*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(1))->getDrawable(0))->getDrawMode() != 0)
+            {
+                BoundingBox bboxInfo = dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(1))->getDrawable(0)->getBound();
+                screenxMin = (center + Vec3(std::max(bboxInfo.xMin(),bbox.xMin()),0,0)) * MVPW;
+                screenxMax = (center + Vec3(std::max(bboxInfo.xMax(),bbox.xMax()),0,0)) * MVPW;
+                screenyMin = (center + Vec3(0,std::max(bboxInfo.yMin(),bbox.yMin()),0)) * MVPW;
+                screenyMax = (center + Vec3(0,std::max(bboxInfo.yMax(),bbox.yMax()),0)) * MVPW;
+                screenzMin = (center + Vec3(0,0,bboxInfo.zMin())) * MVPW;
+                screenzMax = (center + Vec3(0,0,bboxInfo.zMax()+bbox.zMax())) * MVPW;
+            }
+        }
+
         //std::cout << "(" << screenxMin[0] <<" , " << screenxMin[1] << ")("<<screenxMax[0] << " , " <<screenxMax[1] <<")("<< screenyMin[0] << " , " << screenyMin[1] << ")(" << screenyMax[0] << " , "<<screenyMax[1]<<")(" << screenzMin[0] << " , " << screenzMin[1] << ")("<< screenzMax[0] <<" , " << screenzMax[1] << ")" <<std::endl;
 
         // The bounds of the polytope are determined by the largest rectangle including the projection of the bbox
@@ -92,33 +108,45 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
         ref_ptr<osgUtil::PolytopeIntersector> intersector = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX, minY, maxX, maxY);
 
         osgUtil::IntersectionVisitor iv( intersector.get() );
+
+        // If no info label :
+        if (dynamic_cast<Group*>(node)->getNumChildren()<2)
+        {
+             iv.setTraversalMask( ~0x1 );
+        }
+        else
+        {
+            if (dynamic_cast<osgText::Text*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(1))->getDrawable(0))->getDrawMode() == 0)
+            {
+                 iv.setTraversalMask( ~0x1 );
+            }
+        }
+
         view->getCamera()->accept( iv );
 
         if ( intersector->containsIntersections())
         {
            osgUtil::PolytopeIntersector::Intersection result = *(intersector->getIntersections().begin());
-           ref_ptr<osgText::Text> currentLabel = dynamic_cast<osgText::Text*> (dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
-            if (result.drawable != currentLabel)
+            if (result.drawable->getParent(0)->getParent(0) != node)
             {
                 dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,1));
             }
             //If not, lower it
-            /// TO DO : the label is not fully lowered if there is a building on the back
             else if (center[2]>0)
             {
                 // look below the label if we can lower it :
-                dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,-1));
                 ref_ptr<osgUtil::PolytopeIntersector> intersectorBelow = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX, minY-30, maxX, maxY);
                 osgUtil::IntersectionVisitor ivBelow( intersectorBelow.get() );
+
                 view->getCamera()->accept( ivBelow );
                 if (intersectorBelow->containsIntersections())
                 {
-                    osgUtil::PolytopeIntersector::Intersection resultBelow = *(intersectorBelow->getIntersections().begin());             /// TO DO : the label is not fully lowered if there is a building on the back
+                    osgUtil::PolytopeIntersector::Intersection resultBelow = *(intersectorBelow->getIntersections().begin()); /// TO DO : the label is not fully lowered if there is a building on the back
                     // Check if we still see the label
-                    if (resultBelow.drawable != currentLabel)
+                    if (resultBelow.drawable->getParent(0)->getParent(0) == node)
                     {
-                        //if not, put the precious position
-                        dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform);
+                        //if so, put lower the label
+                        dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(0,0,-1));
                     }
                 }
             }

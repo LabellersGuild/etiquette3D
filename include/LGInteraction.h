@@ -6,12 +6,13 @@
 #include <osg/MatrixTransform>
 #include <osgUtil/LineSegmentIntersector>
 #include <osgText/Text>
+#include <osg/LightSource>
 
 class LGInteraction : public osgGA::GUIEventHandler
 {
     public:
         virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
-        LGInteraction(std::vector<osgText::Text*> l) : listLabels(l) {};
+        LGInteraction(std::vector<osgText::Text*> l);
     protected:
         std::vector<osgText::Text*> selectedLabels;
         std::vector<osgText::Text*> listLabels;
