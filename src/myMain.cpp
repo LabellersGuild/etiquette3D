@@ -1,3 +1,11 @@
+/* Fichier : myMain.cpp
+ * Description : Fichier de test pour les classes LGInteraction et LGAnimation
+ *      Deux étiquettes sont créées, ainsi qu'un étiquette d'information rattachée à la 2e étiquette.
+ *      Un fichier citygml est chargé, mais les étiquettes ne sont pas reliées à un noeud de cette structure.
+ *      Le code mis en commentaire précise des options de modification des étiquettes
+ * Auteur : Thomas Brunel
+ */
+
 #include <iostream>
 #include <osg/ShapeDrawable>
 #include <osgDB/ReadFile>
