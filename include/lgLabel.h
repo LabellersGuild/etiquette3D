@@ -35,6 +35,9 @@ class lgLabel : public osgText::Text {
     protected :
         osg::ref_ptr<lgNode> linkNode;
         osg::Vec3 absolutePosition;
+        //this position is the recommended starting position of the label
+        //at the initialization, position should be positionInit
+        osg::Vec3 positionInit;
         int priority;
         std::string labelType;
         bool internal; //true if we have an internal label, to be developed

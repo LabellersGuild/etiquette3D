@@ -55,9 +55,11 @@ int main()
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode;
     cin >> idNode;
-    lgNodeOverseer findNode(idNode);
+    lgNodeVisitor findNode(idNode);
     model->accept(findNode);
-
+    findNode.feedFoundPointList(*(findNode.getFirst()));
+    std::vector<osg::Vec3> points = findNode.getFoundPointList();
+    std::cout << "On a trouvé un liste de " << points.size() << " points" << std::endl;
     // Add this group node to the root
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
@@ -77,10 +79,11 @@ int main()
         }
     }
     osg::Geode* myGeode = (osg::Geode*) rootNode.get();
-    // Add the label
-    // To do : you can change the name of the label, it is the 3rd argument of the next line
-   addTextLabel(myGeode,rootModel->getName(),rootModel->getName());
-
+    if(myGeode){
+        // Add the label
+        // To do : you can change the name of the label, it is the 3rd argument of the next line
+       addTextLabel(myGeode,rootModel->getName(),rootModel->getName());
+    }
    viewer.setSceneData( root );
    viewer.setCameraManipulator(new osgGA::TrackballManipulator());
    viewer.realize();
