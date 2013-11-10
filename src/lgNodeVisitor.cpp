@@ -92,3 +92,25 @@ void lgNodeVisitor::feedFoundPointList(osg::Node& targetNode) {
 std::vector<osg::Vec3> lgNodeVisitor::getFoundPointList(){
     return foundPointList;
 }
+
+/*
+ *Calculate a Vec3 made from the foundPointList points that the recommend
+ * as the positionInit of a label linked to foundNode
+ */
+osg::Vec3 lgNodeVisitor::recommendedCoordinates(){
+    osg::Vec3 coordinates;
+    coordinates.set(0,0,0);
+    int listSize = foundPointList.size();
+    if(listSize>0){
+        int sumX=0, sumY=0, maxZ=0;
+        for (int i = 0; i < listSize; i++){
+            sumX += foundPointList.at(i).x();
+            sumY += foundPointList.at(i).y();
+            if(maxZ<foundPointList.at(i).z()){
+                maxZ = foundPointList.at(i).z();
+            }
+        }
+        coordinates.set(sumX/listSize, sumY/listSize, maxZ);
+    }
+    return coordinates;
+}

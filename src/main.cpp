@@ -57,9 +57,14 @@ int main()
     cin >> idNode;
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
+    
     findNode.feedFoundPointList(*(findNode.getFirst()));
     std::vector<osg::Vec3> points = findNode.getFoundPointList();
     std::cout << "On a trouvé un liste de " << points.size() << " points" << std::endl;
+    
+    osg::Vec3 positionCalc = findNode.recommendedCoordinates();
+    std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
+    
     // Add this group node to the root
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;

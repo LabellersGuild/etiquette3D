@@ -34,6 +34,7 @@ public:
     
     void feedFoundPointList(osg::Node& targetNode);
     std::vector<osg::Vec3> getFoundPointList();
+    osg::Vec3 recommendedCoordinates();
     
 protected:
     /*
