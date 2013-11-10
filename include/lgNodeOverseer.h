@@ -37,10 +37,21 @@ public:
     nodeListType& getNodeList() {
         return foundNodeList;
     }
+    
+    void setShowDrawable (bool toggle);
+    bool getShowDrawable();
+    
 protected:
     std::string searchForName;
     nodeListType foundNodeList;
+    /*
+     * used by the Overseer to indent its printing of nodes
+     */
     unsigned int _level;
+    /**
+     * allow the Overseer to print details about drawables, default is true
+     **/
+    bool showDrawable;
 };
 
 #endif	/* LGNODEOVERSEER_H */

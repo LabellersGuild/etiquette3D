@@ -16,15 +16,19 @@
 
 #include "../include/lgNodeOverseer.h"
 
+using namespace std;
+
 lgNodeOverseer::lgNodeOverseer() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),
                                         searchForName(){
     _level = 0;
+    showDrawable = true;
 }
 
-lgNodeOverseer::lgNodeOverseer(const std::string &name) :
+lgNodeOverseer::lgNodeOverseer(const string &name) :
                                    osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),
                                    searchForName(name){
     _level = 0;
+    showDrawable = true;
 }
 
 //The 'apply' method for 'node' type instances.
@@ -33,14 +37,14 @@ lgNodeOverseer::lgNodeOverseer(const std::string &name) :
 //If the strings match, add this node to our list
 
 void lgNodeOverseer::apply(osg::Node &searchNode) {
-    std::cout << spaces() << "Node simple : " << searchNode.getName() << std::endl;
+    cout << spaces() << "Node simple : " << searchNode.getName() << endl;
     // If no node is found, return searchNode
     if (searchForName == "") {
         foundNodeList.push_back(&searchNode);
     } else {
         if (searchNode.getName() == searchForName) {
             foundNodeList.push_back(&searchNode);
-        }
+    }
         _level++;
         traverse(searchNode);
         _level--;
@@ -48,7 +52,7 @@ void lgNodeOverseer::apply(osg::Node &searchNode) {
 }
 
 void lgNodeOverseer::apply(osg::Group &searchNode) {
-    std::cout << spaces() << "Groupe :"<< &(searchNode.getName()) << ", " << searchNode.getNumChildren() << " noeuds fils" << std::endl;
+    cout << spaces() << "Groupe :"<< &(searchNode.getName()) << ", " << searchNode.getNumChildren() << " noeuds fils" << endl;
     // If no node is found, return searchNode
     if (searchForName == "") {
         foundNodeList.push_back(&searchNode);
@@ -63,28 +67,28 @@ void lgNodeOverseer::apply(osg::Group &searchNode) {
 }
 
 void lgNodeOverseer::apply(osg::Geode &searchNode) {
-    std::cout << spaces() << "Géode :"<< searchNode.getName() << ", " << searchNode.getNumDrawables() << " drawables" << std::endl;
-    if(searchNode.getNumDrawables()>0){
+    cout << spaces() << "Géode :"<< searchNode.getName() << ", " << searchNode.getNumDrawables() << " drawables" << endl;
+    if(searchNode.getNumDrawables()>0 && showDrawable){
         for (int i=0;i<searchNode.getNumDrawables();i++){
             _level++;
-            std::cout << spaces() << "Drawable " << i << " : " << searchNode.getDrawable(i)->getName() << std::endl;
-            osg::Geometry* myGeom = (osg::Geometry*) searchNode.getDrawable(i);
+            cout << spaces() << "Drawable " << i << " : " << searchNode.getDrawable(i)->getName() << endl;
+            osg::ref_ptr<osg::Geometry> myGeom = dynamic_cast<osg::Geometry*>(searchNode.getDrawable(i));
             if(myGeom){
-                osg::Vec3Array* arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
+                osg::ref_ptr<osg::Vec3Array> arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
                 _level++;
                 int size = arrayVertex->size();
-                std::cout << spaces() << "Il y a " << size << " sommets" << std::endl;
+                cout << spaces() << "Il y a " << size << " sommets" << endl;
                 for (int j=0; j<size;j++){
-                    std::cout << spaces() << "Sommet " << j+1 << " : x=" << arrayVertex->at(j).x() <<
-                            ", y=" << arrayVertex->at(j).y() << ", z=" << arrayVertex->at(j).z() << std::endl;
+                    cout << spaces() << "Sommet " << j+1 << " : x=" << arrayVertex->at(j).x() <<
+                            ", y=" << arrayVertex->at(j).y() << ", z=" << arrayVertex->at(j).z() << endl;
                 }
                 _level--;
             } else {
-                std::cout << "Pas de géométrie" << std::endl;
+                cout << "Pas de géométrie" << endl;
             }
             _level--;
         }
-        std::cout << spaces() << std::endl;
+        cout << spaces() << endl;
     }
     // If no node is found, return searchNode
     if (searchForName == "") {
@@ -111,3 +115,10 @@ osg::Node* lgNodeOverseer::getLast() {
     return (foundNodeList.at(taille-1));
 }
 
+bool lgNodeOverseer::getShowDrawable(){
+    return showDrawable;
+}
+
+void lgNodeOverseer::setShowDrawable(bool toggle){
+    showDrawable = toggle;
+}
