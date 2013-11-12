@@ -9,7 +9,6 @@
 #define	LGLABEL_H
 
 #include "lgNodeVisitor.h"
-#include "lgNode.h"
 #include <osgText/Text>
 
 class lgLabel : public osgText::Text {
@@ -17,13 +16,12 @@ class lgLabel : public osgText::Text {
 
         lgLabel();
         lgLabel(const lgLabel& originalLabel);
-        lgLabel(std::string text, osg::ref_ptr<lgNode> linkedNode);
+        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode);
         lgLabel(std::string filePath, std::string idNode);
         
         //getters and setters
-        void setLinkNode(osg::ref_ptr<lgNode> aNode);
-        void setLinkNode(osg::Node* aNode);
-        osg::ref_ptr<lgNode> getLinkNode();
+        void setLinkNode(osg::ref_ptr<osg::Node> aNode);
+        osg::ref_ptr<osg::Node> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
         void setPosition(osg::Vec3 relativePosition);
@@ -31,9 +29,13 @@ class lgLabel : public osgText::Text {
         void setLabelType(std::string labelType);
         bool getInternal();
         void setInternal (bool internal);
+        void setPositionInit(osg::Vec3 newPositionInit);
+        osg::Vec3 getPositionInit();
         
     protected :
-        osg::ref_ptr<lgNode> linkNode;
+        //the node who is supposed to contain the label, if it is a group
+        //it has a geode child containing the label
+        osg::ref_ptr<osg::Node> linkNode;
         osg::Vec3 absolutePosition;
         //this position is the recommended starting position of the label
         //at the initialization, position should be positionInit

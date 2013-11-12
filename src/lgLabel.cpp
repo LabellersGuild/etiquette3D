@@ -6,7 +6,7 @@
  */
 
 #include "../include/lgLabel.h"
-
+using namespace std;
 
 //constructors
 lgLabel::lgLabel() : osgText::Text(){
@@ -15,8 +15,9 @@ lgLabel::lgLabel() : osgText::Text(){
 lgLabel::lgLabel(const lgLabel& originalLabel) {
 }
 
-lgLabel::lgLabel(std::string text, osg::ref_ptr<lgNode> linkedNode) {
-    
+lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode) {
+    this->setText(text);
+    this->setLinkNode(linkedNode);
 }
 
 lgLabel::lgLabel(std::string filePath, std::string idNode) {
@@ -24,16 +25,36 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
 }
 
 //getters and setters
-void lgLabel::setLinkNode(osg::ref_ptr<lgNode> aNode){
+/**
+ * set the param as linkNode attribute, then see if it got the
+ * label in his children, if not it adds it (eventually creating a new
+ * geode if the param is a group)
+ * @param aNode, osg:ref_ptr<osg::Node> to the node
+ */
+void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode){
     this->linkNode = aNode;
+    osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
+    osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
+    if(!targetGeode && targetGroup){
+        targetGeode = new osg::Geode();
+        targetGroup->addChild(targetGeode);
+    }
+    if(targetGeode){
+        bool alreadyChild = false;
+        for (int i = 0; i < targetGeode->getNumDrawables(); i++){
+            osg::ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
+            if(drawAsLabel && drawAsLabel.get()==this){
+                alreadyChild = true;
+            }
+        }
+        if(!alreadyChild){
+            targetGeode->addDrawable(this);
+        }
+    }
 }
 
-void lgLabel::setLinkNode(osg::Node* aNode){
-    osg::ref_ptr<lgNode> aLgNode = (lgNode*) aNode;
-    this->linkNode = aLgNode;
-}
 
-osg::ref_ptr<lgNode> lgLabel::getLinkNode() {
+osg::ref_ptr<osg::Node> lgLabel::getLinkNode() {
     return this->linkNode;
 }
 
@@ -78,4 +99,17 @@ bool lgLabel::getInternal() {
 }
 void lgLabel::setInternal (bool internal) {
     this->internal = internal;
+}
+
+/*
+ *Set the initial position in the attribute positionInit
+ * but also call the setPosition method with the same argument 
+ */
+void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
+    positionInit = newPositionInit;
+    this->setPosition(positionInit);
+}
+
+osg::Vec3 lgLabel::getPositionInit(){
+    return positionInit;
 }

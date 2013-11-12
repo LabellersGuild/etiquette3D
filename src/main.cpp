@@ -17,7 +17,7 @@
 
 using namespace std;
 
-bool addTextLabel(osg::Geode* g, std::string nom_id, std::string nom);
+bool addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Vec3 recoPos);
 
 
 /// I don't use a makefile, but only Code::Blocks.
@@ -69,26 +69,10 @@ int main()
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
     osg::Node* rootModel = findNode.getFirst();
-    osg::ref_ptr<osg::Node> rootNode = (osg::Node*) rootModel;
-    osg::Group* groupe = (osg::Group*) rootModel;
-    rootNode = (osg::Node*) groupe->getChild(0);
-    std::cout << "le node trouvé a " << groupe->getNumChildren() << " noeuds fils" <<endl;
-    bool fin = false;
-    while (fin == false){
-        groupe = (osg::Group*) rootNode.get();
-        std::cout << "le node fils a " << groupe->getNumChildren() << " noeuds fils" <<endl;
-        if(groupe->getNumChildren()<1){
-            fin = true;
-        } else {
-            rootNode = (osg::Node*) groupe->getChild(0); 
-        }
-    }
-    osg::Geode* myGeode = (osg::Geode*) rootNode.get();
-    if(myGeode){
-        // Add the label
-        // To do : you can change the name of the label, it is the 3rd argument of the next line
-       addTextLabel(myGeode,rootModel->getName(),rootModel->getName());
-    }
+    // Add the label
+    // To do : you can change the name of the label, it is the 3rd argument of the next line
+    addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc);
+    
    viewer.setSceneData( root );
    viewer.setCameraManipulator(new osgGA::TrackballManipulator());
    viewer.realize();
@@ -99,7 +83,7 @@ int main()
    }
 }
 
-bool addTextLabel(osg::Geode* g, std::string name_id, std::string name)
+bool addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::Vec3 recoPos)
 {
    if (!g)
    {
@@ -109,19 +93,15 @@ bool addTextLabel(osg::Geode* g, std::string name_id, std::string name)
    osg::Geode* textLabelGeode = new osg::Geode();
    lgLabel* textOne = new lgLabel();
    
-   //we get the first drawable of the node
-   osg::Geometry* myGeom = (osg::Geometry*) g->getDrawable(0);
-   //le vertex array est le tableau des sommets de la géométrie cible
-   osg::Vec3Array* arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
-   
-   g->addDrawable(textOne);
+   osg::ref_ptr<osg::Node> linkToNode = g;
+   textOne->setLinkNode(linkToNode);
+   textOne->setPositionInit(recoPos);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
    //textOne->setFont("/home/tbrunel/T�l�chargements/OSG_data/OSG_data/fonts/arial.ttf");
    textOne->setText(name, osgText::String::ENCODING_UTF8 );
    textOne->setAxisAlignment(osgText::Text::SCREEN);
    textOne->setColor( osg::Vec4(192.0f/255.0f,0,0,1.0f) );
-   textOne->setPosition( osg::Vec3(arrayVertex->at(0).x(),arrayVertex->at(0).y(),arrayVertex->at(0).z()+25) );
    textOne->setDrawMode(osgText::Text::TEXT |
                              osgText::Text::ALIGNMENT |
                                 osgText::Text::BOUNDINGBOX);
@@ -133,7 +113,7 @@ bool addTextLabel(osg::Geode* g, std::string name_id, std::string name)
    cout << textOne->getPosition().x() << endl;
    cout << textOne->getPosition().y() << endl;
    cout << textOne->getPosition().z() << endl;
-   textOne->setLinkNode(g);
+
    cout << "textOne absolute position" << endl;
    cout << textOne->getAbsolutePosition().x() << endl;
    cout << textOne->getAbsolutePosition().y() << endl;

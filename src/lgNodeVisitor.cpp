@@ -110,7 +110,7 @@ osg::Vec3 lgNodeVisitor::recommendedCoordinates(){
                 maxZ = foundPointList.at(i).z();
             }
         }
-        coordinates.set(sumX/listSize, sumY/listSize, maxZ);
+        coordinates.set(sumX/listSize, sumY/listSize, maxZ+10);
     }
     return coordinates;
 }
