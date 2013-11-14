@@ -1,8 +1,8 @@
 /* Fichier : myMain.cpp
  * Description : Fichier de test pour les classes LGInteraction et LGAnimation
- *      Deux étiquettes sont créées, ainsi qu'un étiquette d'information rattachée à la 2e étiquette.
- *      Un fichier citygml est chargé, mais les étiquettes ne sont pas reliées à un noeud de cette structure.
- *      Le code mis en commentaire précise des options de modification des étiquettes
+ *      Deux ï¿½tiquettes sont crï¿½ï¿½es, ainsi qu'un ï¿½tiquette d'information rattachï¿½e ï¿½ la 2e ï¿½tiquette.
+ *      Un fichier citygml est chargï¿½, mais les ï¿½tiquettes ne sont pas reliï¿½es ï¿½ un noeud de cette structure.
+ *      Le code mis en commentaire prï¿½cise des options de modification des ï¿½tiquettes
  * Auteur : Thomas Brunel
  */
 
@@ -19,7 +19,7 @@
 using namespace std;
 using namespace osg;
 
-int main()
+int mainSecond()
 {
     // Creation of the tree nodes :
     osgViewer::Viewer viewer;

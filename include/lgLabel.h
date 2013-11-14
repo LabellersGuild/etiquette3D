@@ -10,17 +10,18 @@
 
 #include "lgNodeVisitor.h"
 #include <osgText/Text>
+#include <osgViewer/Viewer>
 
 class lgLabel : public osgText::Text {
     public :
 
         lgLabel();
         lgLabel(const lgLabel& originalLabel);
-        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode);
+        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer);
         lgLabel(std::string filePath, std::string idNode);
         
         //getters and setters
-        void setLinkNode(osg::ref_ptr<osg::Node> aNode);
+        void setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer);
         osg::ref_ptr<osg::Node> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();

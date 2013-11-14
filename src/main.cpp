@@ -7,6 +7,9 @@
 #include "../include/lgNodeOverseer.h"
 #include "../include/lgNode.h"
 #include "../include/lgLabel.h"
+#include "../include/LGAnimation.h"
+#include "../include/LGInteraction.h"
+#include "../include/myLGAnimation.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -17,7 +20,7 @@
 
 using namespace std;
 
-bool addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Vec3 recoPos);
+lgLabel* addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Vec3 recoPos, osgViewer::Viewer* viewer);
 
 
 /// I don't use a makefile, but only Code::Blocks.
@@ -64,37 +67,42 @@ int main()
     
     osg::Vec3 positionCalc = findNode.recommendedCoordinates();
     std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
-    
+
     // Add this group node to the root
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
     osg::Node* rootModel = findNode.getFirst();
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
-    addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc);
-    
-   viewer.setSceneData( root );
-   viewer.setCameraManipulator(new osgGA::TrackballManipulator());
-   viewer.realize();
+    vector<osgText::Text*> listLabels = vector<osgText::Text*>();
+    lgLabel* textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
 
-   while( !viewer.done() )
-   {
-      viewer.frame();
-   }
+    // Create LGInteraction
+    listLabels.push_back(textOne);
+    osg::ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
+    viewer.addEventHandler(interaction.get());
+    
+    viewer.setSceneData(root);
+    viewer.setCameraManipulator(new osgGA::TrackballManipulator());
+    viewer.realize();
+
+    while (!viewer.done()) {
+        viewer.frame();
+    }
 }
 
-bool addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::Vec3 recoPos)
+lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::Vec3 recoPos, osgViewer::Viewer* viewer)
 {
    if (!g)
    {
        std::cout << "Error while creating the label" << std::endl;
-      return false;
+      return NULL;
    }
    osg::Geode* textLabelGeode = new osg::Geode();
    lgLabel* textOne = new lgLabel();
    
    osg::ref_ptr<osg::Node> linkToNode = g;
-   textOne->setLinkNode(linkToNode);
+   textOne->setLinkNode(linkToNode, viewer);
    textOne->setPositionInit(recoPos);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
@@ -118,5 +126,5 @@ bool addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::Vec3
    cout << textOne->getAbsolutePosition().x() << endl;
    cout << textOne->getAbsolutePosition().y() << endl;
    cout << textOne->getAbsolutePosition().z() << endl;
-   return true;
+   return textOne;
 }

@@ -5,6 +5,10 @@
  * Created on October 19, 2013, 4:31 PM
  */
 
+#include <osgViewer/Viewer>
+#include <osg/MatrixTransform>
+#include "../include/LGAnimation.h"
+#include "../include/myLGAnimation.h"
 #include "../include/lgLabel.h"
 using namespace std;
 
@@ -15,9 +19,9 @@ lgLabel::lgLabel() : osgText::Text(){
 lgLabel::lgLabel(const lgLabel& originalLabel) {
 }
 
-lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode) {
+lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer) {
     this->setText(text);
-    this->setLinkNode(linkedNode);
+    this->setLinkNode(linkedNode, viewer);
 }
 
 lgLabel::lgLabel(std::string filePath, std::string idNode) {
@@ -31,15 +35,19 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
  * geode if the param is a group)
  * @param aNode, osg:ref_ptr<osg::Node> to the node
  */
-void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode){
+void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer){
     this->linkNode = aNode;
     osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
     osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
+    osg::ref_ptr<osg::MatrixTransform> mtLabel1 = new osg::MatrixTransform;
     if(!targetGeode && targetGroup){
         targetGeode = new osg::Geode();
-        targetGroup->addChild(targetGeode);
+        targetGroup->addChild(mtLabel1);
+        mtLabel1->addChild(targetGeode);
+        mtLabel1->setUpdateCallback( new myLGAnimation(viewer));
     }
     if(targetGeode){
+        //todo gérer le cas où on a direct une géode
         bool alreadyChild = false;
         for (int i = 0; i < targetGeode->getNumDrawables(); i++){
             osg::ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
