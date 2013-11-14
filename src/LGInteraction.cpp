@@ -1,0 +1,232 @@
+/* Fichier : LGInteraction.cpp
+ * Description : Fichier source de la classe LGINteraction
+ * Cette classe g�re l'ensemble des interaction entre les �tiquettes et l'utilisateur une fois que le programme est lanc� :
+ * - ctrl+ clic gauche : s�lection d'une �tiquette. Les �tiquettes d�j� s�lectionn�es le restent.
+ * - 'a' : s�lectionner toutes les �tiquettes
+ * - 'q' ou 'Q' ou Gauche : augmenter la valeur X des �tiquettes
+ * - 'd' ou 'D' ou Droite : diminuer la valeur de X des �tiquettes
+ * - 'z' ou 'Z' ou Haut : augmenter la valeur de Y des �tiquettes
+ * - 's' ou 'S' ou Bas : diminuer la valeur de Y des �tiquettes
+ * - '+' : augmenter la taille des �tiquettes
+ * - '-' : diminuer la taille des �tiquettes
+ * - 'h' ou 'H' : cacher les �tiquettes
+ * - 'l' ou 'L' : savoir � quelles drawables les �tiquettes sont rattach�es
+ * - 'm' ou 'M' : ne plus savoir quelles drawables rattach�s aux �tiquettes
+ * - 'i' ou 'I' : afficher l'�tiquette d'informations suppl�mentaires, si elle existe
+ * Pour l'utiliser, il faut cr�er une instance et l'ajouter en tant que EventHandler � l'objet Viewer du programme principal :
+ *      ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
+ *      viewer.addEventHandler(interaction.get());
+ * Avec listLabels un vecteurs de pointeurs vers les �tiquettes.
+ * Auteur : Thomas Brunel
+ */
+
+ #include "../include/LGInteraction.h"
+
+#include <iostream>
+
+using namespace osg;
+
+/* Constructeur
+ * Argument :
+ * - l : vector<osgText::Text> : la liste des �tiquettes cr��es dans le programme principal.
+ */
+LGInteraction::LGInteraction(std::vector<osgText::Text*> l) : listLabels(l) {};
+
+
+  /* Fonction qui s'active automatiquement lorsqu'un �venement est d�tect�
+   * Arguments :
+   * - ea : osgGA::GUIEventAdapter
+   * - aa : osgGA::GUIActionAdapter
+   * Retour : renvoie toujours false. La valeur de retour indique si l'�venement a �t� trait�.
+   * Si true est renvo�, OSG consid�re que l'�venement n'est plus n�cessaire � aucun handler et sera ignor� par les autres handlers, dont le "camera manipulator"
+   * (cf. Beginner's guide p. 237)
+   */
+bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
+{
+    // Ctrl + left click : label picking
+    if (ea.getEventType()==osgGA::GUIEventAdapter::RELEASE && ea.getButton()==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON && ea.getModKeyMask()&osgGA::GUIEventAdapter::MODKEY_CTRL )
+    {
+        ref_ptr<osgViewer::Viewer> viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
+
+        if ( viewer )
+        {
+            // To know on what the user clicked :
+            ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector( osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
+            osgUtil::IntersectionVisitor iv( intersector.get() );
+            iv.setTraversalMask( ~0x1 );
+
+            viewer->getCamera()->accept( iv );
+            if ( intersector->containsIntersections() )
+            {
+                osgUtil::LineSegmentIntersector::Intersection result = *(intersector->getIntersections().begin());
+
+                // If it is a label :
+                if (result.drawable->isSameKindAs(new osgText::Text()))
+                {
+                    //Add the label to the list of selected labels
+                    selectedLabels.push_back(dynamic_cast<osgText::Text*>(result.drawable.get()));
+
+                    // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
+                    ref_ptr<StateSet> stateSet = selectedLabels.at(selectedLabels.size()-1)->getParent(0)->getParent(0)->getOrCreateStateSet();
+                    stateSet->setMode(GL_DEPTH_TEST,StateAttribute::OFF);
+                    stateSet->setRenderingHint( StateSet::TRANSPARENT_BIN );
+                    // Make sure this geometry is draw last. RenderBins are handled in numerical order so set bin number to 11
+                    stateSet->setRenderBinDetails(11, "DepthSortedBin");
+
+                    //Bounding box :
+                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+                }
+                else
+                {
+                    //Reset the stateset of the previous selected objects
+                    //Clear the list of selected labels
+                    for (unsigned i(0); i<selectedLabels.size();i++)
+                    {
+                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
+                        selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT);
+                    }
+                    selectedLabels.clear();
+                }
+
+            }
+            else
+            {
+                //Reset the stateset of the previous selected objects
+                //Clear the list of selected labels
+                for (unsigned i(0); i<selectedLabels.size();i++)
+                {
+                    selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
+                    selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT);
+                }
+                selectedLabels.clear();
+            }
+        }
+    }
+    // 'a' : select every label
+    else if (ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN && (ea.getKey() =='a' || ea.getKey()=='A'))
+    {
+        selectedLabels.clear();
+        for (unsigned i(0);i<listLabels.size();i++)
+        {
+            selectedLabels.push_back(listLabels.at(i));
+
+            // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
+            ref_ptr<StateSet> stateSet = selectedLabels.at(selectedLabels.size()-1)->getParent(0)->getParent(0)->getOrCreateStateSet();
+            stateSet->setMode(GL_DEPTH_TEST,StateAttribute::OFF);
+            stateSet->setRenderingHint( StateSet::TRANSPARENT_BIN );
+            // Make sure this geometry is draw last. RenderBins are handled in numerical order so set bin number to 11
+            stateSet->setRenderBinDetails(11, "DepthSortedBin");
+
+            //Bounding box :
+            selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+        }
+    }
+    else
+    {
+         switch ( ea.getEventType() )
+        {
+        case osgGA::GUIEventAdapter::KEYDOWN:
+            switch ( ea.getKey() )
+            {
+            // 'q' or 'Q' or Left : decrease the X value of the labels
+            case 'q': case 'Q': case osgGA::GUIEventAdapter::KEY_Left :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->setMatrix(dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getMatrix()*Matrix::translate(-5,0,0));
+                }
+                break;
+            // 'd' or 'D' or Right : increase the X value of the labels
+            case 'd': case 'D':  case osgGA::GUIEventAdapter::KEY_Right :
+               for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->setMatrix(dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getMatrix()*Matrix::translate(5,0,0));
+                }
+                break;
+            // 'z' or 'Z' or Up : increase the Y cvalue of the labels
+            case 'z': case 'Z': case osgGA::GUIEventAdapter::KEY_Up :
+               for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->setMatrix(dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getMatrix()*Matrix::translate(0,5,0));
+                }
+                break;
+            // 's' or 'S' or Down : decrease the Y value of the labels
+            case 's': case 'S': case osgGA::GUIEventAdapter::KEY_Down :
+               for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->setMatrix(dynamic_cast<MatrixTransform*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getMatrix()*Matrix::translate(0,-5,0));
+                }
+                break;
+            // '+' : increase size of the labels
+            case osgGA::GUIEventAdapter::KEY_Plus : case osgGA::GUIEventAdapter::KEY_KP_Add :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    selectedLabels.at(i)->setCharacterSize(selectedLabels.at(i)->getCharacterHeight()+1);
+                }
+                break;
+            // '-' : decrease size of the lables
+            case osgGA::GUIEventAdapter::KEY_Minus : case osgGA::GUIEventAdapter::KEY_KP_Subtract :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    selectedLabels.at(i)->setCharacterSize(selectedLabels.at(i)->getCharacterHeight()-1);
+                }
+                break;
+            // 'h' or 'H' : hide the labels
+            case 'h' : case 'H' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    if (selectedLabels.at(i)->getDrawMode() != 0)
+                         selectedLabels.at(i)->setDrawMode(0);
+                    else
+                        selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+                }
+                break;
+            // 'l' or 'L' : see the drawables corresponding to the labels
+            case 'l' : case 'L' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    stateset->setMode(GL_FOG, osg::StateAttribute::ON);
+                }
+                break;
+            // 'm' or 'M' : don't see the drawables corresponding to the labels
+            case 'm' : case 'M' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    stateset->setMode(GL_FOG, osg::StateAttribute::OFF);
+                }
+                break;
+            // 'i' : show info label if it exists
+            case 'i' : case 'I' :
+                for (unsigned i(0);i<selectedLabels.size();i++)
+                {
+                    // hasInfoLabel()
+                  if (dynamic_cast<Group*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getNumChildren()>1)
+                  {
+                      ref_ptr<osgText::Text> infoLabel = dynamic_cast<osgText::Text*>(dynamic_cast<Geode*>(dynamic_cast<Group*>(selectedLabels.at(i)->getParent(0)->getParent(0))->getChild(1))->getDrawable(0));
+                      if (infoLabel->getDrawMode()==0)
+                      {
+                          infoLabel->setDrawMode(osgText::Text::TEXT);
+                          selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()+Vec3(0,0,infoLabel->getBound().zMax()));
+                      }
+                      else
+                      {
+                           infoLabel->setDrawMode(0);
+                           selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()-Vec3(0,0,infoLabel->getBound().zMax()));
+                      }
+                  }
+                }
+                break;
+            default:
+                break;
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+    return false;
+}

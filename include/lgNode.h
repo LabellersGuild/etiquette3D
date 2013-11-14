@@ -1,34 +1,26 @@
-#ifndef LGNODE_H_INCLUDED
-#define LGNODE_H_INCLUDED
+/* 
+ * File:   lgNode.h
+ * Author: paulyves
+ *
+ * Created on October 22, 2013, 9:55 AM
+ */
 
+#ifndef LGNODE_H
+#define	LGNODE_H
 #include <osg/NodeVisitor>
 #include <osg/Node>
 
 #include <iostream>
 #include <vector>
 
-class lgNode : public osg::NodeVisitor {
+class lgNode : public osg::Node {
 public:
-
-   lgNode();
-
-   lgNode(const std::string &name) ;
-
-   virtual void apply(osg::Node &searchNode);
-
-   void setNameToFind(const std::string &name);
-
-   osg::Node* getFirst();
-
-   typedef std::vector<osg::Node*> nodeListType;
-
-   nodeListType& getNodeList() { return foundNodeList; }
-
+    lgNode();
+    lgNode(const lgNode& orig);
+    virtual ~lgNode();
 private:
-
-   std::string searchForName;
-   nodeListType foundNodeList;
 
 };
 
-#endif // LGNODE_H_INCLUDED
+#endif	/* LGNODE_H */
+
