@@ -5,6 +5,10 @@ Makefile~
 /build/
 /bin/
 /nbproject/
+<<<<<<< HEAD
 /CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+=======
+/Codeblocks/
+>>>>>>> 948cf6b2744483ffde1de72f99cd65890291a26d
