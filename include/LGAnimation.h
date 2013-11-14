@@ -1,9 +1,9 @@
 /* Fichier : LGAnimation.h
  * Description : Header de la classe LGAnimation
- *      Cette classe facilite le placement dynamique des étiquettes
- *      Pour l'utiliser, il faut d'abord créer une sous classe qui redéfinit la méthode operator().
- *      Dans cette méthode, on peut utiliser les autres méthodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet à OSG de continuer la traversée de l'arbre.
- *      Ensuite, il faut créer une instance de la sous classe et la rattacher à la matrice de transformation d'une étiquette :
+ *      Cette classe facilite le placement dynamique des etiquettes
+ *      Pour l'utiliser, il faut d'abord crÃ©er une sous classe qui redefinit la methode operator().
+ *      Dans cette mÃ©thode, on peut utiliser les autres mÃ©thodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet Ã  OSG de continuer la traversÃ©e de l'arbre.
+ *      Ensuite, il faut crÃ©er une instance de la sous classe et la rattacher Ã  la matrice de transformation d'une Ã©tiquette :
  *          matriceDeTransformation->setUpdateCallback( new LGAnimationSousClasse(&viewer));
  * Auteur : Thomas Brunel
  */
@@ -27,30 +27,30 @@ class LGAnimation : public osg::NodeCallback
          */
         LGAnimation(osgViewer::Viewer* viewer) : view(viewer) {};
 
-        /* Fonction qui gère le déplacement dynamique des étiquettes
+        /* Fonction qui gÃ¨re le dÃ©placement dynamique des Ã©tiquettes
          * Arguments :
-         * - node : osg::Node* : le noeuds rattaché à l'objet LGAnimation : normalement, la matrice de transformation reliée à l'étiquette
+         * - node : osg::Node* : le noeuds rattachÃ© Ã  l'objet LGAnimation : normalement, la matrice de transformation reliÃ©e Ã  l'Ã©tiquette
          * - nv : osg::NodeVisitor
          */
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) ;
 
-        /* Fonction qui permet de déplacer l'étiquette.
+        /* Fonction qui permet de dÃ©placer l'Ã©tiquette.
          * Arguments :
-         * - x : déplacement selon l'axe X
-         * - y : déplacement selon l'axe Y
-         * - z : déplacement selon l'axe Z
+         * - x : dÃ©placement selon l'axe X
+         * - y : dÃ©placement selon l'axe Y
+         * - z : dÃ©placement selon l'axe Z
          */
         void translateLabel(osg::Node* node, int x, int y, int z);
 
-        /* Précise si l'étiquette et ses environs sont cachés par d'autres drawables
-         * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
+        /* PrÃ©cise si l'Ã©tiquette et ses environs sont cachÃ©s par d'autres drawables
+         * Pour savoir si l'Ã©tiquette est cachÃ©e, ne pas prÃ©ciser les valeurs des 4 derniers arguments (0 par dÃ©faut)
          * Arguments :
-         * - node : osg::Node* : même argument que operator()
-         * - nv : osg::NodeVisitor* : même argument que operator()
-         * - int Xminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
-         * - int Yminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
-         * - int Xmaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
-         * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
+         * - node : osg::Node* : mÃªme argument que operator()
+         * - nv : osg::NodeVisitor* : mÃªme argument que operator()
+         * - int Xminimum : 0 par dÃ©faut. Augmente la fenÃªtre de vÃ©rification selon l'axe X Ã  de la fenÃªtre
+         * - int Yminimum : 0 par dÃ©faut. Augmente la fenÃªtre de vÃ©rification selon l'axe Y de la fenÃªtre
+         * - int Xmaximum : 0 par dÃ©faut. Augmente la fenÃªtre de vÃ©rification selon l'axe X Ã  de la fenÃªtre
+         * - int Ymaximum : 0 par dÃ©faut. Augmente la fenÃªtre de vÃ©rification selon l'axe Y de la fenÃªtre
          */
         bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
 
