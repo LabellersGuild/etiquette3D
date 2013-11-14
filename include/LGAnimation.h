@@ -42,7 +42,7 @@ class LGAnimation : public osg::NodeCallback
          */
         void translateLabel(osg::Node* node, int x, int y, int z);
 
-        /* Précise si l'étiquette est ses environs sont cachés par d'autres drawables
+        /* Précise si l'étiquette et ses environs sont cachés par d'autres drawables
          * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
          * Arguments :
          * - node : osg::Node* : même argument que operator()
