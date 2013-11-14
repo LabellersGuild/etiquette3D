@@ -60,11 +60,11 @@ int main()
     cin >> idNode;
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
-    
+
     findNode.feedFoundPointList(*(findNode.getFirst()));
     std::vector<osg::Vec3> points = findNode.getFoundPointList();
     std::cout << "On a trouvé un liste de " << points.size() << " points" << std::endl;
-    
+
     osg::Vec3 positionCalc = findNode.recommendedCoordinates();
     std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
 
@@ -81,7 +81,7 @@ int main()
     listLabels.push_back(textOne);
     osg::ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
-    
+
     viewer.setSceneData(root);
     viewer.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer.realize();
@@ -98,9 +98,8 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
        std::cout << "Error while creating the label" << std::endl;
       return NULL;
    }
-   osg::Geode* textLabelGeode = new osg::Geode();
    lgLabel* textOne = new lgLabel();
-   
+
    osg::ref_ptr<osg::Node> linkToNode = g;
    textOne->setLinkNode(linkToNode, viewer);
    textOne->setPositionInit(recoPos);
@@ -115,7 +114,7 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
                                 osgText::Text::BOUNDINGBOX);
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
-   
+
    //testing that we can have absolute position
    cout << "textOne position" << endl;
    cout << textOne->getPosition().x() << endl;
