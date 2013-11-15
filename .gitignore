@@ -4,6 +4,7 @@ Makefile~
 *.uml
 /build/
 /bin/
+LGProject
 /nbproject/
 <<<<<<< HEAD
 /CMakeFiles/

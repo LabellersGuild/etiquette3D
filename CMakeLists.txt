@@ -12,6 +12,8 @@ find_package( osgViewer )
 find_package( osgSim )
 find_package( osgText ) 
 find_package( osgDB )
+find_package( osgGA )
+find_package( osgUtil )
 find_package( OpenThreads )
 find_package( X11 )
 find_package( OpenGL )
@@ -37,6 +39,9 @@ config_project( LGProject OSG )
 config_project( LGProject OSGDB )
 config_project( LGProject OSGUTIL )
 config_project( LGProject OSGVIEWER )
+config_project( LGProject OSGTEXT )
+config_project( LGProject OSGGA )
+config_project( LGProject OSGUTIL )
 
 target_link_libraries(
     LGProject
