@@ -34,14 +34,6 @@ class LGAnimation : public osg::NodeCallback
          */
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) ;
 
-        /* Fonction qui permet de déplacer l'étiquette.
-         * Arguments :
-         * - x : déplacement selon l'axe X
-         * - y : déplacement selon l'axe Y
-         * - z : déplacement selon l'axe Z
-         */
-        void translateLabel(osg::Node* node, int x, int y, int z);
-
         /* Précise si l'étiquette est ses environs sont cachés par d'autres drawables
          * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
          * Arguments :
@@ -53,6 +45,15 @@ class LGAnimation : public osg::NodeCallback
          * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
          */
         bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
+
+        /**
+        * Function to move the label
+        * @param node, Node* : the matrix transformation node of the label
+        * @param x, int : X axis translation
+        * @param y, int : y axis translation
+        * @param z, int : z axis translation
+        */
+        void translateLabel(osg::Node* node, int x, int y, int z);
 
     protected :
 

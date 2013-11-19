@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   lgLabel.h
  * Author: paulyves
  *
@@ -19,7 +19,7 @@ class lgLabel : public osgText::Text {
         lgLabel(const lgLabel& originalLabel);
         lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer);
         lgLabel(std::string filePath, std::string idNode);
-        
+
         //getters and setters
         void setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer);
         osg::ref_ptr<osg::Node> getLinkNode();
@@ -32,7 +32,7 @@ class lgLabel : public osgText::Text {
         void setInternal (bool internal);
         void setPositionInit(osg::Vec3 newPositionInit);
         osg::Vec3 getPositionInit();
-        
+
     protected :
         //the node who is supposed to contain the label, if it is a group
         //it has a geode child containing the label

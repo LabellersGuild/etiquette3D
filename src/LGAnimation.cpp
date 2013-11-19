@@ -21,18 +21,6 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
 }
 
-/* Fonction qui permet de déplacer l'étiquette.
- * Arguments :
- * - x : déplacement selon l'axe X
- * - y : déplacement selon l'axe Y
- * - z : déplacement selon l'axe Z
-*/
-void LGAnimation::translateLabel(Node* node, int x, int y, int z)
-{
-     Matrix matrixTransform= dynamic_cast<MatrixTransform*>(node)->getMatrix();
-    dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(x,y,z));
-}
-
 /* Précise si l'étiquette et ses environs sont cachés par d'autres drawables
  * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
  * Arguments :
@@ -159,4 +147,17 @@ int LGAnimation::myMin(int a, int b, int c, int d, int e, int f){
     int result = min1 < min2 ? min1 : min2;
     result = result < min3 ? result : min3;
     return result;
+}
+
+/**
+ * Function to move the label
+ * @param node, Node* : the matrix transformation node of the label
+ * @param x, int : X axis translation
+ * @param y, int : y axis translation
+ * @param z, int : z axis translation
+*/
+void LGAnimation::translateLabel(Node* node, int x, int y, int z)
+{
+     osg::Matrix matrixTransform= dynamic_cast<osg::MatrixTransform*>(node)->getMatrix();
+    dynamic_cast<osg::MatrixTransform*>(node)->setMatrix(matrixTransform * osg::Matrix::translate(x,y,z));
 }

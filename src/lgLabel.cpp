@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   lgLabel.cpp
  * Author: paulyves
- * 
+ *
  * Created on October 19, 2013, 4:31 PM
  */
 
@@ -25,7 +25,7 @@ lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer
 }
 
 lgLabel::lgLabel(std::string filePath, std::string idNode) {
-    
+
 }
 
 //getters and setters
@@ -111,7 +111,7 @@ void lgLabel::setInternal (bool internal) {
 
 /*
  *Set the initial position in the attribute positionInit
- * but also call the setPosition method with the same argument 
+ * but also call the setPosition method with the same argument
  */
 void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
     positionInit = newPositionInit;
@@ -121,3 +121,4 @@ void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
 osg::Vec3 lgLabel::getPositionInit(){
     return positionInit;
 }
+

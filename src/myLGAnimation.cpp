@@ -4,6 +4,7 @@
  */
 
 #include "../include/myLGAnimation.h"
+#include "../include/lgLabel.h"
 
 using namespace osg;
 
@@ -15,7 +16,7 @@ void myLGAnimation::operator()(Node* node, NodeVisitor* nv)
 
     if (!isFree(node, nv))
     {
-        translateLabel(node, 0, 0, 1);
+       translateLabel(node, 0, 0, 1);
     }
     else if (center[2]>0)
     {
