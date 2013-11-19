@@ -7,35 +7,22 @@ project(LGProject)
 set(LIBRARY_OUTPUT_PATH lib/${CMAKE_BUILD_TYPE})
 
 
-FIND_PACKAGE(OpenSceneGraph)
-if (NOT IS_DIRECTORY OSG_LIBRARY)
-	SET(OSG_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSG_LIBRARY)
-if (NOT IS_DIRECTORY OSG_INCLUDE_DIR)
-	SET(OSG_INCLUDE_DIR "/usr/local/include/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSG_INCLUDE_DIR)
-FIND_PACKAGE(osgViewer)
-if (NOT IS_DIRECTORY OSGVIEWER_LIBRARY)
-	SET(OSGVIEWER_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSGVIEWER_LIBRARY)
-FIND_PACKAGE(osgSim)
-if (NOT IS_DIRECTORY OSGSIM_LIBRARY)
-	SET(OSGSIM_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSGSIM_LIBRARY)
-FIND_PACKAGE(osgText)
-if (NOT IS_DIRECTORY OSGTEXT_LIBRARY)
-	SET(OSGTEXT_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSGTEXT_LIBRARY)
-FIND_PACKAGE(osgDB)
-if (NOT IS_DIRECTORY OSGDB_LIBRARY)
-	SET(OSGDB_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OSGDB_LIBRARY)
-FIND_PACKAGE(Threads)
-if (NOT IS_DIRECTORY OPENTHREADS_LIBRARY)
-	SET(OPENTHREADS_LIBRARY "/usr/local/lib64/" CACHE PATH "default OSG directory" FORCE)
-endif (NOT IS_DIRECTORY OPENTHREADS_LIBRARY)
-FIND_PACKAGE(X11 REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
+find_package( osg )
+find_package( osgViewer )
+find_package( osgSim )
+find_package( osgText ) 
+find_package( osgDB )
+find_package( osgGA )
+find_package( osgUtil )
+find_package( OpenThreads )
+find_package( X11 )
+find_package( OpenGL )
+
+macro( config_project PROJNAME LIBNAME )
+ include_directories( ${${LIBNAME}_INCLUDE_DIR} )
+ target_link_libraries( ${PROJNAME} ${${LIBNAME}_LIBRARY} )
+endmacro()
+
 
 file(
     GLOB_RECURSE
@@ -47,19 +34,19 @@ add_executable(
     LGProject
     ${source_files}
 )
+config_project( LGProject OPENTHREADS )
+config_project( LGProject OSG )
+config_project( LGProject OSGDB )
+config_project( LGProject OSGUTIL )
+config_project( LGProject OSGVIEWER )
+config_project( LGProject OSGTEXT )
+config_project( LGProject OSGGA )
+config_project( LGProject OSGUTIL )
 
-include_directories(${OSG_INCLUDE_DIR})
-	
 target_link_libraries(
     LGProject
-	${OPENSCENEGRAPH_LIBRARIES}
-	${osgViewer_LIBRARIES}
-	${osgSim_LIBRARIES}
-	${osgText_LIBRARIES}
-	${osgDB_LIBRARIES}
 	${X11_LIBRARIES}
 	${CMAKE_OPENGL_LIBS_INIT}
-	${OPENTHREADS_LIBRARIES}
 	m
 	Xext
 )
