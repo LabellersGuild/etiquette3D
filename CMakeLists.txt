@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 set(SRCDIR "src")
 set(SRCEXT "cpp")
 
-project(LGProject)
+project(main)
 set(LIBRARY_OUTPUT_PATH lib/${CMAKE_BUILD_TYPE})
 
 
@@ -30,23 +30,25 @@ file(
     ${SRCDIR}/*.${SRCEXT}
 )
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin/")
+
 add_executable(
-    LGProject
+    ${CMAKE_PROJECT_NAME}
     ${source_files}
 )
-config_project( LGProject OPENTHREADS )
-config_project( LGProject OSG )
-config_project( LGProject OSGDB )
-config_project( LGProject OSGUTIL )
-config_project( LGProject OSGVIEWER )
-config_project( LGProject OSGTEXT )
-config_project( LGProject OSGGA )
-config_project( LGProject OSGUTIL )
+config_project( ${CMAKE_PROJECT_NAME} OPENTHREADS )
+config_project( ${CMAKE_PROJECT_NAME} OSG )
+config_project( ${CMAKE_PROJECT_NAME} OSGDB )
+config_project( ${CMAKE_PROJECT_NAME} OSGUTIL )
+config_project( ${CMAKE_PROJECT_NAME} OSGVIEWER )
+config_project( ${CMAKE_PROJECT_NAME} OSGTEXT )
+config_project( ${CMAKE_PROJECT_NAME} OSGGA )
+config_project( ${CMAKE_PROJECT_NAME} OSGUTIL )
 
 target_link_libraries(
-    LGProject
-	${X11_LIBRARIES}
-	${CMAKE_OPENGL_LIBS_INIT}
-	m
-	Xext
+    ${CMAKE_PROJECT_NAME}
+    ${X11_LIBRARIES}
+    ${CMAKE_OPENGL_LIBS_INIT}
+    m
+    Xext
 )
