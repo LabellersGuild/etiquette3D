@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   lgLabel.cpp
  * Author: paulyves
- * 
+ *
  * Created on October 19, 2013, 4:31 PM
  */
 
@@ -25,7 +25,7 @@ lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer
 }
 
 lgLabel::lgLabel(std::string filePath, std::string idNode) {
-    
+
 }
 
 //getters and setters
@@ -112,7 +112,7 @@ void lgLabel::setInternal (bool internal) {
 
 /*
  *Set the initial position in the attribute positionInit
- * but also call the setPosition method with the same argument 
+ * but also call the setPosition method with the same argument
  */
 void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
     positionInit = newPositionInit;
@@ -122,6 +122,7 @@ void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
 osg::Vec3 lgLabel::getPositionInit(){
     return positionInit;
 }
+
 
 float lgLabel::distance(osg::ref_ptr<lgLabel> otherLabel){
     osg::Vec3 myPos = this->getAbsolutePosition();
@@ -168,9 +169,6 @@ float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<
     osg::BoundingBox myBound = this->computeBound();
     osg::BoundingBox otherBound = otherLabel->computeBound();
     
-    osg::Vec3 absMinX = (this->getAbsolutePosition()+osg::Vec3(myBound.xMin(),0.0,0.0)) * MVPW;
-    osg::Vec3 absMinY = (this->getAbsolutePosition()+osg::Vec3(0.0,myBound.yMin(),0.0)) * MVPW;
-    osg::Vec3 absMinZ = (this->getAbsolutePosition()+osg::Vec3(0,0,0.0,myBound.zMin())) * MVPW;
     osg::Vec3 oAbsPos = (otherLabel->getAbsolutePosition()) * MVPW;
     osg::Vec3 absPos = (this->getAbsolutePosition()) * MVPW;
     
