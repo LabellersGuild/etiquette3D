@@ -1,9 +1,9 @@
 /* Fichier : LGAnimation.h
  * Description : Header de la classe LGAnimation
- *      Cette classe facilite le placement dynamique des étiquettes
- *      Pour l'utiliser, il faut d'abord créer une sous classe qui redéfinit la méthode operator().
- *      Dans cette méthode, on peut utiliser les autres méthodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet à OSG de continuer la traversée de l'arbre.
- *      Ensuite, il faut créer une instance de la sous classe et la rattacher à la matrice de transformation d'une étiquette :
+ *      Cette classe facilite le placement dynamique des ï¿½tiquettes
+ *      Pour l'utiliser, il faut d'abord crï¿½er une sous classe qui redï¿½finit la mï¿½thode operator().
+ *      Dans cette mï¿½thode, on peut utiliser les autres mï¿½thodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet ï¿½ OSG de continuer la traversï¿½e de l'arbre.
+ *      Ensuite, il faut crï¿½er une instance de la sous classe et la rattacher ï¿½ la matrice de transformation d'une ï¿½tiquette :
  *          matriceDeTransformation->setUpdateCallback( new LGAnimationSousClasse(&viewer));
  * Auteur : Thomas Brunel
  */
@@ -12,20 +12,20 @@
 
 using namespace osg;
 
-/* Fonction qui gère le déplacement dynamique des étiquettes
+/* Fonction qui gï¿½re le dï¿½placement dynamique des ï¿½tiquettes
   * Arguments :
-  * - node : osg::Node* : le noeuds rattaché à l'objet LGAnimation : normalement, la matrice de transformation reliée à l'étiquette
+  * - node : osg::Node* : le noeuds rattachï¿½ ï¿½ l'objet LGAnimation : normalement, la matrice de transformation reliï¿½e ï¿½ l'ï¿½tiquette
   * - nv : osg::NodeVisitor
   */
 void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
 }
 
-/* Fonction qui permet de déplacer l'étiquette.
+/* Fonction qui permet de dï¿½placer l'ï¿½tiquette.
  * Arguments :
- * - x : déplacement selon l'axe X
- * - y : déplacement selon l'axe Y
- * - z : déplacement selon l'axe Z
+ * - x : dï¿½placement selon l'axe X
+ * - y : dï¿½placement selon l'axe Y
+ * - z : dï¿½placement selon l'axe Z
 */
 void LGAnimation::translateLabel(Node* node, int x, int y, int z)
 {
@@ -33,15 +33,15 @@ void LGAnimation::translateLabel(Node* node, int x, int y, int z)
     dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(x,y,z));
 }
 
-/* Précise si l'étiquette est ses environs sont cachés par d'autres drawables
- * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
+/* Prï¿½cise si l'ï¿½tiquette est ses environs sont cachï¿½s par d'autres drawables
+ * Pour savoir si l'ï¿½tiquette est cachï¿½e, ne pas prï¿½ciser les valeurs des 4 derniers arguments (0 par dï¿½faut)
  * Arguments :
- * - node : osg::Node* : même argument que operator()
- * - nv : osg::NodeVisitor* : même argument que operator()
- * - int Xminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
- * - int Yminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
- * - int Xmaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
- * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
+ * - node : osg::Node* : mï¿½me argument que operator()
+ * - nv : osg::NodeVisitor* : mï¿½me argument que operator()
+ * - int Xminimum : 0 par dï¿½faut. Augmente la fenï¿½tre de vï¿½rification selon l'axe X ï¿½ de la fenï¿½tre
+ * - int Yminimum : 0 par dï¿½faut. Augmente la fenï¿½tre de vï¿½rification selon l'axe Y de la fenï¿½tre
+ * - int Xmaximum : 0 par dï¿½faut. Augmente la fenï¿½tre de vï¿½rification selon l'axe X ï¿½ de la fenï¿½tre
+ * - int Ymaximum : 0 par dï¿½faut. Augmente la fenï¿½tre de vï¿½rification selon l'axe Y de la fenï¿½tre
 */
 bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum, int Yminimum, int Xmaximum, int Ymaximum)
 {

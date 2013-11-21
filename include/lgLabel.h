@@ -32,7 +32,10 @@ class lgLabel : public osgText::Text {
         void setInternal (bool internal);
         void setPositionInit(osg::Vec3 newPositionInit);
         osg::Vec3 getPositionInit();
-        
+        float distance(osg::ref_ptr<lgLabel> otherLabel);
+        osg::Vec3 distanceVec(osg::ref_ptr<lgLabel> otherLabel);
+        float distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
+        float distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
     protected :
         //the node who is supposed to contain the label, if it is a group
         //it has a geode child containing the label
@@ -44,6 +47,7 @@ class lgLabel : public osgText::Text {
         int priority;
         std::string labelType;
         bool internal; //true if we have an internal label, to be developed
+        osg::ref_ptr<osg::MatrixTransform> updatedMatrix;
 };
 
 #endif	/* LGLABEL_H */

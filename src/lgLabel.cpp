@@ -44,6 +44,7 @@ void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* view
         targetGeode = new osg::Geode();
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
+        this->updatedMatrix=mtLabel1;
         mtLabel1->setUpdateCallback( new myLGAnimation(viewer));
     }
     if(targetGeode){
@@ -71,7 +72,7 @@ void lgLabel::calcAbsolutePosition() {
     if(this->getLinkNode() ){
         osg::Vec4 extendedPosition = osg::Vec4(this->getPosition(), 1);
         //getting the list of transposed transformation matrices, from node to root
-        osg::MatrixList matricesList = this->getLinkNode()->getWorldMatrices();
+        osg::MatrixList matricesList = updatedMatrix->getWorldMatrices();
         for (int i=0;i<matricesList.size();i++){
             extendedPosition = extendedPosition*matricesList[i];
         }
@@ -121,3 +122,64 @@ void lgLabel::setPositionInit(osg::Vec3 newPositionInit){
 osg::Vec3 lgLabel::getPositionInit(){
     return positionInit;
 }
+
+float lgLabel::distance(osg::ref_ptr<lgLabel> otherLabel){
+    osg::Vec3 myPos = this->getAbsolutePosition();
+    osg::Vec3 otherPos = otherLabel->getAbsolutePosition();
+    float distance = sqrt(pow(myPos.x()-otherPos.x(),2.0)+pow(myPos.y()-otherPos.y(),2.0)+pow(myPos.z()-otherPos.z(),2.0));
+    return distance;
+}
+
+osg::Vec3 lgLabel::distanceVec(osg::ref_ptr<lgLabel> otherLabel){
+    osg::Vec3 myPos = this->getAbsolutePosition();
+    osg::Vec3 otherPos = otherLabel->getAbsolutePosition();
+    return myPos-otherPos;
+}
+
+/**
+ * get the distance between 2 labels from the screen point of view
+ */
+float lgLabel::distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel){
+    //Matrix to change world coordinates in windows coordinates
+    osg::Matrix modelView = view->getCamera()->getViewMatrix();
+    osg::Matrix projection = view->getCamera()->getProjectionMatrix();
+    
+    osg::Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
+    osg::Matrix MVPW = modelView * projection * window;
+    osg::Vec3 absPos = (this->getAbsolutePosition()) * MVPW;
+    osg::Vec3 oAbsPos = (otherLabel->getAbsolutePosition()) * MVPW;
+    cout<<"abs Pos x :"<<absPos.x()<<", y: "<<absPos.y()<<", z: "<<absPos.z()<<endl;
+    cout<<"other abs Pos x :"<<oAbsPos.x()<<", y: "<<oAbsPos.y()<<", z: "<<oAbsPos.z()<<endl;
+    float distance = sqrt(pow(absPos.x()-oAbsPos.x(),2.0)+pow(absPos.y()-oAbsPos.y(),2.0)+pow(absPos.z()-oAbsPos.z(),2.0));
+    return distance;
+}
+
+/*
+ * get the shortest distance between two labels froms screen point of view 
+ * using the bounding boxes of the labels
+ */
+float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel){
+    //Matrix to change world coordinates in windows coordinates
+    osg::Matrix modelView = view->getCamera()->getViewMatrix();
+    osg::Matrix projection = view->getCamera()->getProjectionMatrix();
+    osg::Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
+    osg::Matrix MVPW = modelView * projection * window;
+    
+    osg::BoundingBox myBound = this->computeBound();
+    osg::BoundingBox otherBound = otherLabel->computeBound();
+    
+    osg::Vec3 absMinX = (this->getAbsolutePosition()+osg::Vec3(myBound.xMin(),0.0,0.0)) * MVPW;
+    osg::Vec3 absMinY = (this->getAbsolutePosition()+osg::Vec3(0.0,myBound.yMin(),0.0)) * MVPW;
+    osg::Vec3 absMinZ = (this->getAbsolutePosition()+osg::Vec3(0,0,0.0,myBound.zMin())) * MVPW;
+    osg::Vec3 oAbsPos = (otherLabel->getAbsolutePosition()) * MVPW;
+    osg::Vec3 absPos = (this->getAbsolutePosition()) * MVPW;
+    
+    float deltaX = absPos.x()-oAbsPos.x();
+    float deltaY = absPos.y()-oAbsPos.y();
+    float deltaZ = absPos.z()-oAbsPos.z();
+    
+    
+    float distance = sqrt(pow(absPos.x()-oAbsPos.x(),2.0)+pow(absPos.y()-oAbsPos.y(),2.0)+pow(absPos.z()-oAbsPos.z(),2.0));
+    return distance;
+}
+

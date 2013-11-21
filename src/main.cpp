@@ -40,9 +40,10 @@ int main()
    // If you want to see the names of the nodes, write "names" instead of "" in the next line.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
     //    erreur lors de l'input d'une variable string
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
+//    cout << "Entrer le path du fichier .citygml :" << endl;
+//    string pathFile;
+//    cin >> pathFile;
+    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
@@ -55,9 +56,10 @@ int main()
     // Find the node with its ID :
     // TODO : you can change the ID you are looking for
     //    erreur lors de l'input d'une variable string
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode;
-    cin >> idNode;
+//    cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//    string idNode;
+//    cin >> idNode;
+    string idNode = "ID_276003000001240";
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
     
@@ -75,18 +77,43 @@ int main()
     // Add the label
     // To do : you can change the name of the label, it is the 3rd argument of the next line
     vector<osgText::Text*> listLabels = vector<osgText::Text*>();
-    lgLabel* textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
+    osg::ref_ptr<lgLabel> textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
 
+    //seconde etiquette
+//    cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//    string idNode2;
+//    cin >> idNode2;
+    string idNode2 = "ID_276003000000992_7";
+    lgNodeVisitor findNode2(idNode2);
+    model->accept(findNode2);
+    osg::Node* secondNode = findNode2.getFirst();
+    findNode2.feedFoundPointList(*(findNode2.getFirst()));
+    osg::Vec3 calcPos2 = findNode2.recommendedCoordinates();
+    osg::ref_ptr<lgLabel> textTwo = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer);
+    
+    
     // Create LGInteraction
-    listLabels.push_back(textOne);
+    listLabels.push_back(textOne.get());
+    listLabels.push_back(textTwo.get());
     osg::ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
     
     viewer.setSceneData(root);
     viewer.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer.realize();
-
+    osg::ref_ptr<osgViewer::Viewer> pView = &viewer;
+    float distWin = textOne->distance2d(pView, textTwo); 
+    cout << "distance 2d " << distWin << endl;
+    float dist3d = textOne->distance(textTwo);
+    cout<<"distance 3d " << dist3d<<endl;
+    osg::Vec3 vecDist = textOne->distanceVec(textTwo);
+    cout<<"distance vec "<<vecDist.x()<<" "<<vecDist.y()<<" "<<vecDist.z()<<endl;
+    float calcDist = sqrt(pow(vecDist.x(),2.0)+pow(vecDist.y(),2.0)+pow(vecDist.z(),2.0));
+    cout<<"distance vec "<<calcDist<<endl;
+    float a2dBox = textOne->distance2dBox(pView,textTwo);
+    
     while (!viewer.done()) {
+        float a2dBox = textOne->distance2dBox(pView,textTwo);
         viewer.frame();
     }
 }
