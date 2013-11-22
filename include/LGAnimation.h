@@ -33,20 +33,13 @@ class LGAnimation : public osg::NodeCallback
          */
         LGAnimation(osgViewer::Viewer* viewer) : view(viewer) {};
 
-<<<<<<< HEAD
         /* Fonction qui gere le deplacement dynamique des etiquettes
          * Arguments :
          * - node : osg::Node* : le noeuds rattache a l'objet LGAnimation : normalement, la matrice de transformation reliee a l'etiquette
-=======
-        /* Fonction qui gère le déplacement dynamique des étiquettes
-         * Arguments :
-         * - node : osg::Node* : le noeuds rattaché à l'objet LGAnimation : normalement, la matrice de transformation reliée à l'étiquette
->>>>>>> origin/ThomasB
          * - nv : osg::NodeVisitor
          */
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) ;
 
-<<<<<<< HEAD
         /* Precise si l'etiquette est ses environs sont caches par d'autres drawables
          * Pour savoir si l'etiquette est cachee, ne pas preciser les valeurs des 4 derniers arguments (0 par defaut)
          * Arguments :
@@ -56,25 +49,6 @@ class LGAnimation : public osg::NodeCallback
          * - int Yminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
          * - int Xmaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre
          * - int Ymaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
-=======
-        /* Fonction qui permet de déplacer l'étiquette.
-         * Arguments :
-         * - x : déplacement selon l'axe X
-         * - y : déplacement selon l'axe Y
-         * - z : déplacement selon l'axe Z
-         */
-        void translateLabel(osg::Node* node, int x, int y, int z);
-
-        /* Précise si l'étiquette et ses environs sont cachés par d'autres drawables
-         * Pour savoir si l'étiquette est cachée, ne pas préciser les valeurs des 4 derniers arguments (0 par défaut)
-         * Arguments :
-         * - node : osg::Node* : même argument que operator()
-         * - nv : osg::NodeVisitor* : même argument que operator()
-         * - int Xminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
-         * - int Yminimum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
-         * - int Xmaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe X à de la fenêtre
-         * - int Ymaximum : 0 par défaut. Augmente la fenêtre de vérification selon l'axe Y de la fenêtre
->>>>>>> origin/ThomasB
          */
         bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
 

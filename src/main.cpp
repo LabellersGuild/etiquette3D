@@ -17,6 +17,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
+#include <osg/BlendFunc>
 
 using namespace std;
 
@@ -81,6 +82,7 @@ int main()
 
     //Hide the label if it is too far
     textOne->setHidingDistance(1000);
+    textOne->setTransparency(0.75);
 
     //second label
     cout << "Entrer l'id du noeud à étiquetter :" << endl;

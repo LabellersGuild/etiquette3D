@@ -290,3 +290,14 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
     osg::Vec4 bounds = osg::Vec4(mostLeft[0], mostLeft[1] < mostRight[1] ? mostLeft[1] : mostRight[1], mostRight[0], mostLeft[1] > mostRight[1] ? mostLeft[1] : mostRight[1]);
     return bounds;
 }
+
+void lgLabel::setTransparency(float alpha)
+{
+    osg::Vec4 currentColor = getColor();
+    setColor( osg::Vec4(currentColor[0], currentColor[1], currentColor[2],alpha) );
+    osg::Vec4 currentColorBbox = getBoundingBoxColor();
+    currentColorBbox[3]= alpha;
+    setBoundingBoxColor(currentColorBbox);
+}
+
+

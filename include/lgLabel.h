@@ -50,6 +50,7 @@ class lgLabel : public osgText::Text {
         */
         void translateLabel(int x, int y , int z);
 
+        void setTransparency(float alpha);
 
     protected :
         //the node who is supposed to contain the label, if it is a group
