@@ -214,3 +214,79 @@ void lgLabel::translateLabel(int x, int y , int z)
     osg::Matrix matrixTransform= updatedMatrix->getMatrix();
     updatedMatrix->setMatrix(matrixTransform * osg::Matrix::translate(x,y,z));
 }
+
+osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
+{
+     // Find the world coordinates of the node :
+    osg::Vec3 center = getAbsolutePosition();
+
+    //Bounding box of the label :
+    osg::BoundingBox bbox = computeBound();
+
+    //Matrix to change world coordinates in windows coordinates
+    osg::Matrix modelView = view->getCamera()->getViewMatrix();
+    osg::Matrix projection = view->getCamera()->getProjectionMatrix();
+    osg::Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
+    osg::Matrix MVPW = modelView * projection * window;
+
+    //Projection of the bounding box of the label :
+    osg::Vec3 screenxyz, screenXyz, screenxYz, screenxyZ, screenXYz, screenXyZ, screenxYZ, screenXYZ;
+
+    //If info label :
+    if (updatedMatrix->getNumChildren() > 1)
+    {
+        if (this->getDrawMode() != 0)
+        {
+            osg::BoundingBox bboxInfo = dynamic_cast<osg::Geode*>(updatedMatrix->getChild(1))->getDrawable(0)->getBound();
+            int bboxXMin = (bbox.xMin() < bboxInfo.xMin() ? bbox.xMin() : bboxInfo.xMin());
+            int bboxXMax = (bbox.xMax() > bboxInfo.xMax() ? bbox.xMax() : bboxInfo.xMax());
+            int bboxYMin = (bbox.yMin() < bboxInfo.yMin() ? bbox.yMin() : bboxInfo.yMin());
+            int bboxYMax = (bbox.yMax() > bboxInfo.yMax() ? bbox.yMax() : bboxInfo.yMax());
+            int bboxZMin = (bbox.zMin() < bboxInfo.zMin() ? bbox.zMin() : bboxInfo.zMin());
+            int bboxZMax = (bbox.zMax() > bboxInfo.zMax() ? bbox.zMax() : bboxInfo.zMax());
+
+            screenxyz = (center + osg::Vec3(bboxXMin,bboxYMin,bboxZMin)) * MVPW;
+            screenXyz = (center + osg::Vec3(bboxXMax,bboxYMin,bboxZMin)) * MVPW;
+            screenxYz = (center + osg::Vec3(bboxXMin,bboxYMax,bboxZMin)) * MVPW;
+            screenxyZ = (center + osg::Vec3(bboxXMin,bboxYMin,bboxZMax)) * MVPW;
+            screenXYz = (center + osg::Vec3(bboxXMax,bboxYMax,bboxZMin)) * MVPW;
+            screenXyZ = (center + osg::Vec3(bboxXMax,bboxYMin,bboxZMax)) * MVPW;
+            screenxYZ = (center + osg::Vec3(bboxXMin,bboxYMax,bboxZMax)) * MVPW;
+            screenXYZ = (center + osg::Vec3(bboxXMax,bboxYMax,bboxZMax)) * MVPW;
+        }
+    }
+    // If no info label :
+    else
+    {
+         //Projection of the bounding box of the label :
+        screenxyz = (center + osg::Vec3(bbox.xMin(),bbox.yMin(),bbox.zMin())) * MVPW;
+        screenXyz = (center + osg::Vec3(bbox.xMax(),bbox.yMin(),bbox.zMin())) * MVPW;
+        screenxYz = (center + osg::Vec3(bbox.xMin(),bbox.yMax(),bbox.zMin())) * MVPW;
+        screenxyZ = (center + osg::Vec3(bbox.xMin(),bbox.yMin(),bbox.zMax())) * MVPW;
+        screenXYz = (center + osg::Vec3(bbox.xMax(),bbox.yMax(),bbox.zMin())) * MVPW;
+        screenXyZ = (center + osg::Vec3(bbox.xMax(),bbox.yMin(),bbox.zMax())) * MVPW;
+        screenxYZ = (center + osg::Vec3(bbox.xMin(),bbox.yMax(),bbox.zMax())) * MVPW;
+        screenXYZ = (center + osg::Vec3(bbox.xMax(),bbox.yMax(),bbox.zMax())) * MVPW;
+    }
+
+     // The bounds of the polytope are determined by the two projected points the most on the left and on the right on the screen.
+
+    osg::Vec3 mostLeft = screenxyz[0] < screenXyz[0] ? screenxyz : screenXyz;
+    mostLeft = mostLeft[0] < screenxYz[0] ? mostLeft : screenxYz;
+    mostLeft = mostLeft[0] < screenxyZ[0] ? mostLeft : screenxyZ;
+    mostLeft = mostLeft[0] < screenXYz[0] ? mostLeft : screenXYz;
+    mostLeft = mostLeft[0] < screenXyZ[0] ? mostLeft : screenXyZ;
+    mostLeft = mostLeft[0] < screenxYZ[0] ? mostLeft : screenxYZ;
+    mostLeft = mostLeft[0] < screenXYZ[0] ? mostLeft : screenXYZ;
+
+    osg::Vec3 mostRight = screenxyz[0] > screenXyz[0] ? screenxyz : screenXyz;
+    mostRight = mostRight[0] > screenxYz[0] ? mostRight : screenxYz;
+    mostRight = mostRight[0] > screenxyZ[0] ? mostRight : screenxyZ;
+    mostRight = mostRight[0] > screenXYz[0] ? mostRight : screenXYz;
+    mostRight = mostRight[0] > screenXyZ[0] ? mostRight : screenXyZ;
+    mostRight = mostRight[0] > screenxYZ[0] ? mostRight : screenxYZ;
+    mostRight = mostRight[0] > screenXYZ[0] ? mostRight : screenXYZ;
+
+    osg::Vec4 bounds = osg::Vec4(mostLeft[0], mostLeft[1] < mostRight[1] ? mostLeft[1] : mostRight[1], mostRight[0], mostLeft[1] > mostRight[1] ? mostLeft[1] : mostRight[1]);
+    return bounds;
+}

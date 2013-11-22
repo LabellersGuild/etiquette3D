@@ -39,6 +39,7 @@ class lgLabel : public osgText::Text {
         float distanceCamera(osg::ref_ptr<osgViewer::Viewer> view);
         int getHidingDistance();
         void setHidingDistance(int hDistance);
+        osg::Vec4 compute2dBox(osg::ref_ptr<osgViewer::Viewer> view);
 
         /**
         * Function to move the label
@@ -48,6 +49,7 @@ class lgLabel : public osgText::Text {
         * @param z, int : z axis translation
         */
         void translateLabel(int x, int y , int z);
+
 
     protected :
         //the node who is supposed to contain the label, if it is a group
