@@ -1,9 +1,9 @@
 /* Fichier : LGAnimation.h
  * Description : Header de la classe LGAnimation
- *      Cette classe facilite le placement dynamique des �tiquettes
- *      Pour l'utiliser, il faut d'abord cr�er une sous classe qui red�finit la m�thode operator().
- *      Dans cette m�thode, on peut utiliser les autres m�thodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet � OSG de continuer la travers�e de l'arbre.
- *      Ensuite, il faut cr�er une instance de la sous classe et la rattacher � la matrice de transformation d'une �tiquette :
+ *      Cette classe facilite le placement dynamique des etiquettes
+ *      Pour l'utiliser, il faut d'abord creer une sous classe qui redefinit la methode operator().
+ *      Dans cette methode, on peut utiliser les autres methodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet a OSG de continuer la traversee de l'arbre.
+ *      Ensuite, il faut creer une instance de la sous classe et la rattacher a la matrice de transformation d'une etiquette :
  *          matriceDeTransformation->setUpdateCallback( new LGAnimationSousClasse(&viewer));
  * Auteur : Thomas Brunel
  */
@@ -12,20 +12,20 @@
 
 using namespace osg;
 
-/* Fonction qui g�re le d�placement dynamique des �tiquettes
+/* Fonction qui gere le deplacement dynamique des etiquettes
   * Arguments :
-  * - node : osg::Node* : le noeuds rattach� � l'objet LGAnimation : normalement, la matrice de transformation reli�e � l'�tiquette
+  * - node : osg::Node* : le noeuds rattache a l'objet LGAnimation : normalement, la matrice de transformation reliee a l'etiquette
   * - nv : osg::NodeVisitor
   */
 void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
 }
 
-/* Fonction qui permet de d�placer l'�tiquette.
+/* Fonction qui permet de deplacer l'etiquette.
  * Arguments :
- * - x : d�placement selon l'axe X
- * - y : d�placement selon l'axe Y
- * - z : d�placement selon l'axe Z
+ * - x : deplacement selon l'axe X
+ * - y : deplacement selon l'axe Y
+ * - z : deplacement selon l'axe Z
 */
 void LGAnimation::translateLabel(Node* node, int x, int y, int z)
 {
@@ -33,21 +33,22 @@ void LGAnimation::translateLabel(Node* node, int x, int y, int z)
     dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(x,y,z));
 }
 
-/* Pr�cise si l'�tiquette est ses environs sont cach�s par d'autres drawables
- * Pour savoir si l'�tiquette est cach�e, ne pas pr�ciser les valeurs des 4 derniers arguments (0 par d�faut)
+/* Precise si l'etiquette est ses environs sont caches par d'autres drawables
+ * Pour savoir si l'etiquette est cachee, ne pas preciser les valeurs des 4 derniers arguments (0 par defaut)
  * Arguments :
- * - node : osg::Node* : m�me argument que operator()
- * - nv : osg::NodeVisitor* : m�me argument que operator()
- * - int Xminimum : 0 par d�faut. Augmente la fen�tre de v�rification selon l'axe X � de la fen�tre
- * - int Yminimum : 0 par d�faut. Augmente la fen�tre de v�rification selon l'axe Y de la fen�tre
- * - int Xmaximum : 0 par d�faut. Augmente la fen�tre de v�rification selon l'axe X � de la fen�tre
- * - int Ymaximum : 0 par d�faut. Augmente la fen�tre de v�rification selon l'axe Y de la fen�tre
+ * - node : osg::Node* : meme argument que operator()
+ * - nv : osg::NodeVisitor* : meme argument que operator()
+ * - int Xminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre
+ * - int Yminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
+ * - int Xmaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre
+ * - int Ymaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
 */
 bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum, int Yminimum, int Xmaximum, int Ymaximum)
 {
      // Find the world coordinates of the node :
     Matrix worldMatrix = node->getWorldMatrices()[0];
     Vec3 center = Vec3(worldMatrix(3,0), worldMatrix(3,1), worldMatrix(3,2));
+    //std::cout << node->getWorldMatrices().size() << std::endl;
 
      /// TO DO : Problems with the bounds of the polytope
     //Bounding box of the label :
