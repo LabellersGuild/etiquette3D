@@ -9,6 +9,7 @@
  */
 
  #include "../include/LGAnimation.h"
+#include "../include/lgLabel.h"
 
 using namespace osg;
 
@@ -19,6 +20,18 @@ using namespace osg;
   */
 void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
+    ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
+
+    int hidingDistance = label->getHidingDistance();
+
+    if ( hidingDistance != -1 && hidingDistance < label->distanceCamera(view))
+    {
+        label->setDrawMode(0);
+    }
+    else
+    {
+        label->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+    }
 }
 
 /* Fonction qui permet de deplacer l'etiquette.
@@ -27,11 +40,6 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
  * - y : deplacement selon l'axe Y
  * - z : deplacement selon l'axe Z
 */
-void LGAnimation::translateLabel(Node* node, int x, int y, int z)
-{
-     Matrix matrixTransform= dynamic_cast<MatrixTransform*>(node)->getMatrix();
-    dynamic_cast<MatrixTransform*>(node)->setMatrix(matrixTransform * Matrix::translate(x,y,z));
-}
 
 /* Precise si l'etiquette est ses environs sont caches par d'autres drawables
  * Pour savoir si l'etiquette est cachee, ne pas preciser les valeurs des 4 derniers arguments (0 par defaut)
@@ -45,15 +53,15 @@ void LGAnimation::translateLabel(Node* node, int x, int y, int z)
 */
 bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum, int Yminimum, int Xmaximum, int Ymaximum)
 {
+    //Label
+    ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
+
      // Find the world coordinates of the node :
-    Matrix worldMatrix = node->getWorldMatrices()[0];
-    Vec3 center = Vec3(worldMatrix(3,0), worldMatrix(3,1), worldMatrix(3,2));
-    //std::cout << node->getWorldMatrices().size() << std::endl;
+    Vec3 center = label->getAbsolutePosition();
 
      /// TO DO : Problems with the bounds of the polytope
     //Bounding box of the label :
-    BoundingBox bbox = dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0)->getBound();
-    // std::cout << "label1 : xMax = " << bbox.xMax() << " xMin = " << bbox.xMin() << " yMax = " << bbox.yMax() << " yMin = " << bbox.yMin() << " zMax = " << bbox.zMax() << " zMin = " << bbox.zMin() << std::endl;
+    BoundingBox bbox = label->computeBound();
 
     //Matrix to change world coordinates in windows coordinates
     Matrix modelView = view->getCamera()->getViewMatrix();
@@ -62,43 +70,81 @@ bool LGAnimation::isFree(Node* node, NodeVisitor* nv, int Xminimum, int Yminimum
     Matrix MVPW = modelView * projection * window;
 
     //Projection of the bounding box of the label :
-    Vec3 screenxMin = (center + Vec3(bbox.xMin(),0,0)) * MVPW;
-    Vec3 screenxMax = (center + Vec3(bbox.xMax(),0,0)) * MVPW;
-    Vec3 screenyMin = (center + Vec3(0,bbox.yMin(),0)) * MVPW;
-    Vec3 screenyMax = (center + Vec3(0,bbox.yMax(),0)) * MVPW;
-    Vec3 screenzMin = (center + Vec3(0,0,bbox.zMin())) * MVPW;
-    Vec3 screenzMax = (center + Vec3(0,0,bbox.zMax())) * MVPW;
+    Vec3 screenxyz, screenXyz, screenxYz, screenxyZ, screenXYz, screenXyZ, screenxYZ, screenXYZ;
 
-    // If info label :
-    if (dynamic_cast<Group*>(node)->getNumChildren()>1)
+    //If info label :
+    if (dynamic_cast<Group*>(node)->getNumChildren() > 1)
     {
         if (dynamic_cast<osgText::Text*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(1))->getDrawable(0))->getDrawMode() != 0)
         {
             BoundingBox bboxInfo = dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(1))->getDrawable(0)->getBound();
-            screenxMin = (center + Vec3(std::max(bboxInfo.xMin(),bbox.xMin()),0,0)) * MVPW;
-            screenxMax = (center + Vec3(std::max(bboxInfo.xMax(),bbox.xMax()),0,0)) * MVPW;
-            screenyMin = (center + Vec3(0,std::max(bboxInfo.yMin(),bbox.yMin()),0)) * MVPW;
-            screenyMax = (center + Vec3(0,std::max(bboxInfo.yMax(),bbox.yMax()),0)) * MVPW;
-            screenzMin = (center + Vec3(0,0,bboxInfo.zMin())) * MVPW;
-            screenzMax = (center + Vec3(0,0,bboxInfo.zMax()+bbox.zMax())) * MVPW;
+            int bboxXMin = (bbox.xMin() < bboxInfo.xMin() ? bbox.xMin() : bboxInfo.xMin());
+            int bboxXMax = (bbox.xMax() > bboxInfo.xMax() ? bbox.xMax() : bboxInfo.xMax());
+            int bboxYMin = (bbox.yMin() < bboxInfo.yMin() ? bbox.yMin() : bboxInfo.yMin());
+            int bboxYMax = (bbox.yMax() > bboxInfo.yMax() ? bbox.yMax() : bboxInfo.yMax());
+            int bboxZMin = (bbox.zMin() < bboxInfo.zMin() ? bbox.zMin() : bboxInfo.zMin());
+            int bboxZMax = (bbox.zMax() > bboxInfo.zMax() ? bbox.zMax() : bboxInfo.zMax());
+
+            screenxyz = (center + Vec3(bboxXMin,bboxYMin,bboxZMin)) * MVPW;
+            screenXyz = (center + Vec3(bboxXMax,bboxYMin,bboxZMin)) * MVPW;
+            screenxYz = (center + Vec3(bboxXMin,bboxYMax,bboxZMin)) * MVPW;
+            screenxyZ = (center + Vec3(bboxXMin,bboxYMin,bboxZMax)) * MVPW;
+            screenXYz = (center + Vec3(bboxXMax,bboxYMax,bboxZMin)) * MVPW;
+            screenXyZ = (center + Vec3(bboxXMax,bboxYMin,bboxZMax)) * MVPW;
+            screenxYZ = (center + Vec3(bboxXMin,bboxYMax,bboxZMax)) * MVPW;
+            screenXYZ = (center + Vec3(bboxXMax,bboxYMax,bboxZMax)) * MVPW;
         }
     }
+    // If no info label :
+    else
+    {
+         //Projection of the bounding box of the label :
+        screenxyz = (center + Vec3(bbox.xMin(),bbox.yMin(),bbox.zMin())) * MVPW;
+        screenXyz = (center + Vec3(bbox.xMax(),bbox.yMin(),bbox.zMin())) * MVPW;
+        screenxYz = (center + Vec3(bbox.xMin(),bbox.yMax(),bbox.zMin())) * MVPW;
+        screenxyZ = (center + Vec3(bbox.xMin(),bbox.yMin(),bbox.zMax())) * MVPW;
+        screenXYz = (center + Vec3(bbox.xMax(),bbox.yMax(),bbox.zMin())) * MVPW;
+        screenXyZ = (center + Vec3(bbox.xMax(),bbox.yMin(),bbox.zMax())) * MVPW;
+        screenxYZ = (center + Vec3(bbox.xMin(),bbox.yMax(),bbox.zMax())) * MVPW;
+        screenXYZ = (center + Vec3(bbox.xMax(),bbox.yMax(),bbox.zMax())) * MVPW;
+    }
 
-    //std::cout << "(" << screenxMin[0] <<" , " << screenxMin[1] << ")("<<screenxMax[0] << " , " <<screenxMax[1] <<")("<< screenyMin[0] << " , " << screenyMin[1] << ")(" << screenyMax[0] << " , "<<screenyMax[1]<<")(" << screenzMin[0] << " , " << screenzMin[1] << ")("<< screenzMax[0] <<" , " << screenzMax[1] << ")" <<std::endl;
+    //std::cout << screenxyz[0] << " " << screenxyz[1] << " " << screenXyz[0] << " " << screenXyz[1] << " " << screenxYz[0] << " " << screenxYz[1];
+    //std::cout << " " << screenxyZ[0] << " " << screenxyZ[1] << " " << screenXYz[0] << " " << screenXYz[1] << " " << screenXyZ[0] << " " << screenXyZ[1];
+    //std::cout << " " << screenxYZ[0] << " " << screenxyZ[1] << " " << screenXYZ[0] << " " << screenXYZ[1] << std::endl;
 
-    // The bounds of the polytope are determined by the largest rectangle including the projection of the bbox
+    // The bounds of the polytope are determined by the two projected points the most on the left and on the right on the screen.
+    /*
     int maxX = myMax(screenxMin[0], screenxMax[0], screenyMin[0], screenyMax[0], screenzMin[0], screenzMax[0]);
     int minX = myMin(screenxMin[0], screenxMax[0], screenyMin[0], screenyMax[0], screenzMin[0], screenzMax[0]);
     int maxY = myMax(screenxMin[1], screenxMax[1], screenyMin[1], screenyMax[1], screenzMin[1], screenzMax[1]);
     int minY = myMin(screenxMin[1], screenxMax[1], screenyMin[1], screenyMax[1], screenzMin[1], screenzMax[1]);
-    //std::cout << "minX = "<<minX<<" minY= "<<minY<<" maxX = "<<maxX<<" maxY "<<maxY<<std::endl;
-    /// TO DO ? the minY/maxY are correct only when the camera is perfectly on the Y axis
+    */
+
+    Vec3 mostLeft = screenxyz[0] < screenXyz[0] ? screenxyz : screenXyz;
+    mostLeft = mostLeft[0] < screenxYz[0] ? mostLeft : screenxYz;
+    mostLeft = mostLeft[0] < screenxyZ[0] ? mostLeft : screenxyZ;
+    mostLeft = mostLeft[0] < screenXYz[0] ? mostLeft : screenXYz;
+    mostLeft = mostLeft[0] < screenXyZ[0] ? mostLeft : screenXyZ;
+    mostLeft = mostLeft[0] < screenxYZ[0] ? mostLeft : screenxYZ;
+    mostLeft = mostLeft[0] < screenXYZ[0] ? mostLeft : screenXYZ;
+
+    Vec3 mostRight = screenxyz[0] > screenXyz[0] ? screenxyz : screenXyz;
+    mostRight = mostRight[0] > screenxYz[0] ? mostRight : screenxYz;
+    mostRight = mostRight[0] > screenxyZ[0] ? mostRight : screenxyZ;
+    mostRight = mostRight[0] > screenXYz[0] ? mostRight : screenXYz;
+    mostRight = mostRight[0] > screenXyZ[0] ? mostRight : screenXyZ;
+    mostRight = mostRight[0] > screenxYZ[0] ? mostRight : screenxYZ;
+    mostRight = mostRight[0] > screenXYZ[0] ? mostRight : screenXYZ;
+
+    std::cout << "xMostLeft = " << mostLeft[0] << " yMostLeft = " << mostLeft[1] << " xMostRight = " << mostRight[0] << " yMostRight = " << mostRight[1] << std::endl;
+
 
     //Save the current matrixTransform
     Matrix matrixTransform= dynamic_cast<MatrixTransform*>(node)->getMatrix();
 
     //Find the intersection between the camera and the node :
-    ref_ptr<osgUtil::PolytopeIntersector> intersector = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, minX-Xminimum, minY-Yminimum, maxX-Xmaximum, maxY-Ymaximum);
+    ref_ptr<osgUtil::PolytopeIntersector> intersector = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, mostLeft[0]-Xminimum, (mostLeft[1] < mostRight[1] ? mostLeft[1] : mostRight[1])-Yminimum, mostRight[0]-Xmaximum, (mostLeft[1] > mostRight[1] ? mostLeft[1] : mostRight[1])-Ymaximum);
     osgUtil::IntersectionVisitor iv( intersector.get() );
 
     // If no info label :

@@ -22,7 +22,6 @@ using namespace std;
 
 lgLabel* addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Vec3 recoPos, osgViewer::Viewer* viewer);
 
-
 /// I don't use a makefile, but only Code::Blocks.
 /// To add the library dependencies : right clic on project, build options,
 /// linker settings, add every .so file in the /lib directory of OpenSceneGraph
@@ -38,7 +37,7 @@ int main()
    // Load the model
    // TODO : change the file name
    // If you want to see the names of the nodes, write "names" instead of "" in the next line.
-    osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("names");
+    osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
     //    erreur lors de l'input d'une variable string
     cout << "Entrer le path du fichier .citygml :" << endl;
     string pathFile;
@@ -74,12 +73,16 @@ int main()
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
     osg::Node* rootModel = findNode.getFirst();
+
     // Add the label
-    // To do : you can change the name of the label, it is the 3rd argument of the next line
+    // You can change the name of the label, it is the 3rd argument of the next line
     vector<osgText::Text*> listLabels = vector<osgText::Text*>();
     osg::ref_ptr<lgLabel> textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
 
-    //seconde etiquette
+    //Hide the label if it is too far
+    textOne->setHidingDistance(1000);
+
+    //second label
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode2;
     cin >> idNode2;
@@ -128,8 +131,7 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
    lgLabel* textOne = new lgLabel();
 
    osg::ref_ptr<osg::Node> linkToNode = g;
-   textOne->setLinkNode(linkToNode, viewer);
-   textOne->setPositionInit(recoPos);
+   textOne->setLinkNode(linkToNode, viewer, recoPos);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
    //textOne->setFont("/home/tbrunel/T�l�chargements/OSG_data/OSG_data/fonts/arial.ttf");
@@ -152,5 +154,10 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
    cout << textOne->getAbsolutePosition().x() << endl;
    cout << textOne->getAbsolutePosition().y() << endl;
    cout << textOne->getAbsolutePosition().z() << endl;
+
+   //Testing the distance between the label and the camera :
+   cout << "Distance label-camera" << endl;
+   cout << textOne->distanceCamera(viewer);
+
    return textOne;
 }

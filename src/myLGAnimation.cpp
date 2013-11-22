@@ -10,20 +10,23 @@ using namespace osg;
 
 void myLGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
-    // Find the world coordinates of the node :
-    Matrix worldMatrix = node->getWorldMatrices()[0];
-    Vec3 center = Vec3(worldMatrix(3,0), worldMatrix(3,1), worldMatrix(3,2));
+    LGAnimation::operator()(node, nv);
+
+     //Label
+    ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
+
+    Vec3 center = label->getAbsolutePosition();
 
     if (!isFree(node, nv))
     {
-       translateLabel(node, 0, 0, 1);
+       label->translateLabel(0, 0, 1);
     }
     else if (center[2]>0)
     {
         //Look if below the label is free space
         if (isFree(node, nv, 0,30,0,0))
         {
-            translateLabel(node, 0, 0, -1);
+            label->translateLabel(0, 0, -1);
         }
     }
 

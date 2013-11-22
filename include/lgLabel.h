@@ -17,11 +17,11 @@ class lgLabel : public osgText::Text {
 
         lgLabel();
         lgLabel(const lgLabel& originalLabel);
-        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer);
+        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer, osg::Vec3 recoPos);
         lgLabel(std::string filePath, std::string idNode);
 
         //getters and setters
-        void setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer);
+        void setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer, osg::Vec3 recoPos);
         osg::ref_ptr<osg::Node> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
@@ -36,6 +36,18 @@ class lgLabel : public osgText::Text {
         osg::Vec3 distanceVec(osg::ref_ptr<lgLabel> otherLabel);
         float distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
         float distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
+        float distanceCamera(osg::ref_ptr<osgViewer::Viewer> view);
+        int getHidingDistance();
+        void setHidingDistance(int hDistance);
+
+        /**
+        * Function to move the label
+        * @param node, Node* : the matrix transformation node of the label
+        * @param x, int : X axis translation
+        * @param y, int : y axis translation
+        * @param z, int : z axis translation
+        */
+        void translateLabel(int x, int y , int z);
 
     protected :
         //the node who is supposed to contain the label, if it is a group
@@ -49,6 +61,7 @@ class lgLabel : public osgText::Text {
         std::string labelType;
         bool internal; //true if we have an internal label, to be developed
         osg::ref_ptr<osg::MatrixTransform> updatedMatrix;
+        int hidingDistance;
 };
 
 #endif	/* LGLABEL_H */
