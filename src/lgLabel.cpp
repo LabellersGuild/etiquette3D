@@ -21,9 +21,9 @@ lgLabel::lgLabel(const lgLabel& originalLabel) {
      hidingDistance = -1;
 }
 
-lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osgViewer::Viewer* viewer, osg::Vec3 recoPos) {
+lgLabel::lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osg::Vec3 recoPos, osg::ref_ptr<LGAnimation> animation) {
     this->setText(text);
-    this->setLinkNode(linkedNode, viewer, recoPos);
+    this->setLinkNode(linkedNode, recoPos, animation);
     hidingDistance = -1;
 }
 
@@ -38,7 +38,7 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
  * geode if the param is a group)
  * @param aNode, osg:ref_ptr<osg::Node> to the node
  */
-void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* viewer, osg::Vec3 recoPos){
+void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osg::Vec3 recoPos, osg::ref_ptr<LGAnimation> myLGAnimation){
     this->linkNode = aNode;
     osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
     osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
@@ -48,7 +48,7 @@ void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* view
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
         this->updatedMatrix=mtLabel1;
-        mtLabel1->setUpdateCallback( new myLGAnimation(viewer));
+        mtLabel1->setUpdateCallback(myLGAnimation);
     }
     if(targetGeode){
         //todo gérer le cas où on a direct une géode

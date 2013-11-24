@@ -10,6 +10,7 @@
 #include "../include/LGAnimation.h"
 #include "../include/LGInteraction.h"
 #include "../include/myLGAnimation.h"
+#include "../include/myLGAnimation2.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -40,10 +41,10 @@ int main()
    // If you want to see the names of the nodes, write "names" instead of "" in the next line.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
     //    erreur lors de l'input d'une variable string
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
-   // string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+//cout << "Entrer le path du fichier .citygml :" << endl;
+//string pathFile;
+//cin >> pathFile;
+string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/Castle_Herten_v1.0.0/Castle_Herten_v1.0.0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
@@ -56,10 +57,10 @@ int main()
     // Find the node with its ID :
     // TODO : you can change the ID you are looking for
     //    erreur lors de l'input d'une variable string
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode;
-   cin >> idNode;
-   // string idNode = "ID_276003000001240";
+//cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//string idNode;
+//cin >> idNode;
+string idNode = "ID_251-Schloss";
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
 
@@ -85,10 +86,10 @@ int main()
     textOne->setTransparency(0.75);
 
     //second label
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode2;
-    cin >> idNode2;
-    //string idNode2 = "ID_276003000000992_7";
+//cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//string idNode2;
+//cin >> idNode2;
+string idNode2 = "ID_311-TheMagdalena";
     lgNodeVisitor findNode2(idNode2);
     model->accept(findNode2);
     osg::Node* secondNode = findNode2.getFirst();
@@ -133,7 +134,8 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
    lgLabel* textOne = new lgLabel();
 
    osg::ref_ptr<osg::Node> linkToNode = g;
-   textOne->setLinkNode(linkToNode, viewer, recoPos);
+   osg::ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
+   textOne->setLinkNode(linkToNode, recoPos, animation);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
    //textOne->setFont("/home/tbrunel/T�l�chargements/OSG_data/OSG_data/fonts/arial.ttf");

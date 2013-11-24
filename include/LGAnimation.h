@@ -1,15 +1,11 @@
 /* Fichier : LGAnimation.h
  * Description : Header de la classe LGAnimation
  *      Cette classe facilite le placement dynamique des etiquettes
-<<<<<<< HEAD
  *      Pour l'utiliser, il faut d'abord creer une sous classe qui redefinit la methode operator().
- *      Dans cette methode, on peut utiliser les autres methodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet a OSG de continuer la traversee de l'arbre.
+ *      Dans cette methode, on peut utiliser les autres methodes de la classe, et il faut
+ *      commencer par la ligne " LGAnimation::operator()(node, nv);"
+ *      et finir par la ligne "traverse(node, nv);" qui permet a OSG de continuer la traversee de l'arbre.
  *      Ensuite, il faut creer une instance de la sous classe et la rattacher a la matrice de transformation d'une etiquette :
-=======
- *      Pour l'utiliser, il faut d'abord créer une sous classe qui redefinit la methode operator().
- *      Dans cette méthode, on peut utiliser les autres méthodes de la classe, et il faut finir par la ligne "traverse(node, nv);" qui permet à OSG de continuer la traversée de l'arbre.
- *      Ensuite, il faut créer une instance de la sous classe et la rattacher à la matrice de transformation d'une étiquette :
->>>>>>> origin/ThomasB
  *          matriceDeTransformation->setUpdateCallback( new LGAnimationSousClasse(&viewer));
  * Auteur : Thomas Brunel
  */
@@ -49,8 +45,9 @@ class LGAnimation : public osg::NodeCallback
          * - int Yminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
          * - int Xmaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre
          * - int Ymaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
+         * La fonction renvoie NULL si aucun élément n'est devant l'étiquette, et la position de l'intersection entre le faisceau camera-label et le drawable.
          */
-        bool isFree(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
+        osgUtil::PolytopeIntersector::Intersection* intersectCameraLabel(osg::Node* node, osg::NodeVisitor* nv, int Xminimum=0, int Yminimum=0, int Xmaximum=0, int Ymaximum=0);
 
     protected :
 
@@ -58,29 +55,9 @@ class LGAnimation : public osg::NodeCallback
         */
         osg::ref_ptr<osgViewer::Viewer> view;
 
-    private :
-
-        /* Maximum de 6 entiers
-         * Arguments :
-         * - a : int
-         * - b : int
-         * - c : int
-         * - d : int
-         * - e : int
-         * - f : int
+        /* Objet qui enregistre l'intersection entre le faisceau de la caméra à l'étiquette. Renvoyé par intersectCameraLabel
          */
-        int myMax(int a, int b, int c, int d, int e, int f);
-
-        /* Minimum de 6 entiers
-         * Arguments :
-         * - a : int
-         * - b : int
-         * - c : int
-         * - d : int
-         * - e : int
-         * - f : int
-         */
-        int myMin(int a, int b, int c, int d, int e, int f);
+        osgUtil::PolytopeIntersector::Intersection intersection;
 };
 
 #endif // LGAnimation_H_INCLUDED
