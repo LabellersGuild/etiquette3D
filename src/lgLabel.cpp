@@ -43,22 +43,29 @@ void lgLabel::setLinkNode(osg::ref_ptr<osg::Node> aNode, osgViewer::Viewer* view
     osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
     osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
     osg::ref_ptr<osg::MatrixTransform> mtLabel1 = new osg::MatrixTransform(osg::Matrixd::translate(recoPos));
-    if(!targetGeode && targetGroup){
-        targetGeode = new osg::Geode();
-        targetGroup->addChild(mtLabel1);
-        mtLabel1->addChild(targetGeode);
-        this->updatedMatrix=mtLabel1;
-        mtLabel1->setUpdateCallback( new myLGAnimation(viewer));
-    }
-    if(targetGeode){
-        //todo gérer le cas où on a direct une géode
-        bool alreadyChild = false;
+    
+    bool alreadyChild = false;
+    //if we have a geode, we need to find its parent to then create a matrixTransform
+    if(targetGeode&&!targetGroup){
         for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++){
             osg::ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
             if(drawAsLabel && drawAsLabel.get()==this){
                 alreadyChild = true;
             }
         }
+        targetGroup = targetGeode->getParent(0);
+    }
+    
+    //when we got a group, we set the matrix transform as child and put inside a new Geode
+    if(targetGroup){
+        targetGeode = new osg::Geode();
+        targetGroup->addChild(mtLabel1);
+        mtLabel1->addChild(targetGeode);
+        this->updatedMatrix=mtLabel1;
+        mtLabel1->setUpdateCallback( new myLGAnimation(viewer));
+    }
+    //adding the label as child of the geode
+    if(targetGeode){
         if(!alreadyChild){
             targetGeode->addDrawable(this);
         }
@@ -92,7 +99,11 @@ osg::Vec3 lgLabel::getAbsolutePosition() {
     }
 }
 
-
+/*
+ *set a relative position for the label, not recommended
+ * as it will be independant from the matrixTransform updatedMatrix
+ * and therefore will have trouble with animations 
+ */
 void lgLabel::setPosition(osg::Vec3 relativePosition) {
     osgText::Text::setPosition(relativePosition);
     this->calcAbsolutePosition();
@@ -159,7 +170,7 @@ float lgLabel::distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgL
 }
 
 /*
- * get the shortest distance between two labels froms screen point of view
+ * get the shortest distance between two labels from screen point of view
  * using the bounding boxes of the labels
  */
 float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel){
