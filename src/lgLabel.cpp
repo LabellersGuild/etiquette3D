@@ -174,24 +174,45 @@ float lgLabel::distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgL
  * using the bounding boxes of the labels
  */
 float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel){
-    //Matrix to change world coordinates in windows coordinates
-    osg::Matrix modelView = view->getCamera()->getViewMatrix();
-    osg::Matrix projection = view->getCamera()->getProjectionMatrix();
-    osg::Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
-    osg::Matrix MVPW = modelView * projection * window;
-
-    osg::BoundingBox myBound = this->computeBound();
-    osg::BoundingBox otherBound = otherLabel->computeBound();
-
-    osg::Vec3 oAbsPos = (otherLabel->getAbsolutePosition()) * MVPW;
-    osg::Vec3 absPos = (this->getAbsolutePosition()) * MVPW;
-
-    float deltaX = absPos.x()-oAbsPos.x();
-    float deltaY = absPos.y()-oAbsPos.y();
-    float deltaZ = absPos.z()-oAbsPos.z();
-
-
-    float distance = sqrt(pow(absPos.x()-oAbsPos.x(),2.0)+pow(absPos.y()-oAbsPos.y(),2.0)+pow(absPos.z()-oAbsPos.z(),2.0));
+    //We first get the 2dBox of both labels 
+    osg::Vec4 my2dBox = this->compute2dBox(view);
+    osg::Vec4 other2dBox = otherLabel->compute2dBox(view);
+    //we deduce the box to the left
+    osg::Vec4 leftBox, rightBox;
+    if(my2dBox.x()<other2dBox.x()){
+        leftBox = my2dBox;
+        rightBox = other2dBox;
+    } else {
+        leftBox = other2dBox;
+        rightBox = my2dBox;
+    }
+    //we deduce the box to the top
+    osg::Vec4 topBox, botBox;
+    if(my2dBox.y()<other2dBox.y()){
+        topBox = other2dBox;
+        botBox = my2dBox;
+    } else {
+        topBox = my2dBox;
+        botBox = other2dBox;
+    }
+    //we then calculate the delta for both abs and ord
+    float deltaX = rightBox.x()-leftBox.z();
+    float deltaY = topBox.y() - botBox.w();
+    float distance;
+    //if box touch themselves, we set the distance as negative and a translation from
+    // this distance as absolute value should fix the problem
+    if(deltaX<0 && deltaY<0){
+        distance = -sqrt(pow(deltaX,2.0)+pow(deltaY,2.0));
+    }
+    if(deltaX<0 && deltaY>0){
+        distance = deltaY;
+    }
+    if(deltaX>0 && deltaY<0){
+        distance = deltaX;
+    }
+    if(deltaX>0 && deltaY>0){
+        distance = sqrt(pow(deltaX,2.0)+pow(deltaY,2.0));
+    }
     return distance;
 }
 
@@ -226,6 +247,9 @@ void lgLabel::translateLabel(int x, int y , int z)
     updatedMatrix->setMatrix(matrixTransform * osg::Matrix::translate(x,y,z));
 }
 
+/*
+ *return the xmin, ymin, xmax, ymax screen coordinates of the bounding box 
+ */
 osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
 {
      // Find the world coordinates of the node :

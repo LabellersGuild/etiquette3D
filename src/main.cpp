@@ -42,7 +42,7 @@ int main()
     cout << "Entrer le path du fichier .citygml :" << endl;
     string pathFile;
     cin >> pathFile;
-   // string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+//   string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
@@ -57,8 +57,8 @@ int main()
     //    erreur lors de l'input d'une variable string
     cout << "Entrer l'id du noeud à étiquetter :" << endl;
     string idNode;
-   cin >> idNode;
-   // string idNode = "ID_276003000001240";
+    cin >> idNode;
+//    string idNode = "ID_276003000001240";
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
 
@@ -114,9 +114,11 @@ int main()
     float calcDist = sqrt(pow(vecDist.x(),2.0)+pow(vecDist.y(),2.0)+pow(vecDist.z(),2.0));
     cout<<"distance vec "<<calcDist<<endl;
     float a2dBox = textOne->distance2dBox(pView,textTwo);
-
+    osg::Vec4 bounds = textOne->compute2dBox(pView);
+    cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
     while (!viewer.done()) {
         float a2dBox = textOne->distance2dBox(pView,textTwo);
+        cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
 }
