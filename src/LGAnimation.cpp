@@ -17,8 +17,8 @@ using namespace osg;
 
 /* Fonction qui gere le deplacement dynamique des etiquettes
   * Arguments :
-  * - node : osg::Node* : le noeuds rattache a l'objet LGAnimation : normalement, la matrice de transformation reliee a l'etiquette
-  * - nv : osg::NodeVisitor
+  * - node : Node* : le noeuds rattache a l'objet LGAnimation : normalement, la matrice de transformation reliee a l'etiquette
+  * - nv : NodeVisitor
   */
 void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
@@ -46,8 +46,8 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
 /* Precise si l'etiquette est ses environs sont caches par d'autres drawables
  * Pour savoir si l'etiquette est cachee, ne pas preciser les valeurs des 4 derniers arguments (0 par defaut)
  * Arguments :
- * - node : osg::Node* : meme argument que operator()
- * - nv : osg::NodeVisitor* : meme argument que operator()
+ * - node : Node* : meme argument que operator()
+ * - nv : NodeVisitor* : meme argument que operator()
  * - int Xminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre
  * - int Yminimum : 0 par defaut. Augmente la fenetre de verification selon l'axe Y de la fenetre
  * - int Xmaximum : 0 par defaut. Augmente la fenetre de verification selon l'axe X de la fenetre

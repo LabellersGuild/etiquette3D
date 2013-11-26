@@ -5,7 +5,6 @@
 #include <osgSim/MultiSwitch>
 #include "../include/lgNodeVisitor.h"
 #include "../include/lgNodeOverseer.h"
-#include "../include/lgNode.h"
 #include "../include/lgLabel.h"
 #include "../include/LGAnimation.h"
 #include "../include/LGInteraction.h"
@@ -21,8 +20,9 @@
 #include <osg/BlendFunc>
 
 using namespace std;
+using namespace osg;
 
-lgLabel* addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Vec3 recoPos, osgViewer::Viewer* viewer);
+lgLabel* addTextLabel(Node* g, std::string nom_id, std::string nom, Vec3 recoPos, osgViewer::Viewer* viewer);
 
 /// I don't use a makefile, but only Code::Blocks.
 /// To add the library dependencies : right clic on project, build options,
@@ -32,8 +32,8 @@ lgLabel* addTextLabel(osg::Node* g, std::string nom_id, std::string nom, osg::Ve
 int main()
 {
    // Declare a group for the root of our tree and a group for the model
-   osg::Group* root = new osg::Group();
-   osg::Group* model = NULL;
+   Group* root = new Group();
+   Group* model = NULL;
    osgViewer::Viewer viewer;
 
    // Load the model
@@ -45,7 +45,7 @@ int main()
 //string pathFile;
 //cin >> pathFile;
 string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/Castle_Herten_v1.0.0/Castle_Herten_v1.0.0.citygml";
-    model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
+    model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
    if (! model )
@@ -65,21 +65,21 @@ string idNode = "ID_251-Schloss";
     model->accept(findNode);
 
     findNode.feedFoundPointList(*(findNode.getFirst()));
-    std::vector<osg::Vec3> points = findNode.getFoundPointList();
+    std::vector<Vec3> points = findNode.getFoundPointList();
     std::cout << "On a trouvé un liste de " << points.size() << " points" << std::endl;
 
-    osg::Vec3 positionCalc = findNode.recommendedCoordinates();
+    Vec3 positionCalc = findNode.recommendedCoordinates();
     std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
 
     // Add this group node to the root
     root->addChild(model);
     cout << findNode.getNodeList().size() << endl;
-    osg::Node* rootModel = findNode.getFirst();
+    Node* rootModel = findNode.getFirst();
 
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
     vector<osgText::Text*> listLabels = vector<osgText::Text*>();
-    osg::ref_ptr<lgLabel> textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
+    ref_ptr<lgLabel> textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
 
     //Hide the label if it is too far
     textOne->setHidingDistance(1000);
@@ -92,27 +92,27 @@ string idNode = "ID_251-Schloss";
 string idNode2 = "ID_311-TheMagdalena";
     lgNodeVisitor findNode2(idNode2);
     model->accept(findNode2);
-    osg::Node* secondNode = findNode2.getFirst();
+    Node* secondNode = findNode2.getFirst();
     findNode2.feedFoundPointList(*(findNode2.getFirst()));
-    osg::Vec3 calcPos2 = findNode2.recommendedCoordinates();
-    osg::ref_ptr<lgLabel> textTwo = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer);
+    Vec3 calcPos2 = findNode2.recommendedCoordinates();
+    ref_ptr<lgLabel> textTwo = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer);
 
 
     // Create LGInteraction
     listLabels.push_back(textOne.get());
     listLabels.push_back(textTwo.get());
-    osg::ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
+    ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
     viewer.setSceneData(root);
     viewer.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer.realize();
-    osg::ref_ptr<osgViewer::Viewer> pView = &viewer;
+    ref_ptr<osgViewer::Viewer> pView = &viewer;
     float distWin = textOne->distance2d(pView, textTwo);
     cout << "distance 2d " << distWin << endl;
     float dist3d = textOne->distance(textTwo);
     cout<<"distance 3d " << dist3d<<endl;
-    osg::Vec3 vecDist = textOne->distanceVec(textTwo);
+    Vec3 vecDist = textOne->distanceVec(textTwo);
     cout<<"distance vec "<<vecDist.x()<<" "<<vecDist.y()<<" "<<vecDist.z()<<endl;
     float calcDist = sqrt(pow(vecDist.x(),2.0)+pow(vecDist.y(),2.0)+pow(vecDist.z(),2.0));
     cout<<"distance vec "<<calcDist<<endl;
@@ -124,7 +124,7 @@ string idNode2 = "ID_311-TheMagdalena";
     }
 }
 
-lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::Vec3 recoPos, osgViewer::Viewer* viewer)
+lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoPos, osgViewer::Viewer* viewer)
 {
    if (!g)
    {
@@ -133,20 +133,21 @@ lgLabel* addTextLabel(osg::Node* g, std::string name_id, std::string name, osg::
    }
    lgLabel* textOne = new lgLabel();
 
-   osg::ref_ptr<osg::Node> linkToNode = g;
-   osg::ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
+   ref_ptr<Node> linkToNode = g;
+   ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
    textOne->setLinkNode(linkToNode, recoPos, animation);
    textOne->setCharacterSize(5);
    // TODO : change the path to the font
    //textOne->setFont("/home/tbrunel/T�l�chargements/OSG_data/OSG_data/fonts/arial.ttf");
    textOne->setText(name, osgText::String::ENCODING_UTF8 );
    textOne->setAxisAlignment(osgText::Text::SCREEN);
-   textOne->setColor( osg::Vec4(192.0f/255.0f,0,0,1.0f) );
+   textOne->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
    textOne->setDrawMode(osgText::Text::TEXT |
                              osgText::Text::ALIGNMENT |
                                 osgText::Text::BOUNDINGBOX);
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
+   textOne->setLabelType(external);
 
    //testing that we can have absolute position
    cout << "textOne position" << endl;

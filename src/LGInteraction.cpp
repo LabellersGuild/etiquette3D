@@ -61,7 +61,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 osgUtil::LineSegmentIntersector::Intersection result = *(intersector->getIntersections().begin());
 
                 // If it is a label :
-                if (result.drawable->isSameKindAs(new osgText::Text()))
+                if (result.drawable->isSameKindAs(new lgLabel()))
                 {
                     //Add the label to the list of selected labels
                     selectedLabels.push_back(dynamic_cast<osgText::Text*>(result.drawable.get()));
@@ -186,7 +186,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 {
                     ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
                     StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
-                    stateset->setMode(GL_FOG, osg::StateAttribute::ON);
+                    stateset->setMode(GL_FOG, StateAttribute::ON);
                 }
                 break;
             // 'm' or 'M' : don't see the drawables corresponding to the labels
@@ -195,7 +195,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 {
                     ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
                     StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
-                    stateset->setMode(GL_FOG, osg::StateAttribute::OFF);
+                    stateset->setMode(GL_FOG, StateAttribute::OFF);
                 }
                 break;
             // 'i' : show info label if it exists
@@ -223,7 +223,69 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 break;
             }
             break;
+        case osgGA::GUIEventAdapter::MOVE:
+            {
+                ref_ptr<osgViewer::Viewer> viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
 
+                if ( viewer )
+                {
+                    // To know on what the user clicked :
+                    ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector( osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
+                    osgUtil::IntersectionVisitor iv( intersector.get() );
+                    iv.setTraversalMask( ~0x1 );
+
+                    viewer->getCamera()->accept( iv );
+                    if ( intersector->containsIntersections() )
+                    {
+                        osgUtil::LineSegmentIntersector::Intersection result = *(intersector->getIntersections().begin());
+
+                        // If it is a label :
+                        if (result.drawable->isSameKindAs(new lgLabel()))
+                        {
+                            //See if it was already mouseLabel
+                            if (mouseLabel != result.drawable)
+                            {
+                                if (mouseLabel != NULL)
+                                {
+                                    int characterSize = mouseLabel->getCharacterHeight();
+                                    if (characterSize >2)
+                                    {
+                                       mouseLabel->setCharacterSize(characterSize-2);
+                                    }
+                                }
+                                mouseLabel = dynamic_cast<lgLabel*>(result.drawable.get());
+                                int characterSize = static_cast<lgLabel*>(mouseLabel)->getCharacterHeight();
+                                mouseLabel->setCharacterSize(characterSize+2);
+                            }
+                        }
+                        else
+                        {
+                            if (mouseLabel != NULL)
+                            {
+                                 int characterSize = mouseLabel->getCharacterHeight();
+                                if (characterSize >2)
+                                {
+                                    mouseLabel->setCharacterSize(characterSize-2);
+                                }
+                                mouseLabel = NULL;
+                            }
+                        }
+                    }
+                    else
+                    {
+                          if (mouseLabel != NULL)
+                            {
+                                 int characterSize = mouseLabel->getCharacterHeight();
+                                if (characterSize >2)
+                                {
+                                    mouseLabel->setCharacterSize(characterSize-2);
+                                }
+                            }
+                            mouseLabel = NULL;
+                    }
+                }
+                break;
+            }
         default:
             break;
         }

@@ -35,7 +35,7 @@ void myLGAnimation2::operator()(Node* node, NodeVisitor* nv)
         BoundingBox intersectionBox = intersection->drawable->getBound();
 
         //distance between the intersection and the maxZ of the drawable
-        float deltaZ = fabs(intersectionPoint.z()-intersectionBox.zMax());
+        float deltaZ = fabs(intersection->localIntersectionPoint.z() -intersectionBox.zMax());
 
         //Distance intersection-camera :
         osg::Matrix matrixCamera = view->getCamera()->getInverseViewMatrix();
@@ -44,16 +44,15 @@ void myLGAnimation2::operator()(Node* node, NodeVisitor* nv)
 
         //Thales :
         float deltaZLabel = deltaZ * label->distanceCamera(view) / distanceIntersectionCamera;
+
         label->translateLabel(0,0,deltaZLabel);
     }
     else
     {
-        int i = 0;
-        while (intersectCameraLabel(node, nv, 0,i+30,0,0) == NULL && (label->getAbsolutePosition().z()-i-30 > 0))
+        if (intersectCameraLabel(node, nv, 0,label->getAbsolutePosition().z() - label->getPositionInit().z()+20,0,0) == NULL)
         {
-            i+=30;
+            label->setUpdatedMatrixMatrix(osg::Matrixd::translate(label->getPositionInit()));
         }
-        label->translateLabel(0,0, -i*0.1);
     }
 
     //Allow OSG to continue the node traversal

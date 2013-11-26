@@ -13,6 +13,13 @@
 #include <osgViewer/Viewer>
 #include "LGAnimation.h"
 
+enum lgType{
+    internal_top,
+    internal_face,
+    external
+};
+
+
 class lgLabel : public osgText::Text {
     public :
 
@@ -27,8 +34,8 @@ class lgLabel : public osgText::Text {
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
         void setPosition(osg::Vec3 relativePosition);
-        std::string getLabelType();
-        void setLabelType(std::string labelType);
+        lgType getLabelType();
+        void setLabelType(lgType labelType);
         bool getInternal();
         void setInternal (bool internal);
         void setPositionInit(osg::Vec3 newPositionInit);
@@ -41,7 +48,7 @@ class lgLabel : public osgText::Text {
         int getHidingDistance();
         void setHidingDistance(int hDistance);
         osg::Vec4 compute2dBox(osg::ref_ptr<osgViewer::Viewer> view);
-
+        osg::Vec2 compute2dCenter(osg::ref_ptr<osgViewer::Viewer> view);
         /**
         * Function to move the label
         * @param node, Node* : the matrix transformation node of the label
@@ -52,6 +59,7 @@ class lgLabel : public osgText::Text {
         void translateLabel(int x, int y , int z);
 
         void setTransparency(float alpha);
+        void setUpdatedMatrixMatrix (const osg::Matrix &mat);
 
     protected :
         //the node who is supposed to contain the label, if it is a group
@@ -62,7 +70,7 @@ class lgLabel : public osgText::Text {
         //at the initialization, position should be positionInit
         osg::Vec3 positionInit;
         int priority;
-        std::string labelType;
+        lgType labelType;
         bool internal; //true if we have an internal label, to be developed
         osg::ref_ptr<osg::MatrixTransform> updatedMatrix;
         int hidingDistance;

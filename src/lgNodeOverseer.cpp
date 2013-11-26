@@ -1,11 +1,11 @@
-/* 
+/*
  * File:   lgNodeOverseer.cpp
  * Author: paulyves
- * 
+ *
  * Created on November 5, 2013, 2:18 PM
- * 
- * This class is used to visualise how a cityGML file is built and 
- * parsed in OSG, usefull if you are not sure about what is inside 
+ *
+ * This class is used to visualise how a cityGML file is built and
+ * parsed in OSG, usefull if you are not sure about what is inside
  * your citygml file
  */
 
@@ -17,15 +17,16 @@
 #include "../include/lgNodeOverseer.h"
 
 using namespace std;
+using namespace osg;
 
-lgNodeOverseer::lgNodeOverseer() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),
+lgNodeOverseer::lgNodeOverseer() : NodeVisitor(TRAVERSE_ALL_CHILDREN),
                                         searchForName(){
     _level = 0;
     showDrawable = true;
 }
 
 lgNodeOverseer::lgNodeOverseer(const string &name) :
-                                   osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),
+                                   NodeVisitor(TRAVERSE_ALL_CHILDREN),
                                    searchForName(name){
     _level = 0;
     showDrawable = true;
@@ -36,7 +37,7 @@ lgNodeOverseer::lgNodeOverseer(const string &name) :
 //Compare the 'searchForName' data member against the node's name.
 //If the strings match, add this node to our list
 
-void lgNodeOverseer::apply(osg::Node &searchNode) {
+void lgNodeOverseer::apply(Node &searchNode) {
     cout << spaces() << "Node simple : " << searchNode.getName() << endl;
     // If no node is found, return searchNode
     if (searchForName == "") {
@@ -51,7 +52,7 @@ void lgNodeOverseer::apply(osg::Node &searchNode) {
     }
 }
 
-void lgNodeOverseer::apply(osg::Group &searchNode) {
+void lgNodeOverseer::apply(Group &searchNode) {
     cout << spaces() << "Groupe :"<< &(searchNode.getName()) << ", " << searchNode.getNumChildren() << " noeuds fils" << endl;
     // If no node is found, return searchNode
     if (searchForName == "") {
@@ -66,15 +67,15 @@ void lgNodeOverseer::apply(osg::Group &searchNode) {
     }
 }
 
-void lgNodeOverseer::apply(osg::Geode &searchNode) {
+void lgNodeOverseer::apply(Geode &searchNode) {
     cout << spaces() << "Géode :"<< searchNode.getName() << ", " << searchNode.getNumDrawables() << " drawables" << endl;
     if(searchNode.getNumDrawables()>0 && showDrawable){
-        for (int i=0;i<searchNode.getNumDrawables();i++){
+        for (unsigned i=0;i<searchNode.getNumDrawables();i++){
             _level++;
             cout << spaces() << "Drawable " << i << " : " << searchNode.getDrawable(i)->getName() << endl;
-            osg::ref_ptr<osg::Geometry> myGeom = dynamic_cast<osg::Geometry*>(searchNode.getDrawable(i));
+            ref_ptr<Geometry> myGeom = dynamic_cast<Geometry*>(searchNode.getDrawable(i));
             if(myGeom){
-                osg::ref_ptr<osg::Vec3Array> arrayVertex = (osg::Vec3Array*) myGeom->getVertexArray();
+                ref_ptr<Vec3Array> arrayVertex = (Vec3Array*) myGeom->getVertexArray();
                 _level++;
                 int size = arrayVertex->size();
                 cout << spaces() << "Il y a " << size << " sommets" << endl;
@@ -106,11 +107,11 @@ void lgNodeOverseer::apply(osg::Geode &searchNode) {
 lgNodeOverseer::~lgNodeOverseer() {
 }
 
-osg::Node* lgNodeOverseer::getFirst() {
+Node* lgNodeOverseer::getFirst() {
     return (foundNodeList.at(0));
 }
 
-osg::Node* lgNodeOverseer::getLast() {
+Node* lgNodeOverseer::getLast() {
     int taille = foundNodeList.size();
     return (foundNodeList.at(taille-1));
 }

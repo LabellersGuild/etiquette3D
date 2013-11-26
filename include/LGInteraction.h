@@ -28,6 +28,7 @@
 #include <osg/MatrixTransform>
 #include <osgUtil/LineSegmentIntersector>
 #include <osgText/Text>
+#include "lgLabel.h"
 
 class LGInteraction : public osgGA::GUIEventHandler
 {
@@ -57,6 +58,10 @@ class LGInteraction : public osgGA::GUIEventHandler
         /* Liste des etiquettes creees dans le programme principal
          */
         std::vector<osgText::Text*> listLabels;
+
+        /* Label qui est en dessous de la souris
+         */
+        osg::ref_ptr<lgLabel> mouseLabel;
 };
 
 #endif // LGInteraction_H_INCLUDED
