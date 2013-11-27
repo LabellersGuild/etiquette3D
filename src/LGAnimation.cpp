@@ -32,7 +32,7 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
     }
     else
     {
-        label->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+        label->setDrawMode(label->getPreviousDrawMode());
     }
 }
 

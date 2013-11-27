@@ -60,6 +60,9 @@ class lgLabel : public osgText::Text {
 
         void setTransparency(float alpha);
         void setUpdatedMatrixMatrix (const osg::Matrix &mat);
+        void setSeeInTransparency(bool b);
+        void setPreviousDrawMode(int d);
+        int getPreviousDrawMode();
 
     protected :
         //the node who is supposed to contain the label, if it is a group
@@ -74,6 +77,12 @@ class lgLabel : public osgText::Text {
         bool internal; //true if we have an internal label, to be developed
         osg::ref_ptr<osg::MatrixTransform> updatedMatrix;
         int hidingDistance;
+        bool seeInTransparency;
+
+
+        /* When the label is hidden or is selected, its drawMode is changed. To go back to the previous drawMode, we record it.
+         */
+        int previousDrawMode;
 };
 
 #endif	/* LGLABEL_H */

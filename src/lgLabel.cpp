@@ -337,3 +337,33 @@ Vec2 lgLabel::compute2dCenter(ref_ptr<osgViewer::Viewer> view)
    return Vec2(center2d.x(), center2d.y());
 }
 
+void lgLabel::setSeeInTransparency(bool b)
+{
+    if (b)
+    {
+        setTransparency(0.5);
+
+        // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
+        ref_ptr<StateSet> stateSet = updatedMatrix->getOrCreateStateSet();
+        stateSet->setMode(GL_DEPTH_TEST,StateAttribute::OFF);
+        stateSet->setRenderingHint( StateSet::TRANSPARENT_BIN );
+        // Make sure this geometry is draw last. RenderBins are handled in numerical order so set bin number to 11
+        stateSet->setRenderBinDetails(11, "DepthSortedBin");
+    }
+    else
+    {
+        setTransparency(1);
+
+        updatedMatrix->setStateSet(new StateSet());
+    }
+}
+
+void lgLabel::setPreviousDrawMode(int d)
+{
+    previousDrawMode = d;
+}
+
+int lgLabel::getPreviousDrawMode()
+{
+    return previousDrawMode;
+}

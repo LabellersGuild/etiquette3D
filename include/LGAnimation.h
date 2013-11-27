@@ -58,6 +58,7 @@ class LGAnimation : public osg::NodeCallback
         /* Objet qui enregistre l'intersection entre le faisceau de la caméra à l'étiquette. Renvoyé par intersectCameraLabel
          */
         osgUtil::PolytopeIntersector::Intersection intersection;
+
 };
 
 #endif // LGAnimation_H_INCLUDED

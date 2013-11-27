@@ -30,7 +30,7 @@ using namespace osg;
  * Argument :
  * - l : vector<osgText::Text> : la liste des etiquettes creees dans le programme principal.
  */
-LGInteraction::LGInteraction(std::vector<osgText::Text*> l) : listLabels(l) {};
+LGInteraction::LGInteraction(std::vector<lgLabel*> l) : listLabels(l) {};
 
 
   /* Fonction qui s'active automatiquement lorsqu'un evenement est detecte
@@ -64,7 +64,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 if (result.drawable->isSameKindAs(new lgLabel()))
                 {
                     //Add the label to the list of selected labels
-                    selectedLabels.push_back(dynamic_cast<osgText::Text*>(result.drawable.get()));
+                    selectedLabels.push_back(dynamic_cast<lgLabel*>(result.drawable.get()));
 
                     // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
                     ref_ptr<StateSet> stateSet = selectedLabels.at(selectedLabels.size()-1)->getParent(0)->getParent(0)->getOrCreateStateSet();
@@ -74,7 +74,8 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                     stateSet->setRenderBinDetails(11, "DepthSortedBin");
 
                     //Bounding box :
-                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(selectedLabels.at(selectedLabels.size()-1)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+                    selectedLabels.at(selectedLabels.size()-1)->setPreviousDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode());
                 }
                 else
                 {
@@ -82,8 +83,10 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                     //Clear the list of selected labels
                     for (unsigned i(0); i<selectedLabels.size();i++)
                     {
-                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
-                        selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT);
+                        selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
+                        selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
+                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getPreviousDrawMode());
+
                     }
                     selectedLabels.clear();
                 }
@@ -95,8 +98,9 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 //Clear the list of selected labels
                 for (unsigned i(0); i<selectedLabels.size();i++)
                 {
-                    selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
-                    selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT);
+                        selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
+                        selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
+                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getPreviousDrawMode());
                 }
                 selectedLabels.clear();
             }
@@ -118,7 +122,8 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
             stateSet->setRenderBinDetails(11, "DepthSortedBin");
 
             //Bounding box :
-            selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+            selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+            selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
         }
     }
     else
@@ -177,7 +182,10 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                     if (selectedLabels.at(i)->getDrawMode() != 0)
                          selectedLabels.at(i)->setDrawMode(0);
                     else
-                        selectedLabels.at(i)->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+                    {
+                        selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+                        selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
+                    }
                 }
                 break;
             // 'l' or 'L' : see the drawables corresponding to the labels

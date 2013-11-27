@@ -78,12 +78,12 @@ string idNode = "ID_251-Schloss";
 
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
-    vector<osgText::Text*> listLabels = vector<osgText::Text*>();
+    vector<lgLabel*> listLabels = vector<lgLabel*>();
     ref_ptr<lgLabel> textOne = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer);
 
     //Hide the label if it is too far
     textOne->setHidingDistance(1000);
-    textOne->setTransparency(0.75);
+    textOne->setSeeInTransparency(true);
 
     //second label
 //cout << "Entrer l'id du noeud à étiquetter :" << endl;
@@ -143,8 +143,9 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
    textOne->setAxisAlignment(osgText::Text::SCREEN);
    textOne->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
    textOne->setDrawMode(osgText::Text::TEXT |
-                             osgText::Text::ALIGNMENT |
-                                osgText::Text::BOUNDINGBOX);
+                             osgText::Text::ALIGNMENT);
+    //Record the draw mode
+   textOne->setPreviousDrawMode(textOne->getDrawMode());
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
    textOne->setLabelType(external);
