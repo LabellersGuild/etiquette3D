@@ -42,11 +42,12 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
  */
 void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos, ref_ptr<LGAnimation> myLGAnimation){
     this->linkNode = aNode;
+    this->setPositionInit(recoPos);
+    this->setChangingWhenMouse(true);
 
     osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
     osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
     osg::ref_ptr<osg::MatrixTransform> mtLabel1 = new osg::MatrixTransform(osg::Matrixd::translate(recoPos));
-    this->setPositionInit(recoPos);
 
     bool alreadyChild = false;
     //if we have a geode, we need to find its parent to then create a matrixTransform
@@ -412,4 +413,24 @@ void lgLabel::setPreviousDrawMode(int d)
 int lgLabel::getPreviousDrawMode()
 {
     return previousDrawMode;
+}
+
+void lgLabel::setDefaultDrawMode(int d)
+{
+    defaultDrawMode = d;
+}
+
+int lgLabel::getDefaultDrawMode()
+{
+    return defaultDrawMode;
+}
+
+bool lgLabel::isChangingWhenMouse()
+{
+   return changingWhenMouse;
+}
+
+void lgLabel::setChangingWhenMouse(bool b)
+{
+    changingWhenMouse = b;
 }

@@ -151,6 +151,7 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
                              osgText::Text::ALIGNMENT);
     //Record the draw mode
    textOne->setPreviousDrawMode(textOne->getDrawMode());
+   textOne->setDefaultDrawMode(textOne->getDrawMode());
    textOne->setAlignment(osgText::Text::CENTER_TOP);
    textOne->setFontResolution(64,64);
    textOne->setLabelType(external);

@@ -61,8 +61,12 @@ class lgLabel : public osgText::Text {
         void setTransparency(float alpha);
         void setUpdatedMatrixMatrix (const osg::Matrix &mat);
         void setSeeInTransparency(bool b);
+        void setDefaultDrawMode(int d);
+        int getDefaultDrawMode();
         void setPreviousDrawMode(int d);
         int getPreviousDrawMode();
+        bool isChangingWhenMouse();
+        void setChangingWhenMouse(bool b);
 
     protected :
         //the node who is supposed to contain the label, if it is a group
@@ -80,9 +84,17 @@ class lgLabel : public osgText::Text {
         bool seeInTransparency;
 
 
-        /* When the label is hidden or is selected, its drawMode is changed. To go back to the previous drawMode, we record it.
+        /* When the label is hidden or is selected, its drawMode is changed. To go back to the default drawMode, we record it.
+         */
+        int defaultDrawMode;
+
+        /* The previous drawMode is needed too. For LGInteraction, the hiding option.
          */
         int previousDrawMode;
+
+        /* The increase of the size of the label when the mouse is on it is optional
+         */
+         bool changingWhenMouse;
 };
 
 #endif	/* LGLABEL_H */

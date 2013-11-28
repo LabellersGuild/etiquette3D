@@ -74,7 +74,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                     stateSet->setRenderBinDetails(11, "DepthSortedBin");
 
                     //Bounding box :
-                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(selectedLabels.at(selectedLabels.size()-1)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode() | osgText::Text::BOUNDINGBOX);
                     selectedLabels.at(selectedLabels.size()-1)->setPreviousDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode());
                 }
                 else
@@ -85,7 +85,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                     {
                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
                         selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
-                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getPreviousDrawMode());
+                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
 
                     }
                     selectedLabels.clear();
@@ -100,7 +100,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 {
                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
                         selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
-                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getPreviousDrawMode());
+                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
                 }
                 selectedLabels.clear();
             }
@@ -179,11 +179,15 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
             case 'h' : case 'H' :
                 for (unsigned i(0);i<selectedLabels.size();i++)
                 {
+                    ///TO DO : ne marche plus
                     if (selectedLabels.at(i)->getDrawMode() != 0)
-                         selectedLabels.at(i)->setDrawMode(0);
+                    {
+                        selectedLabels.at(i)->setDrawMode(0);
+                        selectedLabels.at(i)->setPreviousDrawMode(0);
+                    }
                     else
                     {
-                        selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+                        selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getDefaultDrawMode() | osgText::Text::BOUNDINGBOX);
                         selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
                     }
                 }
@@ -193,7 +197,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 for (unsigned i(0);i<selectedLabels.size();i++)
                 {
                     ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
-                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getParent(0)->getParent(0)->getOrCreateStateSet();
                     stateset->setMode(GL_FOG, StateAttribute::ON);
                 }
                 break;
@@ -202,7 +206,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                 for (unsigned i(0);i<selectedLabels.size();i++)
                 {
                     ///TO DO : the fog has to be applied on the Node linked to the label. The LGLabel class is needed here.
-                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getOrCreateStateSet();
+                    StateSet * stateset = selectedLabels.at(i)->getParent(0)->getParent(0)->getParent(0)->getOrCreateStateSet();
                     stateset->setMode(GL_FOG, StateAttribute::OFF);
                 }
                 break;
@@ -235,7 +239,7 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
             {
                 ref_ptr<osgViewer::Viewer> viewer = dynamic_cast<osgViewer::Viewer*>(&aa);
 
-                if ( viewer )
+                if ( viewer)
                 {
                     // To know on what the user clicked :
                     ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector( osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
@@ -250,20 +254,23 @@ bool LGInteraction::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                         // If it is a label :
                         if (result.drawable->isSameKindAs(new lgLabel()))
                         {
-                            //See if it was already mouseLabel
-                            if (mouseLabel != result.drawable)
+                            if (dynamic_cast<lgLabel*>(result.drawable.get())->isChangingWhenMouse())
                             {
-                                if (mouseLabel != NULL)
+                                //See if it was already mouseLabel
+                                if (mouseLabel != result.drawable)
                                 {
-                                    int characterSize = mouseLabel->getCharacterHeight();
-                                    if (characterSize >2)
+                                    if (mouseLabel != NULL)
                                     {
-                                       mouseLabel->setCharacterSize(characterSize-2);
+                                        int characterSize = mouseLabel->getCharacterHeight();
+                                        if (characterSize >2)
+                                        {
+                                           mouseLabel->setCharacterSize(characterSize-2);
+                                        }
                                     }
+                                    mouseLabel = dynamic_cast<lgLabel*>(result.drawable.get());
+                                    int characterSize = static_cast<lgLabel*>(mouseLabel)->getCharacterHeight();
+                                    mouseLabel->setCharacterSize(characterSize+2);
                                 }
-                                mouseLabel = dynamic_cast<lgLabel*>(result.drawable.get());
-                                int characterSize = static_cast<lgLabel*>(mouseLabel)->getCharacterHeight();
-                                mouseLabel->setCharacterSize(characterSize+2);
                             }
                         }
                         else
