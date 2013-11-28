@@ -14,9 +14,9 @@
 #include "LGAnimation.h"
 
 enum lgType{
-    internal_top,
-    internal_face,
-    external
+    INTERNAL_TOP,
+    INTERNAL_FACE,
+    EXTERNAL
 };
 
 
@@ -25,17 +25,17 @@ class lgLabel : public osgText::Text {
 
         lgLabel();
         lgLabel(const lgLabel& originalLabel);
-        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osg::Vec3 recoPos, osg::ref_ptr<LGAnimation> animation);
+        lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osg::Vec3 recoPos);
         lgLabel(std::string filePath, std::string idNode);
 
         //getters and setters
-        void setLinkNode(osg::ref_ptr<osg::Node> aNode, osg::Vec3 recoPos, osg::ref_ptr<LGAnimation> myLGAnimation);
+        void setLinkNode(osg::ref_ptr<osg::Node> aNode, osg::Vec3 recoPos);
         osg::ref_ptr<osg::Node> getLinkNode();
         void calcAbsolutePosition();
         osg::Vec3 getAbsolutePosition();
         void setPosition(osg::Vec3 relativePosition);
         lgType getLabelType();
-        void setLabelType(lgType labelType);
+        void setLabelType(lgType labelType, osg::ref_ptr<LGAnimation> animation);
         bool getInternal();
         void setInternal (bool internal);
         void setPositionInit(osg::Vec3 newPositionInit);

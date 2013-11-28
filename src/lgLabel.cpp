@@ -23,9 +23,9 @@ lgLabel::lgLabel(const lgLabel& originalLabel) {
      hidingDistance = -1;
 }
 
-lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos, ref_ptr<LGAnimation> animation) {
+lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos) {
     this->setText(text);
-    this->setLinkNode(linkedNode, recoPos, animation);
+    this->setLinkNode(linkedNode, recoPos);
     hidingDistance = -1;
 }
 
@@ -40,7 +40,7 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
  * geode if the param is a group)
  * @param aNode, osg:ref_ptr<Node> to the node
  */
-void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos, ref_ptr<LGAnimation> myLGAnimation){
+void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     this->linkNode = aNode;
     this->setPositionInit(recoPos);
     this->setChangingWhenMouse(true);
@@ -67,7 +67,6 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos, ref_ptr<LGAnimation
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
         this->updatedMatrix=mtLabel1;
-        mtLabel1->setUpdateCallback(myLGAnimation);
     }
     //adding the label as child of the geode
     if(targetGeode){
@@ -127,21 +126,27 @@ lgType lgLabel::getLabelType(){
     return this->labelType;
 }
 
-void lgLabel::setLabelType(lgType labelType){
-    this->labelType=labelType;
+void lgLabel::setLabelType(lgType labelType, ref_ptr<LGAnimation> animation){
+   this->labelType=labelType;
 
-    if (labelType == external)
-    {
-
-    }
-    else if (labelType == internal_top)
-    {
-
-    }
-    else
-    {
-
-    }
+   if (labelType == EXTERNAL)
+   {
+       updatedMatrix->setUpdateCallback(animation);
+       setAxisAlignment(osgText::Text::SCREEN);
+       setAlignment(osgText::Text::CENTER_TOP);
+   }
+   else if (labelType == INTERNAL_TOP)
+   {
+       updatedMatrix->setUpdateCallback(animation);
+       setAxisAlignment(osgText::Text::XY_PLANE);
+       setAlignment(osgText::Text::CENTER_CENTER);
+   }
+   else //INTERNAL_FACE
+   {
+       updatedMatrix->setUpdateCallback(animation);
+       setAxisAlignment(osgText::Text::XZ_PLANE);
+       setAlignment(osgText::Text::CENTER_BOTTOM);
+   }
 }
 
 bool lgLabel::getInternal() {
