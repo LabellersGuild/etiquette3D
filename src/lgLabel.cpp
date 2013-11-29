@@ -17,20 +17,24 @@ using namespace osg;
 //constructors
 lgLabel::lgLabel() : osgText::Text(){
      hidingDistance = -1;
+     labelType = EXTERNAL;
 }
 
 lgLabel::lgLabel(const lgLabel& originalLabel) {
      hidingDistance = -1;
+     labelType = EXTERNAL;
 }
 
 lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos) {
     this->setText(text);
     this->setLinkNode(linkedNode, recoPos);
     hidingDistance = -1;
+    labelType = EXTERNAL;
 }
 
 lgLabel::lgLabel(std::string filePath, std::string idNode) {
      hidingDistance = -1;
+     labelType = EXTERNAL;
 }
 
 //getters and setters
@@ -67,6 +71,13 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
         this->updatedMatrix=mtLabel1;
+
+        /// This is a new way to find a recommended position :
+        BoundingBox objectBBox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0));
+        osg::Matrixd matrixPosition = osg::Matrixd::translate((objectBBox.xMax()+objectBBox.xMin())/2.0, (objectBBox.yMax()+objectBBox.yMin())/2.0, objectBBox.zMax()+10.0);
+        updatedMatrix->setMatrix(matrixPosition);
+        ///
+
     }
     //adding the label as child of the geode
     if(targetGeode){
@@ -124,29 +135,6 @@ void lgLabel::setPosition(osg::Vec3 relativePosition) {
 
 lgType lgLabel::getLabelType(){
     return this->labelType;
-}
-
-void lgLabel::setLabelType(lgType labelType, ref_ptr<LGAnimation> animation){
-   this->labelType=labelType;
-
-   if (labelType == EXTERNAL)
-   {
-       updatedMatrix->setUpdateCallback(animation);
-       setAxisAlignment(osgText::Text::SCREEN);
-       setAlignment(osgText::Text::CENTER_TOP);
-   }
-   else if (labelType == INTERNAL_TOP)
-   {
-       updatedMatrix->setUpdateCallback(animation);
-       setAxisAlignment(osgText::Text::XY_PLANE);
-       setAlignment(osgText::Text::CENTER_CENTER);
-   }
-   else //INTERNAL_FACE
-   {
-       updatedMatrix->setUpdateCallback(animation);
-       setAxisAlignment(osgText::Text::XZ_PLANE);
-       setAlignment(osgText::Text::CENTER_BOTTOM);
-   }
 }
 
 bool lgLabel::getInternal() {
@@ -438,4 +426,80 @@ bool lgLabel::isChangingWhenMouse()
 void lgLabel::setChangingWhenMouse(bool b)
 {
     changingWhenMouse = b;
+}
+
+
+BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
+{
+    for(unsigned i=0;i< node->getNumChildren();i++)
+    {
+        if (node->getChild(i)->isSameKindAs(new Geode()))
+        {
+            ref_ptr<Geode> child = dynamic_cast<Geode*>(node->getChild(i));
+            for(unsigned j=0;j< child->getNumDrawables();j++)
+            {
+                if (! child->getDrawable(i)->isSameKindAs(new lgLabel()))
+                {
+                    BoundingBox childbbox = child->getDrawable(j)->getBound();
+
+                    if (bbox.xMax()==0 && bbox.xMin() == 0 && bbox.yMax()==0 && bbox.yMin()==0 && bbox.zMax()==0 && bbox.zMin() ==0)
+                    {
+                        bbox.xMax() = childbbox.xMax();
+                        bbox.yMax() = childbbox.yMax();
+                        bbox.zMax() = childbbox.zMax();
+                        bbox.xMin() = childbbox.xMin();
+                        bbox.yMin() = childbbox.yMin();
+                        bbox.zMin() = childbbox.zMin();
+                    }
+                    else
+                    {
+                        if (bbox.xMax() < childbbox.xMax()) bbox.xMax() = childbbox.xMax();
+                        if (bbox.yMax() < childbbox.yMax()) bbox.yMax() = childbbox.yMax();
+                        if (bbox.zMax() < childbbox.zMax()) bbox.zMax() = childbbox.zMax();
+                        if (bbox.xMin() > childbbox.xMin()) bbox.xMin() = childbbox.xMin();
+                        if (bbox.yMin() > childbbox.yMin()) bbox.yMin() = childbbox.yMin();
+                        if (bbox.zMin() > childbbox.zMin()) bbox.zMin() = childbbox.zMin();
+                    }
+                }
+            }
+            return bbox;
+        }
+        else if (node->getChild(i)->isSameKindAs(new Group()))
+        {
+            return computeObjectBBox(dynamic_cast<Group*>(node->getChild(i)), bbox);
+        }
+    }
+    return bbox;
+}
+
+void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
+   this->labelType=labelType;
+   updatedMatrix->setUpdateCallback(animation);
+   labelType = type;
+
+   if (type == EXTERNAL)
+   {
+       setAxisAlignment(osgText::Text::SCREEN);
+       setAlignment(osgText::Text::CENTER_TOP);
+       updatedMatrix->setMatrix(Matrixd::translate(getPositionInit()));
+   }
+   else if (type == INTERNAL_TOP)
+   {
+       setAxisAlignment(osgText::Text::XY_PLANE);
+       setAlignment(osgText::Text::CENTER_CENTER);
+
+        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
+
+        //Put the label on the object
+        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,(bbox.yMax()+bbox.yMin())/2, bbox.zMax()));
+   }
+   else //INTERNAL_FACE
+   {
+       setAxisAlignment(osgText::Text::XZ_PLANE);
+       setAlignment(osgText::Text::CENTER_BOTTOM);
+
+       BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
+
+       updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,bbox.yMin(), (bbox.zMax()+bbox.zMin())/2));
+   }
 }

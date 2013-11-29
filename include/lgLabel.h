@@ -67,6 +67,7 @@ class lgLabel : public osgText::Text {
         int getPreviousDrawMode();
         bool isChangingWhenMouse();
         void setChangingWhenMouse(bool b);
+        osg::BoundingBox computeObjectBBox(osg::ref_ptr<osg::Group> node, osg::BoundingBox bbox);
 
     protected :
         //the node who is supposed to contain the label, if it is a group

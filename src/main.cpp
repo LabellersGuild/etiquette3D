@@ -95,6 +95,7 @@ int main()
     Node* secondNode = findNode2.getFirst();
     findNode2.feedFoundPointList(*(findNode2.getFirst()));
     Vec3 calcPos2 = findNode2.recommendedCoordinates();
+    std::cout << "Le point recommandé est : x:" << calcPos2.x() << " y=" << calcPos2.y() << " z=" << calcPos2.z() << std::endl;
     ref_ptr<lgLabel> label2 = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer, INTERNAL_TOP);
 
     // Create LGInteraction
@@ -121,7 +122,7 @@ int main()
 
     while (!viewer.done()) {
         float a2dBox = label1->distance2dBox(pView,label2);
-        cout<<"distance 2d "<<a2dBox<<endl;
+        //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
 }

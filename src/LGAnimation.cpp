@@ -94,3 +94,4 @@ osgUtil::PolytopeIntersector::Intersection* LGAnimation::intersectCameraLabel(No
     }
     return NULL;
 }
+
