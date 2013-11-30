@@ -1,23 +1,23 @@
-/* Fichier : LGInteraction.h
- * Description : Header de la classe LGINteraction
- * Cette classe gere l'ensemble des interaction entre les etiquettes et l'utilisateur une fois que le programme est lance :
- * - ctrl+ clic gauche : selection d'une etiquette. Les etiquettes deja selectionnees le restent.
- * - 'a' : selectionner toutes les etiquettes
- * - 'q' ou 'Q' ou Gauche : augmenter la valeur X des etiquettes
- * - 'd' ou 'D' ou Droite : diminuer la valeur de X des etiquettes
- * - 'z' ou 'Z' ou Haut : augmenter la valeur de Y des etiquettes
- * - 's' ou 'S' ou Bas : diminuer la valeur de Y des etiquettes
- * - '+' : augmenter la taille des etiquettes
- * - '-' : diminuer la taille des etiquettes
- * - 'h' ou 'H' : cacher les etiquettes
- * - 'l' ou 'L' : savoir a quels drawables les etiquettes sont rattachees
- * - 'm' ou 'M' : ne plus savoir quels drawables sont rattaches aux etiquettes
- * - 'i' ou 'I' : afficher l'etiquette d'informations supplementaires, si elle existe
- * Pour l'utiliser, il faut creer une instance et l'ajouter en tant que EventHandler a l'objet Viewer du programme principal :
- *      ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
- *      viewer.addEventHandler(interaction.get());
- * Avec listLabels un vecteurs de pointeurs vers les etiquettes.
- * Auteur : Thomas Brunel
+/** File : LGInteraction.h
+ * Description : header of the LGInteraction class
+ * This class deals with every interaction between the user and the labels when the program is running.
+ * - ctrl+ left click : select a label. Already selected labels remain seleced.
+ * - 'a' : select every label
+ * - 'q' or 'Q' ou Left : increase X value of the selected labels
+ * - 'd' or'D' ou Right : decrease X value of the selected labels
+ * - 'z' or 'Z' ou Up : increase Y value of the selected labels
+ * - 's' or 'S' ou Down : decrease Z value of the selected labels
+ * - '+' : inclrease the size of the selected labels
+ * - '-' : declrease the size of the selected labels
+ * - 'h' or 'H' : hide the selected labels
+ * - 'l' or 'L' : see in dark the objects linked to the selected labels
+ * - 'm' or 'M' : set the objects linked to the selected labels back to normal
+ * - 'i' or 'I' : see the information label, if exists.
+ * TO use this class, create an instance and add it as an EventHandler to the viewer object of the main file :
+ * ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
+ * viewer.addEventHandler(interaction.get());
+ * With listLabels a vector of pointers on the labels.
+ * Author : Thomas Brunel
  */
 
 #ifndef LGInteraction_H_INCLUDED
@@ -33,33 +33,30 @@
 class LGInteraction : public osgGA::GUIEventHandler
 {
     public:
-        /* Fonction qui s'active automatiquement lorsqu'un evenement est detecte
-         * Arguments :
-         * - ea : osgGA::GUIEventAdapter
-         * - aa : osgGA::GUIActionAdapter
-         * Retour : renvoie toujours false. La valeur de retour indique si l'evenement a ete traite.
-         * Si true est renvoye, OSG considere que l'evenement n'est plus necessaire a aucun handler et sera ignore par les autres handlers, dont le "camera manipulator"
-         * (cf. Beginner's guide p. 237)
-         */
-        virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
-
-        /* Constructeur
-         * Argument :
-         * - l : vector<osgText::Text> : la liste des etiquettes creees dans le programme principal.
-         */
+       /** Constructor
+        * @param l : vector<lgLabel*> : list of lgLabels created.
+        */
         LGInteraction(std::vector<lgLabel*> l);
+
+       /** Automatically fires when an event is detected.
+        * @param ea : osgGA::GUIEventAdapter
+        * @param aa : osgGA::GUIActionAdapter
+        * @return false : the return value tells if the event is treated.
+        * If true is returned, OSG consider that the event is no longer needed to other handlers, and they will ignore it. The camera manipulator is on of these other handlers.
+        */
+        virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
 
     protected:
 
-        /* Liste des etiquettes selectionnees a un instant donne
+        /** List of the currently selected labels
          */
         std::vector<lgLabel*> selectedLabels;
 
-        /* Liste des etiquettes creees dans le programme principal
+        /** List of the labels created in the main file
          */
         std::vector<lgLabel*> listLabels;
 
-        /* Label qui est en dessous de la souris
+        /** Label under the mouse
          */
         osg::ref_ptr<lgLabel> mouseLabel;
 };

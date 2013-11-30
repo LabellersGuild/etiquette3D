@@ -1,6 +1,6 @@
-/*
+/**
  * File:   lgLabel.cpp
- * Author: paulyves
+ * Authors: Paul-Yves, Thomas
  *
  * Created on October 19, 2013, 4:31 PM
  */
@@ -71,13 +71,6 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
         this->updatedMatrix=mtLabel1;
-
-        /// This is a new way to find a recommended position :
-        BoundingBox objectBBox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0));
-        osg::Matrixd matrixPosition = osg::Matrixd::translate((objectBBox.xMax()+objectBBox.xMin())/2.0, (objectBBox.yMax()+objectBBox.yMin())/2.0, objectBBox.zMax()+10.0);
-        updatedMatrix->setMatrix(matrixPosition);
-        ///
-
     }
     //adding the label as child of the geode
     if(targetGeode){
@@ -133,13 +126,23 @@ void lgLabel::setPosition(osg::Vec3 relativePosition) {
     this->calcAbsolutePosition();
 }
 
+/** Getter for the labelType
+ * @return lgType :
+ */
 lgType lgLabel::getLabelType(){
-    return this->labelType;
+    return labelType;
 }
 
+/** Getter for the internal attribute
+ * @return bool : internal
+ */
 bool lgLabel::getInternal() {
-    return this->internal;
+    return internal;
 }
+
+/** Setter for the internal attribute
+ * @param internal : bool
+ */
 void lgLabel::setInternal (bool internal) {
     this->internal = internal;
 }
@@ -153,6 +156,9 @@ void lgLabel::setPositionInit(Vec3 newPositionInit){
     //this->setPosition(positionInit);
 }
 
+/** Getter of the positionInit
+ * @return Vec3 : the inital position of the label
+ */
 Vec3 lgLabel::getPositionInit(){
     return positionInit;
 }
@@ -237,43 +243,52 @@ float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<
     return distance;
 }
 
+/** Gives the distance between the camera and the label
+ * @param view : ref_ptr<osgViewer::Viewer> : the viewer object of the main file
+ * @return float : distance between the camera and the label
+ */
 float lgLabel::distanceCamera(ref_ptr<osgViewer::Viewer> view)
 {
      Matrix matrixCamera = view->getCamera()->getInverseViewMatrix();
      Vec3 positionCamera= Vec3(matrixCamera(3,0), matrixCamera(3,1), matrixCamera(3,2));
-     float distance = sqrt(pow(absolutePosition[0]-positionCamera[0],2.0)+pow(absolutePosition[1]-positionCamera[1],2.0)+pow(absolutePosition[2]-positionCamera[2],2.0));
+     float distance = sqrt(pow(absolutePosition[0]-positionCamera[0],2.0)+pow(absolutePosition.y()-positionCamera.y(),2.0)+pow(absolutePosition[2]-positionCamera[2],2.0));
      return distance;
 }
 
+/** Getter of the hindingDistance
+ * @return int : the hiding distance
+ */
 int lgLabel::getHidingDistance()
 {
     return hidingDistance;
 }
 
+/** Setter of the hidingDistance
+ * @param hDistance : int : hiding distance
+ */
 void lgLabel::setHidingDistance(int hDistance)
 {
     hidingDistance = hDistance;
 }
 
-/**
-* Function to move the label
-* @param node, Node* : the matrix transformation node of the label
-* @param x, int : X axis translation
-* @param y, int : y axis translation
-* @param z, int : z axis translation
-*/
+/** Translate the label
+ * @param x : int : y axis translation
+ * @param y : int : y axis translation
+ * @param z : int : z axis translation
+ */
 void lgLabel::translateLabel(int x, int y , int z)
 {
     Matrix matrixTransform= updatedMatrix->getMatrix();
     updatedMatrix->setMatrix(matrixTransform * Matrix::translate(x,y,z));
 }
 
-/*
- *return the xmin, ymin, xmax, ymax screen coordinates of the bounding box
+/** Calculate the coordinates of the bounding box of the label on the screen
+ * @param view : ref_ptr<osgViewer> : the viewer object of the main file
+ * @return Vec4 : coordinates (xMin, yMin, xMax, yMax) of the bounding box.
  */
 osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
 {
-     // Find the world coordinates of the node :
+    // Find the world coordinates of the node :
     Vec3 center = getAbsolutePosition();
 
     //Bounding box of the label :
@@ -288,12 +303,13 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
     //Projection of the bounding box of the label :
     Vec3 screenxyz, screenXyz, screenxYz, screenxyZ, screenXYz, screenXyZ, screenxYZ, screenXYZ;
 
-    //If info label :
-    if (updatedMatrix->getNumChildren() > 1)
+    //If there is an info label :
+    if (getInfoLabel() != NULL)
     {
+        //And this label is not invisible
         if (this->getDrawMode() != 0)
         {
-            BoundingBox bboxInfo = dynamic_cast<Geode*>(updatedMatrix->getChild(1))->getDrawable(0)->getBound();
+            BoundingBox bboxInfo = getInfoLabel()->getBound();
             int bboxXMin = (bbox.xMin() < bboxInfo.xMin() ? bbox.xMin() : bboxInfo.xMin());
             int bboxXMax = (bbox.xMax() > bboxInfo.xMax() ? bbox.xMax() : bboxInfo.xMax());
             int bboxYMin = (bbox.yMin() < bboxInfo.yMin() ? bbox.yMin() : bboxInfo.yMin());
@@ -301,6 +317,7 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
             int bboxZMin = (bbox.zMin() < bboxInfo.zMin() ? bbox.zMin() : bboxInfo.zMin());
             int bboxZMax = (bbox.zMax() > bboxInfo.zMax() ? bbox.zMax() : bboxInfo.zMax());
 
+            //Projection of the 8 corners of the bounding box
             screenxyz = (center + Vec3(bboxXMin,bboxYMin,bboxZMin)) * MVPW;
             screenXyz = (center + Vec3(bboxXMax,bboxYMin,bboxZMin)) * MVPW;
             screenxYz = (center + Vec3(bboxXMin,bboxYMax,bboxZMin)) * MVPW;
@@ -314,7 +331,7 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
     // If no info label :
     else
     {
-         //Projection of the bounding box of the label :
+         //Projection of the 8 corners of the bounding box of the label :
         screenxyz = (center + Vec3(bbox.xMin(),bbox.yMin(),bbox.zMin())) * MVPW;
         screenXyz = (center + Vec3(bbox.xMax(),bbox.yMin(),bbox.zMin())) * MVPW;
         screenxYz = (center + Vec3(bbox.xMin(),bbox.yMax(),bbox.zMin())) * MVPW;
@@ -326,27 +343,29 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
     }
 
      // The bounds of the polytope are determined by the two projected points the most on the left and on the right on the screen.
+    Vec3 mostLeft = screenxyz.x() < screenXyz.x() ? screenxyz : screenXyz;
+    mostLeft = mostLeft.x() < screenxYz.x() ? mostLeft : screenxYz;
+    mostLeft = mostLeft.x() < screenxyZ.x() ? mostLeft : screenxyZ;
+    mostLeft = mostLeft.x() < screenXYz.x() ? mostLeft : screenXYz;
+    mostLeft = mostLeft.x() < screenXyZ.x() ? mostLeft : screenXyZ;
+    mostLeft = mostLeft.x() < screenxYZ.x() ? mostLeft : screenxYZ;
+    mostLeft = mostLeft.x() < screenXYZ.x() ? mostLeft : screenXYZ;
 
-    Vec3 mostLeft = screenxyz[0] < screenXyz[0] ? screenxyz : screenXyz;
-    mostLeft = mostLeft[0] < screenxYz[0] ? mostLeft : screenxYz;
-    mostLeft = mostLeft[0] < screenxyZ[0] ? mostLeft : screenxyZ;
-    mostLeft = mostLeft[0] < screenXYz[0] ? mostLeft : screenXYz;
-    mostLeft = mostLeft[0] < screenXyZ[0] ? mostLeft : screenXyZ;
-    mostLeft = mostLeft[0] < screenxYZ[0] ? mostLeft : screenxYZ;
-    mostLeft = mostLeft[0] < screenXYZ[0] ? mostLeft : screenXYZ;
+    Vec3 mostRight = screenxyz.x() > screenXyz.x() ? screenxyz : screenXyz;
+    mostRight = mostRight.x() > screenxYz.x() ? mostRight : screenxYz;
+    mostRight = mostRight.x() > screenxyZ.x() ? mostRight : screenxyZ;
+    mostRight = mostRight.x() > screenXYz.x() ? mostRight : screenXYz;
+    mostRight = mostRight.x() > screenXyZ.x() ? mostRight : screenXyZ;
+    mostRight = mostRight.x() > screenxYZ.x() ? mostRight : screenxYZ;
+    mostRight = mostRight.x() > screenXYZ.x() ? mostRight : screenXYZ;
 
-    Vec3 mostRight = screenxyz[0] > screenXyz[0] ? screenxyz : screenXyz;
-    mostRight = mostRight[0] > screenxYz[0] ? mostRight : screenxYz;
-    mostRight = mostRight[0] > screenxyZ[0] ? mostRight : screenxyZ;
-    mostRight = mostRight[0] > screenXYz[0] ? mostRight : screenXYz;
-    mostRight = mostRight[0] > screenXyZ[0] ? mostRight : screenXyZ;
-    mostRight = mostRight[0] > screenxYZ[0] ? mostRight : screenxYZ;
-    mostRight = mostRight[0] > screenXYZ[0] ? mostRight : screenXYZ;
-
-    Vec4 bounds = Vec4(mostLeft[0], mostLeft[1] < mostRight[1] ? mostLeft[1] : mostRight[1], mostRight[0], mostLeft[1] > mostRight[1] ? mostLeft[1] : mostRight[1]);
+    Vec4 bounds = Vec4(mostLeft.x(), mostLeft.y() < mostRight.y() ? mostLeft.y() : mostRight.y(), mostRight.x(), mostLeft.y() > mostRight.y() ? mostLeft.y() : mostRight.y());
     return bounds;
 }
 
+/** Setter of the transparency of the label
+ * @param alpha : float : value of the transparency. 0 is invisible, 1 is opaque
+ */
 void lgLabel::setTransparency(float alpha)
 {
     Vec4 currentColor = getColor();
@@ -356,11 +375,18 @@ void lgLabel::setTransparency(float alpha)
     setBoundingBoxColor(currentColorBbox);
 }
 
- void lgLabel::setUpdatedMatrixMatrix (const Matrix &mat)
- {
-     updatedMatrix->setMatrix(mat);
- }
+/** Setter of the updatedMatrix's matrix
+ * @param mat : const Matrix& : the matrix to use
+ */
+void lgLabel::setUpdatedMatrixMatrix (const Matrix &mat)
+{
+    updatedMatrix->setMatrix(mat);
+}
 
+/** Calculate the position of the center of the label on the screen
+ * @param ref_ptr<osgViewer::Viewer> view : the viewer object of the main file
+ * @return Vec2 : position (x,y) of the center
+ */
 Vec2 lgLabel::compute2dCenter(ref_ptr<osgViewer::Viewer> view)
 {
      // Find the world coordinates of the node :
@@ -377,6 +403,9 @@ Vec2 lgLabel::compute2dCenter(ref_ptr<osgViewer::Viewer> view)
    return Vec2(center2d.x(), center2d.y());
 }
 
+/** Setter to see the label in transparency in front of or behind the objects.
+ * @param b : bool : true to set the transparency, false otherwise.
+ */
 void lgLabel::setSeeInTransparency(bool b)
 {
     if (b)
@@ -387,6 +416,7 @@ void lgLabel::setSeeInTransparency(bool b)
         ref_ptr<StateSet> stateSet = updatedMatrix->getOrCreateStateSet();
         stateSet->setMode(GL_DEPTH_TEST,StateAttribute::OFF);
         stateSet->setRenderingHint( StateSet::TRANSPARENT_BIN );
+
         // Make sure this geometry is draw last. RenderBins are handled in numerical order so set bin number to 11
         stateSet->setRenderBinDetails(11, "DepthSortedBin");
     }
@@ -394,56 +424,84 @@ void lgLabel::setSeeInTransparency(bool b)
     {
         setTransparency(1);
 
+        //Reset the stateset of the matrix
         updatedMatrix->setStateSet(new StateSet());
     }
 }
 
+/** Setter of the previousDrawMode
+ * @param d : int : a draw mode
+ */
 void lgLabel::setPreviousDrawMode(int d)
 {
     previousDrawMode = d;
 }
 
+/** Getter of the previousDrawMode
+ * @return int : the previous draw mode
+ */
 int lgLabel::getPreviousDrawMode()
 {
     return previousDrawMode;
 }
 
+/** Setter of the defaultDrawMode
+ * @param d : int : a draw mode
+ */
 void lgLabel::setDefaultDrawMode(int d)
 {
     defaultDrawMode = d;
 }
 
+/** Getter of the defaultDrawMode
+ * @return int : the defaultDrawMode
+ */
 int lgLabel::getDefaultDrawMode()
 {
     return defaultDrawMode;
 }
 
+/** To know if the label has to change when the mouse is on it
+ * @return bool
+ */
 bool lgLabel::isChangingWhenMouse()
 {
    return changingWhenMouse;
 }
 
+/** Setter of changingWhenMouse
+ * @param b : bool : true if the label changes when the mouse is on it, false otherwise.
+ */
 void lgLabel::setChangingWhenMouse(bool b)
 {
     changingWhenMouse = b;
 }
 
-
+/** Return the bounding box of the object linked to the label. Recursive funcion.
+ * @param node : ref_ptr<Group> node : For the first call of the function, it is the node parent of the matrixTransform of the label
+ * @param bbox : BoundingBox : For the first call, put BoundingBox(0,0,0,0,0,0)
+ */
 BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
 {
+    //Look at the children
     for(unsigned i=0;i< node->getNumChildren();i++)
     {
+        //If the child is a geode
         if (node->getChild(i)->isSameKindAs(new Geode()))
         {
             ref_ptr<Geode> child = dynamic_cast<Geode*>(node->getChild(i));
+
+            //Look at the drawables that are not a lgLabel, and adapt the bbox
             for(unsigned j=0;j< child->getNumDrawables();j++)
             {
                 if (! child->getDrawable(i)->isSameKindAs(new lgLabel()))
                 {
                     BoundingBox childbbox = child->getDrawable(j)->getBound();
 
+                    //First call of the function
                     if (bbox.xMax()==0 && bbox.xMin() == 0 && bbox.yMax()==0 && bbox.yMin()==0 && bbox.zMax()==0 && bbox.zMin() ==0)
                     {
+                        //adapt the bbox
                         bbox.xMax() = childbbox.xMax();
                         bbox.yMax() = childbbox.yMax();
                         bbox.zMax() = childbbox.zMax();
@@ -453,6 +511,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
                     }
                     else
                     {
+                        //adapt the bbox
                         if (bbox.xMax() < childbbox.xMax()) bbox.xMax() = childbbox.xMax();
                         if (bbox.yMax() < childbbox.yMax()) bbox.yMax() = childbbox.yMax();
                         if (bbox.zMax() < childbbox.zMax()) bbox.zMax() = childbbox.zMax();
@@ -464,6 +523,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
             }
             return bbox;
         }
+        //If the child is a group, call this function on it
         else if (node->getChild(i)->isSameKindAs(new Group()))
         {
             return computeObjectBBox(dynamic_cast<Group*>(node->getChild(i)), bbox);
@@ -472,6 +532,10 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
     return bbox;
 }
 
+/** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
+ * @param type : lgType : the type of label
+ * @param animation : ref_ptr<LGAnimation> : the animation related to the label
+ */
 void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
    this->labelType=labelType;
    updatedMatrix->setUpdateCallback(animation);
@@ -481,6 +545,8 @@ void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
    {
        setAxisAlignment(osgText::Text::SCREEN);
        setAlignment(osgText::Text::CENTER_TOP);
+
+       //Put the label on the initial position. It is the recommended position by default.
        updatedMatrix->setMatrix(Matrixd::translate(getPositionInit()));
    }
    else if (type == INTERNAL_TOP)
@@ -488,18 +554,55 @@ void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
        setAxisAlignment(osgText::Text::XY_PLANE);
        setAlignment(osgText::Text::CENTER_CENTER);
 
-        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
+       //Bounding box of the linked object
+       BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
 
-        //Put the label on the object
-        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,(bbox.yMax()+bbox.yMin())/2, bbox.zMax()));
+       //Put the label on the object
+       updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,(bbox.yMax()+bbox.yMin())/2, bbox.zMax()));
    }
    else //INTERNAL_FACE
    {
        setAxisAlignment(osgText::Text::XZ_PLANE);
        setAlignment(osgText::Text::CENTER_BOTTOM);
 
+       //Bounding box of the linked object
        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
 
+       //Put the label on one of the faces of the bounding box.
        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,bbox.yMin(), (bbox.zMax()+bbox.zMin())/2));
    }
+}
+
+/** Create the infoLabel
+ * @param text : String : the text on the label
+ */
+void lgLabel::setInfoLabel(string text)
+{
+    ref_ptr<Geode> geodeInfoLabel = new Geode;
+    ref_ptr<osgText::Text> infoLabel = new osgText::Text;
+
+    updatedMatrix->addChild(geodeInfoLabel.get());
+    geodeInfoLabel->addDrawable(infoLabel.get());
+    infoLabel->setText(text, osgText::String::ENCODING_UTF8 );
+    infoLabel->setAxisAlignment(osgText::Text::SCREEN);
+    infoLabel->setAlignment(osgText::Text::CENTER_BOTTOM);
+    infoLabel->setCharacterSize(2);
+    infoLabel->setDrawMode(0); // Hidden by default
+    geodeInfoLabel->setNodeMask( 0x1 );
+}
+
+/** infoLabel getter
+ * @return osgText::Text* : the infoLabel
+ */
+osgText::Text* lgLabel::getInfoLabel()
+{
+   return infoLabel;
+}
+
+/** updatedMatrix getter
+ * @return updatedMatrix : MatrixTransform*
+ */
+MatrixTransform* lgLabel::getUpdatedMatrix()
+{
+    return updatedMatrix;
 }
