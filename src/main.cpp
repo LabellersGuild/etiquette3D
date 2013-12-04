@@ -149,6 +149,8 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
    }
+   test monTest=test();
+   monTest.test_label_setLinkNode(linkToNode,label);
 
    label->setCharacterSize(5);
    // TODO : change the path to the font

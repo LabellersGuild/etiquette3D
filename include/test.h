@@ -22,7 +22,7 @@ class test
         test();
         virtual ~test();
         lgNodeVisitor test_lgNodeVisitor_initialisation(Group* model);
-
+        void test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel);
 
     protected:
 

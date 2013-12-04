@@ -51,3 +51,9 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model){
 
     return findNode;
 }
+
+void test::test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel){
+    if(theLinkNode.get()==(theLabel->getLinkNode()).get()){
+        cout<<"Le linkNode a bien été assigné à l'étiquette"<<endl;
+    }
+}
