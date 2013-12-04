@@ -6,6 +6,7 @@
 #include "../include/lgNodeVisitor.h"
 #include "../include/lgNodeOverseer.h"
 #include "../include/lgLabel.h"
+#include "../include/test.h"
 #include "../include/LGAnimation.h"
 #include "../include/LGInteraction.h"
 #include "../include/myLGAnimation.h"
@@ -55,18 +56,8 @@ int main()
       return -1;
    }
 
-    // Find the node with its ID :
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode;
-    cin >> idNode;
-    //string idNode = "ID_276003000001240";
-
-    lgNodeVisitor findNode(idNode);
-    model->accept(findNode);
-
-    findNode.feedFoundPointList(*(findNode.getFirst()));
-    std::vector<Vec3> points = findNode.getFoundPointList();
-    std::cout << "On a trouvé un liste de " << points.size() << " points" << std::endl;
+    test monTest=test();
+    lgNodeVisitor findNode=monTest.test_lgNodeVisitor_initialisation(model);
 
     Vec3 positionCalc = findNode.recommendedCoordinates();
     std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
@@ -79,7 +70,7 @@ int main()
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, INTERNAL_FACE);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
 
     //Hide the label if it is too far
     label1->setHidingDistance(1000);
@@ -96,7 +87,7 @@ int main()
     findNode2.feedFoundPointList(*(findNode2.getFirst()));
     Vec3 calcPos2 = findNode2.recommendedCoordinates();
     std::cout << "Le point recommandé est : x:" << calcPos2.x() << " y=" << calcPos2.y() << " z=" << calcPos2.z() << std::endl;
-    ref_ptr<lgLabel> label2 = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer, INTERNAL_TOP);
+    ref_ptr<lgLabel> label2 = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer, EXTERNAL);
 
     // Create LGInteraction
     listLabels.push_back(label1.get());
