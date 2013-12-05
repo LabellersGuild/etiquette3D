@@ -73,10 +73,6 @@ int main()
     label1->setHidingDistance(1000);
     label1->setSeeInTransparency(true);
 
-    //Some tests:
-    myTest.test_label_compute2dBox(&viewer, label1);
-    myTest.test_label_translateLabel(label1);
-
     //second label
     lgNodeVisitor findNode2 = myTest.test_lgNodeVisitor_initialisation(model);
     ref_ptr<Node> rootModel2 = findNode2.getFirst();
@@ -107,6 +103,11 @@ int main()
     float a2dBox = label1->distance2dBox(pView,label2);
     osg::Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
+
+    //Some tests:
+    myTest.test_label_compute2dBox(&viewer, label1);
+    myTest.test_label_translateLabel(label1);
+    myTest.test_label_compute2dCenter(&viewer, label1);
 
     while (!viewer.done()) {
         a2dBox = label1->distance2dBox(pView,label2);
@@ -171,8 +172,7 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    cout << label->getAbsolutePosition().z() << endl;
 
    //Testing the distance between the label and the camera :
-   cout << "Distance label-camera" << endl;
-   cout << label->distanceCamera(viewer);
+   cout << "Distance label-camera : " << label->distanceCamera(viewer) << endl;
 
    return label;
 }
