@@ -47,7 +47,7 @@ void myLGAnimation2::operator()(Node* node, NodeVisitor* nv)
 
         label->translateLabel(0,0,deltaZLabel);
     }
-    else
+    else //If the label is not hidden, we look at its initial position and test if we can put it there without being hidden
     {
         if (intersectCameraLabel(node, nv, 0,label->getAbsolutePosition().z() - label->getPositionInit().z()+20,0,0) == NULL)
         {

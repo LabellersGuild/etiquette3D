@@ -11,6 +11,7 @@
 #include "../include/LGInteraction.h"
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
+#include "../include/testLGAnimation.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -23,20 +24,16 @@
 using namespace std;
 using namespace osg;
 
-lgLabel* addTextLabel(Node* g, std::string nom_id, std::string nom, Vec3 recoPos, osgViewer::Viewer* viewer, lgType type);
-
-/// I don't use a makefile, but only Code::Blocks.
-/// To add the library dependencies : right clic on project, build options,
-/// linker settings, add every .so file in the /lib directory of OpenSceneGraph
-/// Then, to use the program, the building is done by codeblocks, but launch it with a console.
-/// The program is in /bin/Debug of the project
+lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string nom_id, string nom, Vec3 recoPos, ref_ptr<osgViewer::Viewer> viewer, lgType type);
 
 int main()
 {
    // Declare a group for the root of our tree and a group for the model
-   Group* root = new Group();
-   Group* model = NULL;
+   ref_ptr<Group> root = new Group();
+   ref_ptr<Group> model = NULL;
+
    osgViewer::Viewer viewer;
+   vector<lgLabel*> listLabels = vector<lgLabel*>();
 
    // Load the model
    // If you want to see the names of the nodes, write "names" instead of "" in the next line.
@@ -49,55 +46,55 @@ int main()
     //string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
-   // quit if we didn't successfully load the models
+   // quit if we didn't successfully load the model
    if (! model )
    {
       std::cout << "could not load model" << std::endl;
       return -1;
    }
 
-    test monTest=test();
-    lgNodeVisitor findNode=monTest.test_lgNodeVisitor_initialisation(model);
-
-    Vec3 positionCalc = findNode.recommendedCoordinates();
-    std::cout << "Le point recommandé est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << std::endl;
-
-    // Add this group node to the root
+    // Add the model group node to the root
     root->addChild(model);
+
+    // Find a node
+    test myTest=test();
+    lgNodeVisitor findNode=myTest.test_lgNodeVisitor_initialisation(model);
+    Vec3 positionCalc = findNode.recommendedCoordinates();
+
     cout << findNode.getNodeList().size() << endl;
-    Node* rootModel = findNode.getFirst();
+    ref_ptr<Node> rootModel = findNode.getFirst();
 
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
-    vector<lgLabel*> listLabels = vector<lgLabel*>();
     ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
+    listLabels.push_back(label1.get());
 
-    //Hide the label if it is too far
+    //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
     label1->setSeeInTransparency(true);
 
+    //Some tests:
+    myTest.test_label_compute2dBox(&viewer, label1);
+    myTest.test_label_translateLabel(label1);
+
     //second label
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode2;
-    cin >> idNode2;
-    //string idNode2 = "ID_311-TheMagdalena";
-    lgNodeVisitor findNode2(idNode2);
-    model->accept(findNode2);
-    Node* secondNode = findNode2.getFirst();
-    findNode2.feedFoundPointList(*(findNode2.getFirst()));
-    Vec3 calcPos2 = findNode2.recommendedCoordinates();
-    std::cout << "Le point recommandé est : x:" << calcPos2.x() << " y=" << calcPos2.y() << " z=" << calcPos2.z() << std::endl;
-    ref_ptr<lgLabel> label2 = addTextLabel(secondNode, secondNode->getName(), secondNode->getName(), calcPos2, &viewer, EXTERNAL);
+    lgNodeVisitor findNode2 = myTest.test_lgNodeVisitor_initialisation(model);
+    ref_ptr<Node> rootModel2 = findNode2.getFirst();
+    Vec3 positionCalc2 = findNode2.recommendedCoordinates();
+    ref_ptr<lgLabel> label2 = addTextLabel(rootModel2, rootModel2->getName(), rootModel2->getName(), positionCalc2, &viewer, EXTERNAL);
+    listLabels.push_back(label2.get());
+
+    //Test of setTransparency :
+    label2->setTransparency(0.7);
 
     // Create LGInteraction
-    listLabels.push_back(label1.get());
-    listLabels.push_back(label2.get());
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
     viewer.setSceneData(root);
     viewer.setCameraManipulator(new osgGA::TrackballManipulator());
     viewer.realize();
+
     ref_ptr<osgViewer::Viewer> pView = &viewer;
     float distWin = label1->distance2d(pView, label2);
     cout << "distance 2d " << distWin << endl;
@@ -112,26 +109,26 @@ int main()
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
 
     while (!viewer.done()) {
-        float a2dBox = label1->distance2dBox(pView,label2);
+        a2dBox = label1->distance2dBox(pView,label2);
         //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
 }
 
-lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoPos, osgViewer::Viewer* viewer, lgType type)
+lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec3 recoPos, ref_ptr<osgViewer::Viewer> viewer, lgType type)
 {
-   if (!g)
+   if (!linkToNode)
    {
-       std::cout << "Error while creating the label" << std::endl;
+      cout << "Error while creating the label" << endl;
       return NULL;
    }
-   lgLabel* label = new lgLabel();
 
-   ref_ptr<Node> linkToNode = g;
+   ref_ptr<lgLabel> label = new lgLabel();
 
    if (type == EXTERNAL)
    {
-       ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
+       // Test of the LGAnimation
+       ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
 
@@ -149,17 +146,15 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
    }
-   test monTest=test();
-   monTest.test_label_setLinkNode(linkToNode,label);
+   test myTest=test();
+   myTest.test_label_setLinkNode(linkToNode,label);
 
    label->setCharacterSize(5);
-   // TODO : change the path to the font
-   //label->setFont("/home/tbrunel/Telechargements/OSG_data/OSG_data/fonts/arial.ttf");
    label->setText(name, osgText::String::ENCODING_UTF8 );
    label->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
-   label->setDrawMode(osgText::Text::TEXT |
-                             osgText::Text::ALIGNMENT);
-    //Record the draw mode
+   label->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+
+   //Record the draw mode
    label->setPreviousDrawMode(label->getDrawMode());
    label->setDefaultDrawMode(label->getDrawMode());
    label->setFontResolution(64,64);

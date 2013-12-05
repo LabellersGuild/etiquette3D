@@ -13,16 +13,16 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
-using namespace osg;
-
 class test
 {
     public:
         test();
         virtual ~test();
-        lgNodeVisitor test_lgNodeVisitor_initialisation(Group* model);
-        void test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel);
+        lgNodeVisitor test_lgNodeVisitor_initialisation(osg::Group* model);
+        void test_label_setLinkNode(osg::ref_ptr<osg::Node> theLinkNode, lgLabel* theLabel);
+        void test_label_translateLabel(lgLabel* theLabel);
+        void test_label_compute2dBox(osgViewer::Viewer* viewer, lgLabel* theLabel);
+        void test_label_compute2dCenter(osgViewer::Viewer* viewer, lgLabel* theLabel);
 
     protected:
 
