@@ -23,7 +23,7 @@ using namespace std;
 using namespace osg;
 
 lgLabel* addTextLabel(Node* g, std::string nom_id, std::string nom, Vec3 recoPos, osgViewer::Viewer* viewer, lgType type);
-
+void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
 /// I don't use a makefile, but only Code::Blocks.
 /// To add the library dependencies : right clic on project, build options,
 /// linker settings, add every .so file in the /lib directory of OpenSceneGraph
@@ -42,10 +42,10 @@ int main()
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
     //  erreur lors de l'input d'une variable string
 
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
-    //string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+//    cout << "Entrer le path du fichier .citygml :" << endl;
+//    string pathFile;
+//    cin >> pathFile;
+    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the models
@@ -56,10 +56,10 @@ int main()
    }
 
     // Find the node with its ID :
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode;
-    cin >> idNode;
-    //string idNode = "ID_276003000001240";
+//    cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//    string idNode;
+//    cin >> idNode;
+    string idNode = "ID_276003000001240";
 
     lgNodeVisitor findNode(idNode);
     model->accept(findNode);
@@ -86,10 +86,10 @@ int main()
     label1->setSeeInTransparency(true);
 
     //second label
-    cout << "Entrer l'id du noeud à étiquetter :" << endl;
-    string idNode2;
-    cin >> idNode2;
-    //string idNode2 = "ID_311-TheMagdalena";
+//    cout << "Entrer l'id du noeud à étiquetter :" << endl;
+//    string idNode2;
+//    cin >> idNode2;
+    string idNode2 = "ID_276003000000992_7";
     lgNodeVisitor findNode2(idNode2);
     model->accept(findNode2);
     Node* secondNode = findNode2.getFirst();
@@ -101,6 +101,9 @@ int main()
     // Create LGInteraction
     listLabels.push_back(label1.get());
     listLabels.push_back(label2.get());
+    
+    addMoreLabel(findNode2, listLabels, model, &viewer);
+    
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
@@ -187,4 +190,41 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
    cout << label->distanceCamera(viewer);
 
    return label;
+}
+
+void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer){
+    string idNode = "ID_276003000000992_26";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    Node* aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    idNode = "ID_276003000000992_27";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    idNode = "ID_276003000005856_87";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    idNode = "ID_276003000005856_45";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    idNode = "ID_276003000005856_71";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
 }

@@ -42,7 +42,7 @@ lgLabel::lgLabel(std::string filePath, std::string idNode) {
  * set the param as linkNode attribute, then see if it got the
  * label in his children, if not it adds it (eventually creating a new
  * geode if the param is a group)
- * @param aNode, osg:ref_ptr<Node> to the node
+ * @param aNode, osg:ref_ptr<Node> to the node, Vec3 recoPos, the recommended starting position of the label
  */
 void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     this->linkNode = aNode;

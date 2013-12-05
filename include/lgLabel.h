@@ -179,7 +179,7 @@ class lgLabel : public osgText::Text {
          * @param text : String : the text on the label
          */
         void setInfoLabel(std::string text);
-
+        
     protected :
         //the node who is supposed to contain the label, if it is a group
         //it has a geode child containing the label
