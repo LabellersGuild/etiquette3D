@@ -82,7 +82,7 @@ osgUtil::PolytopeIntersector::Intersection* LGAnimation::intersectCameraLabel(No
     if ( intersector->containsIntersections())
     {
         intersection = *(intersector->getIntersections().begin());
-        if (intersection.drawable != label.get())
+        if (intersection.drawable != label)
         {
             return &intersection;
         }

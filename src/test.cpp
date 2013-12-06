@@ -65,7 +65,8 @@ void test::test_label_translateLabel(lgLabel* theLabel)
     Vec3 pos = theLabel->getAbsolutePosition();
     cout << "Position before translation : ( " << pos.x() << " , " << pos.y() << " , " << pos.z() << " )" << endl;
     theLabel->translateLabel(4,-6,10);
-    cout << "Translation(4,-6,10) : ( " << pos.x() << " , " << pos.y() << " , " << pos.z() << " )" << endl;
+    Vec3 pos2 = theLabel->getAbsolutePosition();
+    cout << "Translation(4,-6,10) : ( " << pos2.x() << " , " << pos2.y() << " , " << pos2.z() << " )" << endl;
     theLabel->translateLabel(-4,6,-10);
 }
 

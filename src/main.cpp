@@ -36,9 +36,9 @@ int main()
    vector<lgLabel*> listLabels = vector<lgLabel*>();
 
    // Load the model
-   // If you want to see the names of the nodes, write "names" instead of "" in the next line.
+   // If you want to see the names of the nodes, write "names" instead of "" in the next line. Do
+   // Does not work for every citygml file.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
-    //  erreur lors de l'input d'une variable string
 
     cout << "Entrer le path du fichier .citygml :" << endl;
     string pathFile;
@@ -81,7 +81,10 @@ int main()
     listLabels.push_back(label2.get());
 
     //Test of setTransparency :
-    label2->setTransparency(0.7);
+    label2->setTransparency(0.8);
+
+    //Indo label
+    label2->setInfoLabel("This is a well !");
 
     // Create LGInteraction
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
@@ -104,14 +107,17 @@ int main()
     osg::Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
 
-    //Some tests:
-    myTest.test_label_compute2dBox(&viewer, label1);
+    //Translate label test:
     myTest.test_label_translateLabel(label1);
-    myTest.test_label_compute2dCenter(&viewer, label1);
 
     while (!viewer.done()) {
-        a2dBox = label1->distance2dBox(pView,label2);
+        //a2dBox = label1->distance2dBox(pView,label2);
         //cout<<"distance 2d "<<a2dBox<<endl;
+
+        //Some tests :
+        //myTest.test_label_compute2dBox(&viewer, label1);
+        //myTest.test_label_compute2dCenter(&viewer, label1);
+
         viewer.frame();
     }
 }
@@ -128,8 +134,9 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
 
    if (type == EXTERNAL)
    {
-       // Test of the LGAnimation
-       ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
+       // Test of the LGAnimation : use of testLGAnimation class
+       //ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
+       ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
 

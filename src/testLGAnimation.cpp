@@ -21,7 +21,13 @@ void testLGAnimation::operator()(Node* node, NodeVisitor* nv)
 
     if (intersection != NULL)
     {
-        cout << "Hidden :"  << endl;
+        cout << "Hidden :"  << endl << "object hiding : " ;
+        for (unsigned i=0;i<intersection->nodePath.size();i++)
+        {
+            cout << "--" << (intersection->nodePath[i])->getName();
+        }
+        cout << "--" << intersection->drawable->getName() << endl;
+        cout << "Label hidden : " << label->getText().createUTF8EncodedString() << endl;
 
         //Local position of the interesection
         Vec4 intersectionLocalPosition = Vec4(intersection->localIntersectionPoint.x(), intersection->localIntersectionPoint.y(), intersection->localIntersectionPoint.z(), 1);
