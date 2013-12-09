@@ -18,23 +18,38 @@ using namespace osg;
 lgLabel::lgLabel() : osgText::Text(){
      hidingDistance = -1;
      labelType = EXTERNAL;
+     internal = false;
+     seeInTransparency = false;
+     defaultDrawMode = osgText::Text::TEXT | osgText::Text::ALIGNMENT ;
+     previousDrawMode = defaultDrawMode;
+     changingWhenMouse = true;
 }
 
 lgLabel::lgLabel(const lgLabel& originalLabel) {
-     hidingDistance = -1;
-     labelType = EXTERNAL;
+    linkNode = originalLabel.linkNode;
+    absolutePosition = Vec3(originalLabel.absolutePosition);
+    positionInit = Vec3(originalLabel.positionInit);
+    priority = originalLabel.priority;
+    labelType = originalLabel.labelType;
+    internal = originalLabel.internal;
+    updatedMatrix = originalLabel.updatedMatrix;
+    hidingDistance = originalLabel.hidingDistance;
+    seeInTransparency = originalLabel.seeInTransparency;
+    defaultDrawMode = originalLabel.defaultDrawMode;
+    previousDrawMode = originalLabel.previousDrawMode;
+    changingWhenMouse = originalLabel.changingWhenMouse;
+    infoLabel = originalLabel.infoLabel;
 }
 
-lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos) {
-    this->setText(text);
-    this->setLinkNode(linkedNode, recoPos);
-    hidingDistance = -1;
-    labelType = EXTERNAL;
+lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos) : lgLabel(){
+    setText(text);
+    setLinkNode(linkedNode, recoPos);
+    setPositionInit(recoPos);
 }
 
-lgLabel::lgLabel(std::string filePath, std::string idNode) {
-     hidingDistance = -1;
-     labelType = EXTERNAL;
+lgLabel::lgLabel(std::string filePath, std::string idNode) : lgLabel(){
+
+     // What to do with this constructor ?
 }
 
 //getters and setters
@@ -89,7 +104,7 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
 }
 
 
-ref_ptr<Node> lgLabel::getLinkNode() {
+ref_ptr<Node> lgLabel::getLinkNode() const{
     return this->linkNode;
 }
 
@@ -129,14 +144,14 @@ void lgLabel::setPosition(osg::Vec3 relativePosition) {
 /** Getter for the labelType
  * @return lgType :
  */
-lgType lgLabel::getLabelType(){
+lgType lgLabel::getLabelType() const{
     return labelType;
 }
 
 /** Getter for the internal attribute
  * @return bool : internal
  */
-bool lgLabel::getInternal() {
+bool lgLabel::getInternal() const{
     return internal;
 }
 
@@ -159,12 +174,12 @@ void lgLabel::setPositionInit(Vec3 newPositionInit){
 /** Getter of the positionInit
  * @return Vec3 : the inital position of the label
  */
-Vec3 lgLabel::getPositionInit(){
+Vec3 lgLabel::getPositionInit() const{
     return positionInit;
 }
 
 
-float lgLabel::distance(ref_ptr<lgLabel> otherLabel){
+float lgLabel::distance(ref_ptr<lgLabel> otherLabel) {
     Vec3 myPos = this->getAbsolutePosition();
     Vec3 otherPos = otherLabel->getAbsolutePosition();
     float distance = sqrt(pow(myPos.x()-otherPos.x(),2.0)+pow(myPos.y()-otherPos.y(),2.0)+pow(myPos.z()-otherPos.z(),2.0));
@@ -200,7 +215,7 @@ float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> othe
  * using the bounding boxes of the labels
  */
 
-float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel){
+float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel) {
     //We first get the 2dBox of both labels
     osg::Vec4 my2dBox = this->compute2dBox(view);
     osg::Vec4 other2dBox = otherLabel->compute2dBox(view);
@@ -247,7 +262,7 @@ float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<
  * @param view : ref_ptr<osgViewer::Viewer> : the viewer object of the main file
  * @return float : distance between the camera and the label
  */
-float lgLabel::distanceCamera(ref_ptr<osgViewer::Viewer> view)
+float lgLabel::distanceCamera(ref_ptr<osgViewer::Viewer> view) const
 {
      Matrix matrixCamera = view->getCamera()->getInverseViewMatrix();
      Vec3 positionCamera= Vec3(matrixCamera(3,0), matrixCamera(3,1), matrixCamera(3,2));
@@ -258,7 +273,7 @@ float lgLabel::distanceCamera(ref_ptr<osgViewer::Viewer> view)
 /** Getter of the hindingDistance
  * @return int : the hiding distance
  */
-int lgLabel::getHidingDistance()
+int lgLabel::getHidingDistance() const
 {
     return hidingDistance;
 }
@@ -326,6 +341,7 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
             screenXyZ = (center + Vec3(bboxXMax,bboxYMin,bboxZMax)) * MVPW;
             screenxYZ = (center + Vec3(bboxXMin,bboxYMax,bboxZMax)) * MVPW;
             screenXYZ = (center + Vec3(bboxXMax,bboxYMax,bboxZMax)) * MVPW;
+
         }
     }
     // If no info label :
@@ -342,24 +358,36 @@ osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
         screenXYZ = (center + Vec3(bbox.xMax(),bbox.yMax(),bbox.zMax())) * MVPW;
     }
 
-     // The bounds of the polytope are determined by the two projected points the most on the left and on the right on the screen.
-    Vec3 mostLeft = screenxyz.x() < screenXyz.x() ? screenxyz : screenXyz;
-    mostLeft = mostLeft.x() < screenxYz.x() ? mostLeft : screenxYz;
-    mostLeft = mostLeft.x() < screenxyZ.x() ? mostLeft : screenxyZ;
-    mostLeft = mostLeft.x() < screenXYz.x() ? mostLeft : screenXYz;
-    mostLeft = mostLeft.x() < screenXyZ.x() ? mostLeft : screenXyZ;
-    mostLeft = mostLeft.x() < screenxYZ.x() ? mostLeft : screenxYZ;
-    mostLeft = mostLeft.x() < screenXYZ.x() ? mostLeft : screenXYZ;
+    Vec3 pointA, pointB;
+    pointA = screenxyz;
+    pointB = screenXYZ;
+    float deltaYmin = fabs(screenxyz.y() - screenXYZ.y());
+    if (deltaYmin > fabs(screenXyz.y() - screenxYZ.y()))
+    {
+         deltaYmin = fabs(screenXyz.y() - screenxYZ.y());
+         pointA = screenXyz;
+         pointB = screenxYZ;
+    }
+    if (deltaYmin > fabs(screenxYz.y() - screenXyZ.y()))
+    {
+        deltaYmin = fabs(screenxYz.y() - screenXyZ.y());
+        pointA = screenxYz;
+        pointB = screenXyZ;
+    }
+    if (deltaYmin > fabs(screenxyZ.y() - screenXYZ.y()))
+    {
+        deltaYmin = fabs(screenxyZ.y() - screenXYz.y());
+        pointA = screenxyZ;
+        pointB = screenXYz;
+    }
 
-    Vec3 mostRight = screenxyz.x() > screenXyz.x() ? screenxyz : screenXyz;
-    mostRight = mostRight.x() > screenxYz.x() ? mostRight : screenxYz;
-    mostRight = mostRight.x() > screenxyZ.x() ? mostRight : screenxyZ;
-    mostRight = mostRight.x() > screenXYz.x() ? mostRight : screenXYz;
-    mostRight = mostRight.x() > screenXyZ.x() ? mostRight : screenXyZ;
-    mostRight = mostRight.x() > screenxYZ.x() ? mostRight : screenxYZ;
-    mostRight = mostRight.x() > screenXYZ.x() ? mostRight : screenXYZ;
+    float minx = pointA.x() < pointB.x() ? pointA.x() : pointB.x();
+    float miny = pointA.y() < pointB.y() ? pointA.y() : pointB.y();
+    float maxx = pointA.x() > pointB.x() ? pointA.x() : pointB.x();
+    float maxy = pointA.y() > pointB.y() ? pointA.y() : pointB.y();
 
-    Vec4 bounds = Vec4(mostLeft.x(), mostLeft.y() < mostRight.y() ? mostLeft.y() : mostRight.y(), mostRight.x(), mostLeft.y() > mostRight.y() ? mostLeft.y() : mostRight.y());
+    Vec4 bounds = Vec4(minx, miny, maxx, maxy);
+
     return bounds;
 }
 
@@ -410,7 +438,7 @@ void lgLabel::setSeeInTransparency(bool b)
 {
     if (b)
     {
-        setTransparency(0.5);
+        setTransparency(0.7);
 
         // Disable depth testing so geometry is draw regardless of depth values of geometry already draw.
         ref_ptr<StateSet> stateSet = updatedMatrix->getOrCreateStateSet();
@@ -440,7 +468,7 @@ void lgLabel::setPreviousDrawMode(int d)
 /** Getter of the previousDrawMode
  * @return int : the previous draw mode
  */
-int lgLabel::getPreviousDrawMode()
+int lgLabel::getPreviousDrawMode() const
 {
     return previousDrawMode;
 }
@@ -456,7 +484,7 @@ void lgLabel::setDefaultDrawMode(int d)
 /** Getter of the defaultDrawMode
  * @return int : the defaultDrawMode
  */
-int lgLabel::getDefaultDrawMode()
+int lgLabel::getDefaultDrawMode() const
 {
     return defaultDrawMode;
 }
@@ -464,7 +492,7 @@ int lgLabel::getDefaultDrawMode()
 /** To know if the label has to change when the mouse is on it
  * @return bool
  */
-bool lgLabel::isChangingWhenMouse()
+bool lgLabel::isChangingWhenMouse() const
 {
    return changingWhenMouse;
 }
@@ -481,7 +509,7 @@ void lgLabel::setChangingWhenMouse(bool b)
  * @param node : ref_ptr<Group> node : For the first call of the function, it is the node parent of the matrixTransform of the label
  * @param bbox : BoundingBox : For the first call, put BoundingBox(0,0,0,0,0,0)
  */
-BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox)
+BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) const
 {
     //Look at the children
     for(unsigned i=0;i< node->getNumChildren();i++)
@@ -544,7 +572,7 @@ void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
    if (type == EXTERNAL)
    {
        setAxisAlignment(osgText::Text::SCREEN);
-       setAlignment(osgText::Text::CENTER_TOP);
+       setAlignment(osgText::Text::CENTER_BOTTOM);
 
        //Put the label on the initial position. It is the recommended position by default.
        updatedMatrix->setMatrix(Matrixd::translate(getPositionInit()));
@@ -563,7 +591,7 @@ void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
    else //INTERNAL_FACE
    {
        setAxisAlignment(osgText::Text::XZ_PLANE);
-       setAlignment(osgText::Text::CENTER_BOTTOM);
+       setAlignment(osgText::Text::CENTER_CENTER);
 
        //Bounding box of the linked object
        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
@@ -579,22 +607,23 @@ void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
 void lgLabel::setInfoLabel(string text)
 {
     ref_ptr<Geode> geodeInfoLabel = new Geode;
-    ref_ptr<osgText::Text> infoLabel = new osgText::Text;
+    infoLabel = new osgText::Text;
 
     updatedMatrix->addChild(geodeInfoLabel.get());
     geodeInfoLabel->addDrawable(infoLabel.get());
     infoLabel->setText(text, osgText::String::ENCODING_UTF8 );
     infoLabel->setAxisAlignment(osgText::Text::SCREEN);
-    infoLabel->setAlignment(osgText::Text::CENTER_BOTTOM);
-    infoLabel->setCharacterSize(2);
+    infoLabel->setAlignment(osgText::Text::CENTER_TOP);
+    infoLabel->setCharacterSize(getCharacterHeight()-1);
     infoLabel->setDrawMode(0); // Hidden by default
     geodeInfoLabel->setNodeMask( 0x1 );
+    //infoLabel->setPosition(getPosition()));
 }
 
 /** infoLabel getter
  * @return osgText::Text* : the infoLabel
  */
-osgText::Text* lgLabel::getInfoLabel()
+osgText::Text* lgLabel::getInfoLabel() const
 {
    return infoLabel;
 }
@@ -602,7 +631,7 @@ osgText::Text* lgLabel::getInfoLabel()
 /** updatedMatrix getter
  * @return updatedMatrix : MatrixTransform*
  */
-MatrixTransform* lgLabel::getUpdatedMatrix()
+MatrixTransform* lgLabel::getUpdatedMatrix() const
 {
     return updatedMatrix;
 }

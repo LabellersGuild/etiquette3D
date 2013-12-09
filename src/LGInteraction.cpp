@@ -196,13 +196,14 @@ bool LGInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                 {
                     StateSet * stateset = selectedLabels.at(i)->getUpdatedMatrix()->getParent(0)->getOrCreateStateSet();
                     stateset->setMode(GL_FOG, StateAttribute::ON);
+
                 }
                 break;
             // 'm' or 'M' : set the objects linked to the selected labels back to normal
             case 'm' : case 'M' :
                 for (unsigned i(0);i<selectedLabels.size();i++)
                 {
-                    StateSet * stateset = selectedLabels.at(i)->getUpdatedMatrix()->getOrCreateStateSet();
+                    StateSet * stateset = selectedLabels.at(i)->getUpdatedMatrix()->getParent(0)->getOrCreateStateSet();
                     stateset->setMode(GL_FOG, StateAttribute::OFF);
                 }
                 break;
@@ -216,12 +217,12 @@ bool LGInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                       if (infoLabel->getDrawMode()==0)
                       {
                           infoLabel->setDrawMode(osgText::Text::TEXT);
-                          selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()+Vec3(0,0,infoLabel->getBound().zMax()));
+                          selectedLabels.at(i)->setPositionInit(selectedLabels.at(i)->getPositionInit()+Vec3(0,0,(infoLabel->getBound().zMax()-infoLabel->getBound().zMin())));
                       }
                       else
                       {
                            infoLabel->setDrawMode(0);
-                           selectedLabels.at(i)->setPosition(selectedLabels.at(i)->getPosition()-Vec3(0,0,infoLabel->getBound().zMax()));
+                           selectedLabels.at(i)->setPositionInit(selectedLabels.at(i)->getPositionInit()-Vec3(0,0,(infoLabel->getBound().zMax()-infoLabel->getBound().zMin())));
                       }
                   }
                 }

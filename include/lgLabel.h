@@ -35,9 +35,9 @@ class lgLabel : public osgText::Text {
         //getters and setters
         void setLinkNode(osg::ref_ptr<osg::Node> aNode, osg::Vec3 recoPos);
 
-        osg::ref_ptr<osg::Node> getLinkNode();
+        osg::ref_ptr<osg::Node> getLinkNode()const;
 
-        void calcAbsolutePosition();
+        void calcAbsolutePosition() ;
 
         osg::Vec3 getAbsolutePosition();
 
@@ -46,7 +46,7 @@ class lgLabel : public osgText::Text {
         /** Getter for the labelType
          * @return lgType :
          */
-        lgType getLabelType();
+        lgType getLabelType() const;
 
         /** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
          * @param type : lgType : the type of label
@@ -57,7 +57,7 @@ class lgLabel : public osgText::Text {
         /** Getter for the internal attribute
          * @return bool : internal
          */
-        bool getInternal();
+        bool getInternal() const;
 
         /** Setter for the internal attribute
          * @param internal : bool
@@ -69,13 +69,13 @@ class lgLabel : public osgText::Text {
         /** Getter of the positionInit
          * @return Vec3 : the inital position of the label
          */
-        osg::Vec3 getPositionInit();
+        osg::Vec3 getPositionInit() const;
 
-        float distance(osg::ref_ptr<lgLabel> otherLabel);
+        float distance(osg::ref_ptr<lgLabel> otherLabel) ;
 
         osg::Vec3 distanceVec(osg::ref_ptr<lgLabel> otherLabel);
 
-        float distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
+        float distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel) ;
 
         float distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
 
@@ -83,12 +83,12 @@ class lgLabel : public osgText::Text {
          * @param view : ref_ptr<osgViewer::Viewer> : the viewer object of the main file
          * @return float : distance between the camera and the label
          */
-        float distanceCamera(osg::ref_ptr<osgViewer::Viewer> view);
+        float distanceCamera(osg::ref_ptr<osgViewer::Viewer> view) const;
 
         /** Getter of the hindingDistance
          * @return int : the hiding distance
          */
-        int getHidingDistance();
+        int getHidingDistance() const;
 
         /** Setter of the hidingDistance
          * @param hDistance : int : hiding distance
@@ -105,7 +105,7 @@ class lgLabel : public osgText::Text {
          * @param ref_ptr<osgViewer::Viewer> view : the viewer object of the main file
          * @return Vec2 : position (x,y) of the center
          */
-        osg::Vec2 compute2dCenter(osg::ref_ptr<osgViewer::Viewer> view);
+        osg::Vec2 compute2dCenter(osg::ref_ptr<osgViewer::Viewer> view) ;
 
         /** Translate the label
          * @param x : int : y axis translation
@@ -127,7 +127,7 @@ class lgLabel : public osgText::Text {
         /** updatedMatrix getter
          * @return updatedMatrix : MatrixTransform*
          */
-        osg::MatrixTransform* getUpdatedMatrix();
+        osg::MatrixTransform* getUpdatedMatrix() const;
 
         /** Setter to see the label in transparency in front of or behind the objects.
          * @param b : bool : true to set the transparency, false otherwise.
@@ -142,7 +142,7 @@ class lgLabel : public osgText::Text {
         /** Getter of the defaultDrawMode
          * @return int : the defaultDrawMode
          */
-        int getDefaultDrawMode();
+        int getDefaultDrawMode() const;
 
         /** Setter of the previousDrawMode
          * @param d : int : a draw mode
@@ -152,12 +152,12 @@ class lgLabel : public osgText::Text {
         /** Getter of the previousDrawMode
          * @return int : the previous draw mode
          */
-        int getPreviousDrawMode();
+        int getPreviousDrawMode() const;
 
         /** To know if the label has to change when the mouse is on it
          * @return bool
          */
-        bool isChangingWhenMouse();
+        bool isChangingWhenMouse() const;
 
         /** Setter of changingWhenMouse
          * @param b : bool : true if the label changes when the mouse is on it, false otherwise.
@@ -168,12 +168,12 @@ class lgLabel : public osgText::Text {
          * @param node : ref_ptr<Group> node : For the first call of the function, it is the node parent of the matrixTransform of the label
          * @param bbox : BoundingBox : For the first call, put BoundingBox(0,0,0,0,0,0)
          */
-        osg::BoundingBox computeObjectBBox(osg::ref_ptr<osg::Group> node, osg::BoundingBox bbox);
+        osg::BoundingBox computeObjectBBox(osg::ref_ptr<osg::Group> node, osg::BoundingBox bbox) const;
 
         /** infoLabel getter
          * @return osgText::Text* : the infoLabel
          */
-        osgText::Text* getInfoLabel();
+        osgText::Text* getInfoLabel() const;
 
         /** Create the infoLabel
          * @param text : String : the text on the label
