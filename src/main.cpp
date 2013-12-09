@@ -207,6 +207,13 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    return label;
 }
 
+/**
+ * Use this function if you are lazy and just want to add labels, remember to change the idNode(s)
+ * @param visitor a lgNodeVisitor
+ * @param listLabels the list of Labels for further interactions
+ * @param model the model of the citygml file translated in OSG
+ * @param viewer the viewer
+ */
 void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer){
     string idNode = "ID_276003000000992_26";
     visitor.setNameToFind(idNode);

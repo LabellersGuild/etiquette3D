@@ -29,6 +29,12 @@ test::~test()
     //dtor
 }
 
+/**
+ * This test is used to set a label (with idNode as input) and
+ * see if we can recommand a position
+ * @param model the model containing the citygml as OSG
+ * @return findNode : the nodeVisitor fed with the vertex of child drawables and recommended position
+ */
 lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model){
 
     // Find the node with its ID :
@@ -56,12 +62,21 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model){
     return findNode;
 }
 
+/**
+ * Function used to check that we got the proper linkNode
+ * @param theLinkNode the Node father of the label
+ * @param theLabel the label we want to link
+ */
 void test::test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel){
     if(theLinkNode.get()==(theLabel->getLinkNode()).get()){
         cout<<"Le linkNode a bien �t� assign� � l'�tiquette"<<endl;
     }
 }
 
+/**
+ * Test if translation of the label works
+ * @param theLabel : the label we want to translate
+ */
 void test::test_label_translateLabel(lgLabel* theLabel)
 {
     Vec3 pos = theLabel->getAbsolutePosition();
