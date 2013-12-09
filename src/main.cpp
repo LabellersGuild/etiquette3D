@@ -71,11 +71,11 @@ int main()
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, INTERNAL_FACE);
 
     //Hide the label if it is too far
     label1->setHidingDistance(1000);
-    label1->setSeeInTransparency(true);
+    label1->setSeeInTransparency(false);
 
     //second label
 //    cout << "Entrer l'id du noeud à étiquetter :" << endl;
@@ -94,7 +94,7 @@ int main()
     listLabels.push_back(label1.get());
     listLabels.push_back(label2.get());
     
-    addMoreLabel(findNode2, listLabels, model, &viewer);
+    //addMoreLabel(findNode2, listLabels, model, &viewer);
     
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
@@ -114,9 +114,18 @@ int main()
     float a2dBox = label1->distance2dBox(pView,label2);
     osg::Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
-
+    
+    std::clock_t start;
+    double timer;
+    int frame = 0;
+    float fps;
+    start = clock();
     while (!viewer.done()) {
         float a2dBox = label1->distance2dBox(pView,label2);
+        timer = (clock() - start) / (double) CLOCKS_PER_SEC;
+        start = clock();
+        fps = 1/timer;
+        cout<<"fps :"<<fps<<endl;
         //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
@@ -160,7 +169,7 @@ lgLabel* addTextLabel(Node* g, std::string name_id, std::string name, Vec3 recoP
    // TODO : change the path to the font
    //label->setFont("/home/tbrunel/Telechargements/OSG_data/OSG_data/fonts/arial.ttf");
    label->setText(name, osgText::String::ENCODING_UTF8 );
-   label->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
+   label->setColor( Vec4(0,0,0,1.0f) );
    label->setDrawMode(osgText::Text::TEXT |
                              osgText::Text::ALIGNMENT);
     //Record the draw mode
@@ -221,4 +230,24 @@ void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* mod
     aNode = visitor.getFirst();
     visitor.feedFoundPointList(*(aNode));
     listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    idNode = "ID_276003000001194";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    
+    
+    string nodeName="ID_276003000001194_";
+    char numstr[21];
+    for (int j=1;j<19;j++){
+        sprintf(numstr, "%d", j);
+        idNode=nodeName+numstr;
+        visitor.setNameToFind(idNode);
+        model->accept(visitor);
+        aNode = visitor.getFirst();
+        visitor.feedFoundPointList(*(aNode));
+        listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL)); 
+    }
 }
