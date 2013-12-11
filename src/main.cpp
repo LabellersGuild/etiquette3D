@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <osg/BlendFunc>
+#include <osg/ShapeDrawable>
 
 using namespace std;
 using namespace osg;
@@ -90,7 +91,7 @@ int main()
 
     //Test of setTransparency :
     label2->setTransparency(0.8);
-
+    label2->addArrow();
     //Info label
     label2->setInfoLabel("This is a well !");
 

@@ -7,6 +7,7 @@
 
 #include <osgViewer/Viewer>
 #include <osg/MatrixTransform>
+#include <osg/ShapeDrawable>
 #include "../include/LGAnimation.h"
 #include "../include/myLGAnimation.h"
 #include "../include/lgLabel.h"
@@ -634,4 +635,20 @@ osgText::Text* lgLabel::getInfoLabel() const
 MatrixTransform* lgLabel::getUpdatedMatrix() const
 {
     return updatedMatrix;
+}
+
+void lgLabel::addArrow(){
+    if(updatedMatrix!=NULL){
+        ref_ptr<Cylinder> theArrow = new Cylinder(Vec3(0,0,-25),0.2,50);
+        ref_ptr<ShapeDrawable> arrowDrawable = new ShapeDrawable(theArrow);
+        ref_ptr<Geode> theGeode = new Geode();
+        theGeode->addDrawable(arrowDrawable);
+        updatedMatrix->addChild(theGeode);
+        arrowDrawable->setColor(Vec4(0,0,0,1));
+        infoArrow = arrowDrawable;
+    }
+}
+
+ref_ptr<ShapeDrawable> lgLabel::getArrow(){
+    return infoArrow;
 }
