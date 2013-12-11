@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <osg/BlendFunc>
+#include <osg/ShapeDrawable>
 
 using namespace std;
 using namespace osg;
@@ -44,10 +45,10 @@ int main()
    // Does not work for every citygml file.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
 
-//    cout << "Entrer le path du fichier .citygml :" << endl;
-//    string pathFile;
-//    cin >> pathFile;
-    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+    cout << "Entrer le path du fichier .citygml :" << endl;
+    string pathFile;
+    cin >> pathFile;
+//    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -92,8 +93,13 @@ int main()
     //Test of setTransparency :
     label2->setTransparency(0.8);
 
+
     //Indo label
     label1->setInfoLabel("Castle constructed in the XIV th century");
+
+    label2->addArrow();
+    //Info label
+    label2->setInfoLabel("This is a well !");
 
     //more label
     //addMoreLabel(findNode,listLabels,model,&viewer);

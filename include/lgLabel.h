@@ -17,6 +17,7 @@
 
 #include "lgNodeVisitor.h"
 #include <osgText/Text>
+#include <osg/ShapeDrawable>
 #include <osgViewer/Viewer>
 #include "LGAnimation.h"
 
@@ -234,6 +235,9 @@ class lgLabel : public osgText::Text {
          */
         void setInfoLabel(std::string text);
 
+        void addArrow();
+        osg::ref_ptr<osg::ShapeDrawable> getArrow();
+
     protected :
         /**The node which is supposed to contain the label, if it is a group
          * it has a geode child containing the label
@@ -286,6 +290,7 @@ class lgLabel : public osgText::Text {
          /** Information label
           */
          osg::ref_ptr<osgText::Text> infoLabel;
+         osg::ref_ptr<osg::ShapeDrawable> infoArrow;
 };
 
 #endif	/* LGLABEL_H */
