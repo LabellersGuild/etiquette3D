@@ -71,7 +71,7 @@ int main()
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
-    label1->setSeeInTransparency(true);
+    //label1->setSeeInTransparency(true);
 
     //second label
     lgNodeVisitor findNode2 = myTest.test_lgNodeVisitor_initialisation(model);
@@ -84,7 +84,7 @@ int main()
     label2->setTransparency(0.8);
 
     //Indo label
-    label2->setInfoLabel("This is a well !");
+    label1->setInfoLabel("Chateau construit au XIV siecle");
 
     // Create LGInteraction
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);

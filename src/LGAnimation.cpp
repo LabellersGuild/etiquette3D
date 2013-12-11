@@ -65,17 +65,7 @@ osgUtil::PolytopeIntersector::Intersection* LGAnimation::intersectCameraLabel(No
     ref_ptr<osgUtil::PolytopeIntersector> intersector = new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, bbox2d[0]-Xmin, bbox2d[1]-Ymin, bbox2d[2]-Xmax, bbox2d[3]-Ymax);
     osgUtil::IntersectionVisitor iv( intersector.get() );
 
-
-    //If there is no info label :
-    if (label->getInfoLabel() == NULL)
-    {
-        iv.setTraversalMask( ~0x1 );
-    }
-    //There is an info label but it is hidden ;
-    else if (label->getInfoLabel()->getDrawMode() == 0)
-    {
-        iv.setTraversalMask( ~0x1 );
-    }
+    iv.setTraversalMask(~0x1);
 
     view->getCamera()->accept( iv );
     //If an object is detected
