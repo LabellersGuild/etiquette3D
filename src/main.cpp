@@ -1,3 +1,7 @@
+/** File : main.cpp
+ * Description : Test file for our library
+ */
+
 #include <osg/Group>
 #include <osgDB/ReadFile>
 #include <osg/PositionAttitudeTransform>
@@ -26,11 +30,6 @@ using namespace osg;
 
 lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string nom_id, string nom, Vec3 recoPos, ref_ptr<osgViewer::Viewer> viewer, lgType type);
 void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
-/// I don't use a makefile, but only Code::Blocks.
-/// To add the library dependencies : right clic on project, build options,
-/// linker settings, add every .so file in the /lib directory of OpenSceneGraph
-/// Then, to use the program, the building is done by codeblocks, but launch it with a console.
-/// The program is in /bin/Debug of the project
 
 int main()
 {
@@ -49,12 +48,12 @@ int main()
 //    string pathFile;
 //    cin >> pathFile;
     string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
-    model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
+    model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
    if (! model )
    {
-      std::cout << "could not load model" << std::endl;
+      cout << "could not load model" << endl;
       return -1;
    }
 
@@ -118,16 +117,17 @@ int main()
     float calcDist = sqrt(pow(vecDist.x(),2.0)+pow(vecDist.y(),2.0)+pow(vecDist.z(),2.0));
     cout<<"distance vec "<<calcDist<<endl;
     float a2dBox = label1->distance2dBox(pView,label2);
-    osg::Vec4 bounds = label1->compute2dBox(pView);
+    Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
 
 
     //Translate label test:
     myTest.test_label_translateLabel(label1);
-    std::clock_t start;
+    clock_t start;
     double timer;
     float fps;
-    while (!viewer.done()) {
+    while (!viewer.done())
+    {
         //a2dBox = label1->distance2dBox(pView,label2);
 
         //cout<<"distance 2d "<<a2dBox<<endl;
@@ -262,7 +262,8 @@ void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* mod
 
     string nodeName="ID_276003000001194_";
     char numstr[21];
-    for (int j=1;j<19;j++){
+    for (int j=1;j<19;j++)
+    {
         sprintf(numstr, "%d", j);
         idNode=nodeName+numstr;
         visitor.setNameToFind(idNode);

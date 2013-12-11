@@ -22,7 +22,8 @@ using namespace osg;
 
 /** Default constructor
  */
-lgLabel::lgLabel() : osgText::Text(){
+lgLabel::lgLabel() : osgText::Text()
+{
      hidingDistance = -1;
      labelType = EXTERNAL;
      internal = false;
@@ -35,7 +36,8 @@ lgLabel::lgLabel() : osgText::Text(){
 /** Copy constructor
  * @param originalLabel : lgLabel : label that will be copied
  */
-lgLabel::lgLabel(const lgLabel& originalLabel) {
+lgLabel::lgLabel(const lgLabel& originalLabel)
+{
     linkNode = originalLabel.linkNode;
     absolutePosition = Vec3(originalLabel.absolutePosition);
     positionInit = Vec3(originalLabel.positionInit);
@@ -54,7 +56,8 @@ lgLabel::lgLabel(const lgLabel& originalLabel) {
  * @param linkedNode : ref_ptr<Node> : node linked to the label
  * @param recoPos : Vec3 : recommended position
  */
-lgLabel::lgLabel(string text, ref_ptr<Node> linkedNode, Vec3 recoPos){
+lgLabel::lgLabel(string text, ref_ptr<Node> linkedNode, Vec3 recoPos)
+{
     hidingDistance = -1;
      labelType = EXTERNAL;
      internal = false;
@@ -72,7 +75,8 @@ lgLabel::lgLabel(string text, ref_ptr<Node> linkedNode, Vec3 recoPos){
  * @param filePath : string
  * @param idNode : string
  */
-lgLabel::lgLabel(string filePath, string idNode){
+lgLabel::lgLabel(string filePath, string idNode)
+{
     hidingDistance = -1;
     labelType = EXTERNAL;
     internal = false;
@@ -91,21 +95,25 @@ lgLabel::lgLabel(string filePath, string idNode){
  * @param aNode : osg:ref_ptr<Node> : link node
  * @param recoPos : Vec3  : the recommended starting position of the label
  */
-void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
+void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos)
+{
     this->linkNode = aNode;
     this->setPositionInit(recoPos);
     this->setChangingWhenMouse(true);
 
-    osg::ref_ptr<osg::Group> targetGroup = dynamic_cast<osg::Group*>(linkNode.get());
-    osg::ref_ptr<osg::Geode> targetGeode = dynamic_cast<osg::Geode*>(linkNode.get());
-    osg::ref_ptr<osg::MatrixTransform> mtLabel1 = new osg::MatrixTransform(osg::Matrixd::translate(recoPos));
+    ref_ptr<Group> targetGroup = dynamic_cast<Group*>(linkNode.get());
+    ref_ptr<Geode> targetGeode = dynamic_cast<Geode*>(linkNode.get());
+    ref_ptr<MatrixTransform> mtLabel1 = new MatrixTransform(Matrixd::translate(recoPos));
 
     bool alreadyChild = false;
     //if we have a geode, we need to find its parent to then create a matrixTransform
-    if(targetGeode&&!targetGroup){
-        for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++){
-            osg::ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
-            if(drawAsLabel && drawAsLabel.get()==this){
+    if(targetGeode&&!targetGroup)
+    {
+        for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++)
+        {
+            ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
+            if(drawAsLabel && drawAsLabel.get()==this)
+            {
                 alreadyChild = true;
             }
         }
@@ -113,23 +121,28 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     }
 
     //when we got a group, we set the matrix transform as child and put inside a new Geode
-    if(targetGroup){
-        targetGeode = new osg::Geode();
+    if(targetGroup)
+    {
+        targetGeode = new Geode();
         targetGroup->addChild(mtLabel1);
         mtLabel1->addChild(targetGeode);
         this->updatedMatrix=mtLabel1;
     }
     //adding the label as child of the geode
-    if(targetGeode){
+    if(targetGeode)
+    {
         //TODO deal with the case when we directly have a Geode
         bool alreadyChild = false;
-        for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++){
+        for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++)
+        {
             ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
-            if(drawAsLabel && drawAsLabel.get()==this){
+            if(drawAsLabel && drawAsLabel.get()==this)
+            {
                 alreadyChild = true;
             }
         }
-        if(!alreadyChild){
+        if(!alreadyChild)
+        {
             targetGeode->addDrawable(this);
         }
     }
@@ -138,18 +151,22 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
 /** Getter of linknode
  * @return ref_ptr<Node> linkNode
  */
-ref_ptr<Node> lgLabel::getLinkNode() const{
+ref_ptr<Node> lgLabel::getLinkNode() const
+{
     return this->linkNode;
 }
 
 /** Calculate the absolute position thanks to the position of linknode
  */
-void lgLabel::calcAbsolutePosition() {
-    if(this->getLinkNode() ){
+void lgLabel::calcAbsolutePosition()
+{
+    if(this->getLinkNode() )
+    {
         Vec4 extendedPosition = Vec4(this->getPosition(), 1);
         //getting the list of transposed transformation matrices, from node to root
         MatrixList matricesList = updatedMatrix->getWorldMatrices();
-        for (unsigned i=0;i<matricesList.size();i++){
+        for (unsigned i=0;i<matricesList.size();i++)
+        {
             extendedPosition = extendedPosition*matricesList[i];
         }
         this->absolutePosition = Vec3(extendedPosition.x(),extendedPosition.y(),extendedPosition.z());
@@ -159,11 +176,15 @@ void lgLabel::calcAbsolutePosition() {
 /** Calculate the abosolute position and return it
  * @return Vec3 : absolute position
  */
-Vec3 lgLabel::getAbsolutePosition() {
-    if(this->getLinkNode()){
+Vec3 lgLabel::getAbsolutePosition()
+{
+    if(this->getLinkNode())
+    {
         this->calcAbsolutePosition();
         return this->absolutePosition;
-    } else {
+    }
+    else
+    {
         return Vec3(0,0,0);
     }
 }
@@ -174,7 +195,8 @@ Vec3 lgLabel::getAbsolutePosition() {
  * and therefore will have trouble with animations
  * @param relativePosition : Vec3 : position to set.
  */
-void lgLabel::setPosition(osg::Vec3 relativePosition) {
+void lgLabel::setPosition(Vec3 relativePosition)
+{
 
     osgText::Text::setPosition(relativePosition);
     this->calcAbsolutePosition();
@@ -183,7 +205,8 @@ void lgLabel::setPosition(osg::Vec3 relativePosition) {
 /** Getter for the labelType
  * @return lgType :
  */
-lgType lgLabel::getLabelType() const{
+lgType lgLabel::getLabelType() const
+{
     return labelType;
 }
 
@@ -191,14 +214,16 @@ lgType lgLabel::getLabelType() const{
  * but also call the setPosition method with the same argument
  * @param newPositioinInit : Vec3 : new initial position
  */
-void lgLabel::setPositionInit(Vec3 newPositionInit){
+void lgLabel::setPositionInit(Vec3 newPositionInit)
+{
     positionInit = newPositionInit;
 }
 
 /** Getter of the positionInit
  * @return Vec3 : the inital position of the label
  */
-Vec3 lgLabel::getPositionInit() const{
+Vec3 lgLabel::getPositionInit() const
+{
     return positionInit;
 }
 
@@ -206,7 +231,8 @@ Vec3 lgLabel::getPositionInit() const{
  * @param otherLabel : ref_ptr<lgLabel> : other label
  * @return float : distance
  */
-float lgLabel::distance(ref_ptr<lgLabel> otherLabel) {
+float lgLabel::distance(ref_ptr<lgLabel> otherLabel)
+{
     Vec3 myPos = this->getAbsolutePosition();
     Vec3 otherPos = otherLabel->getAbsolutePosition();
     float distance = sqrt(pow(myPos.x()-otherPos.x(),2.0)+pow(myPos.y()-otherPos.y(),2.0)+pow(myPos.z()-otherPos.z(),2.0));
@@ -217,7 +243,8 @@ float lgLabel::distance(ref_ptr<lgLabel> otherLabel) {
  * @param otherLabel : ref_ptr<lgLabel> : other label
  * @return Vec3 : the vector
  */
-Vec3 lgLabel::distanceVec(ref_ptr<lgLabel> otherLabel){
+Vec3 lgLabel::distanceVec(ref_ptr<lgLabel> otherLabel)
+{
     Vec3 myPos = this->getAbsolutePosition();
     Vec3 otherPos = otherLabel->getAbsolutePosition();
     return myPos-otherPos;
@@ -228,7 +255,8 @@ Vec3 lgLabel::distanceVec(ref_ptr<lgLabel> otherLabel){
  * @param otherLabel : ref_ptr<lgLabel> : other label
  * @return float : the distance
  */
-float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> otherLabel){
+float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> otherLabel)
+{
     //Matrix to change world coordinates in windows coordinates
     Matrix modelView = view->getCamera()->getViewMatrix();
     Matrix projection = view->getCamera()->getProjectionMatrix();
@@ -249,25 +277,32 @@ float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> othe
  * @param otherLabel : ref_ptr<lgLabel> : other label
  * @return float : the distance
  */
-float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel) {
+float lgLabel::distance2dBox(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> otherLabel)
+{
     //We first get the 2dBox of both labels
-    osg::Vec4 my2dBox = this->compute2dBox(view);
-    osg::Vec4 other2dBox = otherLabel->compute2dBox(view);
+    Vec4 my2dBox = this->compute2dBox(view);
+    Vec4 other2dBox = otherLabel->compute2dBox(view);
     //we deduce the box to the left
-    osg::Vec4 leftBox, rightBox;
-    if(my2dBox.x()<other2dBox.x()){
+    Vec4 leftBox, rightBox;
+    if(my2dBox.x()<other2dBox.x())
+    {
         leftBox = my2dBox;
         rightBox = other2dBox;
-    } else {
+    }
+    else
+    {
         leftBox = other2dBox;
         rightBox = my2dBox;
     }
     //we deduce the box to the top
-    osg::Vec4 topBox, botBox;
-    if(my2dBox.y()<other2dBox.y()){
+    Vec4 topBox, botBox;
+    if(my2dBox.y()<other2dBox.y())
+    {
         topBox = other2dBox;
         botBox = my2dBox;
-    } else {
+    }
+    else
+    {
         topBox = my2dBox;
         botBox = other2dBox;
     }
@@ -277,16 +312,20 @@ float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<
     float distance;
     //if box touch themselves, we set the distance as negative and a translation from
     // this distance as absolute value should fix the problem
-    if(deltaX<0 && deltaY<0){
+    if(deltaX<0 && deltaY<0)
+    {
         distance = -sqrt(pow(deltaX,2.0)+pow(deltaY,2.0));
     }
-    if(deltaX<0 && deltaY>0){
+    if(deltaX<0 && deltaY>0)
+    {
         distance = deltaY;
     }
-    if(deltaX>0 && deltaY<0){
+    if(deltaX>0 && deltaY<0)
+    {
         distance = deltaX;
     }
-    if(deltaX>0 && deltaY>0){
+    if(deltaX>0 && deltaY>0)
+    {
         distance = sqrt(pow(deltaX,2.0)+pow(deltaY,2.0));
     }
     return distance;
@@ -335,7 +374,7 @@ void lgLabel::translateLabel(int x, int y , int z)
  * @param view : ref_ptr<osgViewer> : the viewer object of the main file
  * @return Vec4 : coordinates (xMin, yMin, xMax, yMax) of the bounding box.
  */
-osg::Vec4 lgLabel::compute2dBox(osg::ref_ptr<osgViewer::Viewer> view)
+Vec4 lgLabel::compute2dBox(ref_ptr<osgViewer::Viewer> view)
 {
     // Find the world coordinates of the node :
     Vec3 center = getAbsolutePosition();

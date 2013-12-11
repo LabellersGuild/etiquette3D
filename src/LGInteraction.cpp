@@ -95,24 +95,7 @@ bool LGInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                 //Reset the stateset of the previous selected objects
                 //Clear the list of selected labels
                 for (unsigned i(0); i<selectedLabels.size();i++)
-                {/*
-ref_ptr<Vec3Array> points = new Vec3Array;
-ref_ptr<Vec4Array> color = new Vec4Array;
-ref_ptr<Geode> anchorGeode = new Geode;
-ref_ptr<Geometry> anchor = new osg::Geometry;
-
-points->push_back(Vec3(0,0,0));
-points->push_back(label->getPosition());
-color->push_back(osg::Vec4(255.0,255.0,255.0,1.0));
-anchor ->setVertexArray(points.get());
-anchor ->setColorArray(color.get());
-anchor ->setColorBinding(osg::Geometry::BIND_OVERALL);
-anchor ->addPrimitiveSet(new osg::DrawArrays(GL_LINES,0, points->size()));
-anchorGeode ->setNodeMask( 0x1 );
-
-dynamic_cast<Group*>(label->getUpdatedMatrix()->getParent(0))->addChild(anchorGeode);
-anchorGeode->addDrawable(anchor);
-*/
+                {
                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
                         selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
                         selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());

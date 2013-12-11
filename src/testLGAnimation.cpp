@@ -1,6 +1,6 @@
 /** File : testLGAnimation.cpp
  * Description : Class used to test the LGAnimation functions.
- * Author : Thomas Brunel
+ * Author : Thomas
  */
 
 #include "../include/testLGAnimation.h"
@@ -9,6 +9,8 @@
 using namespace osg;
 using namespace std;
 
+/** Override of operator()
+ */
 void testLGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
     LGAnimation::operator()(node, nv);

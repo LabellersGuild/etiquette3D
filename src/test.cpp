@@ -1,4 +1,8 @@
-#include "../include/test.h"
+/** File : test.cpp
+ * Description : Test file for our library
+ */
+
+ #include "../include/test.h"
 
 #include <osg/Group>
 #include <osgDB/ReadFile>
@@ -18,24 +22,14 @@
 using namespace std;
 using namespace osg;
 
-
-test::test()
-{
-    //ctor
-}
-
-test::~test()
-{
-    //dtor
-}
-
 /**
  * This test is used to set a label (with idNode as input) and
  * see if we can recommand a position
  * @param model the model containing the citygml as OSG
  * @return findNode : the nodeVisitor fed with the vertex of child drawables and recommended position
  */
-lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model){
+lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model)
+{
 
     // Find the node with its ID :
     cout << "Entrer l'id du noeud � �tiquetter :" << endl;
@@ -67,7 +61,8 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model){
  * @param theLinkNode the Node father of the label
  * @param theLabel the label we want to link
  */
-void test::test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel){
+void test::test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel)
+{
     if(theLinkNode.get()==(theLabel->getLinkNode()).get()){
         cout<<"Le linkNode a bien �t� assign� � l'�tiquette"<<endl;
     }
@@ -87,12 +82,22 @@ void test::test_label_translateLabel(lgLabel* theLabel)
     theLabel->translateLabel(-4,6,-10);
 }
 
+/**
+ * Test if the 2D bounding box computed for the label is correct
+ * @param viewer : osgViewer::Viewer* : the viewer object of the main file
+ * @param theLabel : lgLabel* : label
+ */
 void test::test_label_compute2dBox(osgViewer::Viewer* viewer, lgLabel* theLabel)
 {
     Vec4 bbox = theLabel->compute2dBox(viewer);
     cout << "2D Bounding box of the label : xMin = " << bbox[0] << " , xMax = " << bbox[2] << " ,yMin = " << bbox[1] << " ,yMax = " << bbox[3] << endl;
 }
 
+/**
+ * Test if the 2D center calculated for the label is correct
+ * @param viewer : osgViewer::Viewer* : the viewer object of the main file
+ * @param theLabel : lgLabel* : label
+ */
 void test::test_label_compute2dCenter(osgViewer::Viewer* viewer, lgLabel* theLabel)
 {
     Vec2 center = theLabel->compute2dCenter(viewer);

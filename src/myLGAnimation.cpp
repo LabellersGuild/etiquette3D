@@ -1,6 +1,6 @@
-/* Fichier : myLGAnimation.cpp
- * Description : Fichier cr�ant une sous classe de LGAnimation, pour red�finir la m�thode operator()
- * Auteur : Thomas Brunel
+/** File: myLGAnimation.cpp
+ * Description : file that creates a sub-class of LGAnimation, and overrides the operator() method.
+ * Author : Thomas
  */
 
 #include "../include/myLGAnimation.h"
@@ -8,10 +8,11 @@
 
 using namespace osg;
 
+ /** Override of operator()
+  */
 void myLGAnimation::operator()(Node* node, NodeVisitor* nv)
 {
     LGAnimation::operator()(node, nv);
-
 
      //Label
     ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));

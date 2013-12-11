@@ -1,6 +1,6 @@
 /** File : testLGAnimation.h
  * Description : Class used to test the LGAnimation functions.
- * Author : Thomas Brunel
+ * Author :
  */
 
 #ifndef TESTLGANIMATION_H

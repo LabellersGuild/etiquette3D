@@ -1,6 +1,6 @@
-/* Fichier : myLGAnimation.h
- * Description : Fichier créant une sous classe de LGAnimation, pour redéfinir la méthode operator()
- * Auteur : Thomas Brunel
+/** File: myLGAnimation.h
+ * Description : file that creates a sub-class of LGAnimation, and overrides the operator() method.
+ * Author : Thomas
  */
 
 #ifndef MYLGANIMATION_H_INCLUDED
@@ -12,12 +12,12 @@ class myLGAnimation : public LGAnimation
 {
     public :
 
-    /* Constructeur : appel a celui de LGAnimation
-     */
+     /** Constructor : uses the constructor of LGAnimation
+      */
      myLGAnimation(osgViewer::Viewer* viewer) : LGAnimation(viewer) {};
 
-     /* Redefinition de la methode operator()
-      */
+       /** Override of operator()
+        */
      virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) ;
 };
 #endif // MYLGANIMATION_H_INCLUDED
