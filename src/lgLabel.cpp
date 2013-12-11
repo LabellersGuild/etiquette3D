@@ -1,5 +1,12 @@
-/**
- * File:   lgLabel.cpp
+/** File: lgLabel.cpp
+ * Description :
+ * This class represents a label.
+ * A label has a lgType that corresponds to the type of label : internal on the top of the object, internal on a face, or external.
+ * In the graph scene of OpenSceneGraph, the labels are linked to the nodes they describe, thus there is a pointer to this node : linkNode.
+ * lgLabel has also a pointer to a an intermediary node used for the placement of the label during animations : updatedMatrix.
+ * lgLabes has several methods that calculate specific distances between two labels, in the scene or on the screen.
+ * lgLabel is a sub-class of osgText::Text, used to represent text in the 3D environment of OSG.
+ *
  * Authors: Paul-Yves, Thomas
  *
  * Created on October 19, 2013, 4:31 PM
@@ -8,13 +15,13 @@
 #include <osgViewer/Viewer>
 #include <osg/MatrixTransform>
 #include "../include/LGAnimation.h"
-#include "../include/myLGAnimation.h"
 #include "../include/lgLabel.h"
 
 using namespace std;
 using namespace osg;
 
-//constructors
+/** Default constructor
+ */
 lgLabel::lgLabel() : osgText::Text(){
      hidingDistance = -1;
      labelType = EXTERNAL;
@@ -25,13 +32,14 @@ lgLabel::lgLabel() : osgText::Text(){
      changingWhenMouse = true;
 }
 
+/** Copy constructor
+ * @param originalLabel : lgLabel : label that will be copied
+ */
 lgLabel::lgLabel(const lgLabel& originalLabel) {
     linkNode = originalLabel.linkNode;
     absolutePosition = Vec3(originalLabel.absolutePosition);
     positionInit = Vec3(originalLabel.positionInit);
-    priority = originalLabel.priority;
     labelType = originalLabel.labelType;
-    internal = originalLabel.internal;
     updatedMatrix = originalLabel.updatedMatrix;
     hidingDistance = originalLabel.hidingDistance;
     seeInTransparency = originalLabel.seeInTransparency;
@@ -41,23 +49,47 @@ lgLabel::lgLabel(const lgLabel& originalLabel) {
     infoLabel = originalLabel.infoLabel;
 }
 
-lgLabel::lgLabel(std::string text, ref_ptr<Node> linkedNode, Vec3 recoPos) : lgLabel(){
+/** Constructor
+ * @param text : string : text of the label
+ * @param linkedNode : ref_ptr<Node> : node linked to the label
+ * @param recoPos : Vec3 : recommended position
+ */
+lgLabel::lgLabel(string text, ref_ptr<Node> linkedNode, Vec3 recoPos){
+    hidingDistance = -1;
+     labelType = EXTERNAL;
+     internal = false;
+     seeInTransparency = false;
+     defaultDrawMode = osgText::Text::TEXT | osgText::Text::ALIGNMENT ;
+     previousDrawMode = defaultDrawMode;
+     changingWhenMouse = true;
+
     setText(text);
     setLinkNode(linkedNode, recoPos);
     setPositionInit(recoPos);
 }
 
-lgLabel::lgLabel(std::string filePath, std::string idNode) : lgLabel(){
+/** Constructor
+ * @param filePath : string
+ * @param idNode : string
+ */
+lgLabel::lgLabel(string filePath, string idNode){
+    hidingDistance = -1;
+    labelType = EXTERNAL;
+    internal = false;
+    seeInTransparency = false;
+    defaultDrawMode = osgText::Text::TEXT | osgText::Text::ALIGNMENT ;
+    previousDrawMode = defaultDrawMode;
+    changingWhenMouse = true;
 
      // What to do with this constructor ?
 }
 
-//getters and setters
 /**
- * set the param as linkNode attribute, then see if it got the
+ * Set the param as linkNode attribute, then see if it got the
  * label in his children, if not it adds it (eventually creating a new
  * geode if the param is a group)
- * @param aNode, osg:ref_ptr<Node> to the node
+ * @param aNode : osg:ref_ptr<Node> : link node
+ * @param recoPos : Vec3  : the recommended starting position of the label
  */
 void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     this->linkNode = aNode;
@@ -89,7 +121,7 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     }
     //adding the label as child of the geode
     if(targetGeode){
-        //todo gérer le cas où on a direct une géode
+        //TODO deal with the case when we directly have a Geode
         bool alreadyChild = false;
         for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++){
             ref_ptr<lgLabel> drawAsLabel = dynamic_cast<lgLabel*>(targetGeode->getDrawable(i));
@@ -103,12 +135,15 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos){
     }
 }
 
-
+/** Getter of linknode
+ * @return ref_ptr<Node> linkNode
+ */
 ref_ptr<Node> lgLabel::getLinkNode() const{
     return this->linkNode;
 }
 
-//calculate the absolute position thanks to the position of linknode
+/** Calculate the absolute position thanks to the position of linknode
+ */
 void lgLabel::calcAbsolutePosition() {
     if(this->getLinkNode() ){
         Vec4 extendedPosition = Vec4(this->getPosition(), 1);
@@ -121,6 +156,9 @@ void lgLabel::calcAbsolutePosition() {
     }
 }
 
+/** Calculate the abosolute position and return it
+ * @return Vec3 : absolute position
+ */
 Vec3 lgLabel::getAbsolutePosition() {
     if(this->getLinkNode()){
         this->calcAbsolutePosition();
@@ -130,10 +168,11 @@ Vec3 lgLabel::getAbsolutePosition() {
     }
 }
 
-/*
- *set a relative position for the label, not recommended
+/**
+ *Set a relative position for the label, not recommended
  * as it will be independant from the matrixTransform updatedMatrix
  * and therefore will have trouble with animations
+ * @param relativePosition : Vec3 : position to set.
  */
 void lgLabel::setPosition(osg::Vec3 relativePosition) {
 
@@ -148,27 +187,12 @@ lgType lgLabel::getLabelType() const{
     return labelType;
 }
 
-/** Getter for the internal attribute
- * @return bool : internal
- */
-bool lgLabel::getInternal() const{
-    return internal;
-}
-
-/** Setter for the internal attribute
- * @param internal : bool
- */
-void lgLabel::setInternal (bool internal) {
-    this->internal = internal;
-}
-
-/*
- *Set the initial position in the attribute positionInit
+/** *Set the initial position in the attribute positionInit
  * but also call the setPosition method with the same argument
+ * @param newPositioinInit : Vec3 : new initial position
  */
 void lgLabel::setPositionInit(Vec3 newPositionInit){
     positionInit = newPositionInit;
-    //this->setPosition(positionInit);
 }
 
 /** Getter of the positionInit
@@ -178,7 +202,10 @@ Vec3 lgLabel::getPositionInit() const{
     return positionInit;
 }
 
-
+/** Calculate and return the distance between two labels
+ * @param otherLabel : ref_ptr<lgLabel> : other label
+ * @return float : distance
+ */
 float lgLabel::distance(ref_ptr<lgLabel> otherLabel) {
     Vec3 myPos = this->getAbsolutePosition();
     Vec3 otherPos = otherLabel->getAbsolutePosition();
@@ -186,14 +213,20 @@ float lgLabel::distance(ref_ptr<lgLabel> otherLabel) {
     return distance;
 }
 
+/** Calculate and return the vector formed with the position of two labels
+ * @param otherLabel : ref_ptr<lgLabel> : other label
+ * @return Vec3 : the vector
+ */
 Vec3 lgLabel::distanceVec(ref_ptr<lgLabel> otherLabel){
     Vec3 myPos = this->getAbsolutePosition();
     Vec3 otherPos = otherLabel->getAbsolutePosition();
     return myPos-otherPos;
 }
 
-/**
- * get the distance between 2 labels from the screen point of view
+/** Get the distance between 2 labels from the screen point of view
+ * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+ * @param otherLabel : ref_ptr<lgLabel> : other label
+ * @return float : the distance
  */
 float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> otherLabel){
     //Matrix to change world coordinates in windows coordinates
@@ -210,11 +243,12 @@ float lgLabel::distance2d(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> othe
     return distance;
 }
 
-/*
- * get the shortest distance between two labels from screen point of view
+/** Get the shortest distance between two labels from screen point of view
  * using the bounding boxes of the labels
+ * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+ * @param otherLabel : ref_ptr<lgLabel> : other label
+ * @return float : the distance
  */
-
 float lgLabel::distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel) {
     //We first get the 2dBox of both labels
     osg::Vec4 my2dBox = this->compute2dBox(view);
@@ -617,7 +651,6 @@ void lgLabel::setInfoLabel(string text)
     infoLabel->setCharacterSize(getCharacterHeight()-1);
     infoLabel->setDrawMode(0); // Hidden by default
     geodeInfoLabel->setNodeMask( 0x1 );
-    //infoLabel->setPosition(getPosition()));
 }
 
 /** infoLabel getter

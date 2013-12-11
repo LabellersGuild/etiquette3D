@@ -1,5 +1,5 @@
 /* Fichier : myLGAnimation.cpp
- * Description : Fichier créant une sous classe de LGAnimation, pour redéfinir la méthode operator()
+ * Description : Fichier crï¿½ant une sous classe de LGAnimation, pour redï¿½finir la mï¿½thode operator()
  * Auteur : Thomas Brunel
  */
 

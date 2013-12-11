@@ -25,6 +25,12 @@ using namespace std;
 using namespace osg;
 
 lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string nom_id, string nom, Vec3 recoPos, ref_ptr<osgViewer::Viewer> viewer, lgType type);
+void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
+/// I don't use a makefile, but only Code::Blocks.
+/// To add the library dependencies : right clic on project, build options,
+/// linker settings, add every .so file in the /lib directory of OpenSceneGraph
+/// Then, to use the program, the building is done by codeblocks, but launch it with a console.
+/// The program is in /bin/Debug of the project
 
 int main()
 {
@@ -33,17 +39,16 @@ int main()
    ref_ptr<Group> model = NULL;
 
    osgViewer::Viewer viewer;
-   vector<lgLabel*> listLabels = vector<lgLabel*>();
 
    // Load the model
    // If you want to see the names of the nodes, write "names" instead of "" in the next line. Do
    // Does not work for every citygml file.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
 
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
-    //string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+//    cout << "Entrer le path du fichier .citygml :" << endl;
+//    string pathFile;
+//    cin >> pathFile;
+    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<osg::Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -53,8 +58,10 @@ int main()
       return -1;
    }
 
+
     // Add the model group node to the root
     root->addChild(model);
+
 
     // Find a node
     test myTest=test();
@@ -66,11 +73,14 @@ int main()
 
     // Add the label
     // You can change the name of the label, it is the 3rd argument of the next line
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
-    listLabels.push_back(label1.get());
+
+    vector<lgLabel*> listLabels = vector<lgLabel*>();
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, INTERNAL_FACE);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
+
+    //Test of setSeeInTransparency :
     //label1->setSeeInTransparency(true);
 
     //second label
@@ -84,9 +94,13 @@ int main()
     label2->setTransparency(0.8);
 
     //Indo label
-    label1->setInfoLabel("Chateau construit au XIV siecle");
+    label1->setInfoLabel("Castle constructed in the XIV th century");
+
+    //more label
+    //addMoreLabel(findNode,listLabels,model,&viewer);
 
     // Create LGInteraction
+
     ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
@@ -107,17 +121,27 @@ int main()
     osg::Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
 
+
     //Translate label test:
     myTest.test_label_translateLabel(label1);
-
+    std::clock_t start;
+    double timer;
+    float fps;
     while (!viewer.done()) {
         //a2dBox = label1->distance2dBox(pView,label2);
+
         //cout<<"distance 2d "<<a2dBox<<endl;
 
         //Some tests :
         //myTest.test_label_compute2dBox(&viewer, label1);
         //myTest.test_label_compute2dCenter(&viewer, label1);
 
+        //fps calc
+        timer = (clock() - start) / (double) CLOCKS_PER_SEC;
+        start = clock();
+        fps = 1/timer;
+        cout<<"fps :"<<fps<<endl;
+        //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
 }
@@ -159,6 +183,7 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
 
    label->setCharacterSize(5);
    label->setText(name, osgText::String::ENCODING_UTF8 );
+
    label->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
    label->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
 
@@ -182,4 +207,68 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    cout << "Distance label-camera : " << label->distanceCamera(viewer) << endl;
 
    return label;
+}
+
+/**
+ * Use this function if you are lazy and just want to add labels, remember to change the idNode(s)
+ * @param visitor a lgNodeVisitor
+ * @param listLabels the list of Labels for further interactions
+ * @param model the model of the citygml file translated in OSG
+ * @param viewer the viewer
+ */
+void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer){
+    string idNode = "ID_276003000000992_26";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    Node* aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+    idNode = "ID_276003000000992_27";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+    idNode = "ID_276003000005856_87";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+    idNode = "ID_276003000005856_45";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+    idNode = "ID_276003000005856_71";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+    idNode = "ID_276003000001194";
+    visitor.setNameToFind(idNode);
+    model->accept(visitor);
+    aNode = visitor.getFirst();
+    visitor.feedFoundPointList(*(aNode));
+    listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+
+
+    string nodeName="ID_276003000001194_";
+    char numstr[21];
+    for (int j=1;j<19;j++){
+        sprintf(numstr, "%d", j);
+        idNode=nodeName+numstr;
+        visitor.setNameToFind(idNode);
+        model->accept(visitor);
+        aNode = visitor.getFirst();
+        visitor.feedFoundPointList(*(aNode));
+        listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+    }
 }

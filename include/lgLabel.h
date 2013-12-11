@@ -1,5 +1,12 @@
-/**
- * File:   lgLabel.cpp
+/** File: lgLabel.h
+ * Description :
+ * This class represents a label.
+ * A label has a lgType that corresponds to the type of label : internal on the top of the object, internal on a face, or external.
+ * In the graph scene of OpenSceneGraph, the labels are linked to the nodes they describe, thus there is a pointer to this node : linkNode.
+ * lgLabel has also a pointer to a an intermediary node used for the placement of the label during animations : updatedMatrix.
+ * lgLabes has several methods that calculate specific distances between two labels, in the scene or on the screen.
+ * lgLabel is a sub-class of osgText::Text, used to represent text in the 3D environment of OSG.
+ *
  * Authors: Paul-Yves, Thomas
  *
  * Created on October 19, 2013, 3:30 PM
@@ -24,23 +31,57 @@ enum lgType{
 class lgLabel : public osgText::Text {
     public :
 
+        /** Default constructor
+         */
         lgLabel();
 
+        /** Copy constructor
+         * @param originalLabel : lgLabel : label that will be copied
+         */
         lgLabel(const lgLabel& originalLabel);
 
+        /** Constructor
+         * @param text : string : text of the label
+         * @param linkedNode : ref_ptr<Node> : node linked to the label
+         * @param recoPos : Vec3 : recommended position
+         */
         lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osg::Vec3 recoPos);
 
+        /** Constructor
+         * @param filePath : string
+         * @param idNode : string
+         */
         lgLabel(std::string filePath, std::string idNode);
 
-        //getters and setters
+        /**
+         * Set the param as linkNode attribute, then see if it got the
+         * label in his children, if not it adds it (eventually creating a new
+         * geode if the param is a group)
+         * @param aNode : osg:ref_ptr<Node> : link node
+         * @param recoPos : Vec3  : the recommended starting position of the label
+         */
         void setLinkNode(osg::ref_ptr<osg::Node> aNode, osg::Vec3 recoPos);
 
+        /** Getter of linknode
+         * @return ref_ptr<Node> linkNode
+         */
         osg::ref_ptr<osg::Node> getLinkNode()const;
 
+        /** Calculate the absolute position thanks to the position of linknode
+         */
         void calcAbsolutePosition() ;
 
+        /** Calculate the abosolute position and return it
+         * @return Vec3 : absolute position
+         */
         osg::Vec3 getAbsolutePosition();
 
+        /**
+         *Set a relative position for the label, not recommended
+         * as it will be independant from the matrixTransform updatedMatrix
+         * and therefore will have trouble with animations
+         * @param relativePosition : Vec3 : position to set.
+         */
         void setPosition(osg::Vec3 relativePosition);
 
         /** Getter for the labelType
@@ -54,16 +95,10 @@ class lgLabel : public osgText::Text {
          */
         void setLabelType(lgType labelType, osg::ref_ptr<LGAnimation> animation);
 
-        /** Getter for the internal attribute
-         * @return bool : internal
+        /** *Set the initial position in the attribute positionInit
+         * but also call the setPosition method with the same argument
+         * @param newPositioinInit : Vec3 : new initial position
          */
-        bool getInternal() const;
-
-        /** Setter for the internal attribute
-         * @param internal : bool
-         */
-        void setInternal (bool internal);
-
         void setPositionInit(osg::Vec3 newPositionInit);
 
         /** Getter of the positionInit
@@ -71,12 +106,31 @@ class lgLabel : public osgText::Text {
          */
         osg::Vec3 getPositionInit() const;
 
+        /** Calculate and return the distance between two labels
+         * @param otherLabel : ref_ptr<lgLabel> : other label
+         * @return float : distance
+         */
         float distance(osg::ref_ptr<lgLabel> otherLabel) ;
 
+        /** Calculate and return the vector formed with the position of two labels
+         * @param otherLabel : ref_ptr<lgLabel> : other label
+         * @return Vec3 : the vector
+         */
         osg::Vec3 distanceVec(osg::ref_ptr<lgLabel> otherLabel);
 
+        /** Get the distance between 2 labels from the screen point of view
+         * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+         * @param otherLabel : ref_ptr<lgLabel> : other label
+         * @return float : the distance
+         */
         float distance2d(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel) ;
 
+        /** Get the shortest distance between two labels from screen point of view
+         * using the bounding boxes of the labels
+         * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+         * @param otherLabel : ref_ptr<lgLabel> : other label
+         * @return float : the distance
+         */
         float distance2dBox(osg::ref_ptr<osgViewer::Viewer> view, osg::ref_ptr<lgLabel> otherLabel);
 
         /** Gives the distance between the camera and the label
@@ -181,17 +235,20 @@ class lgLabel : public osgText::Text {
         void setInfoLabel(std::string text);
 
     protected :
-        //the node who is supposed to contain the label, if it is a group
-        //it has a geode child containing the label
+        /**The node which is supposed to contain the label, if it is a group
+         * it has a geode child containing the label
+         */
         osg::ref_ptr<osg::Node> linkNode;
 
+        /** Absolute position of the label.
+         * It is calculated every time its corresponding getter is used
+         */
         osg::Vec3 absolutePosition;
 
-        //this position is the recommended starting position of the label
-        //at the initialization, position should be positionInit
+        /**This position is the recommended starting position of the label
+         * At the initialization, position should be positionInit
+         */
         osg::Vec3 positionInit;
-
-        int priority;
 
         /** Type of the label : EXTERNAL, INTERNAL_TOP or INTERNAL_FACe
          */
