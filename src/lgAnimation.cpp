@@ -11,7 +11,7 @@
  * Author : Thomas Brunel
  */
 
-#include "../include/LGAnimation.h"
+#include "../include/lgAnimation.h"
 #include "../include/lgLabel.h"
 
 using namespace osg;
@@ -21,7 +21,7 @@ using namespace std;
   * @param node : Node* : the node linked to the lgAnimation instance. It should be the matrix transformation of the label.
   * @param nv : NodeVisitor
   */
-void LGAnimation::operator()(Node* node, NodeVisitor* nv)
+void lgAnimation::operator()(Node* node, NodeVisitor* nv)
 {
     //Get the label linked to the node
     ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
@@ -50,7 +50,7 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
  * @param int Ymax : Increase the checking window on the top of the screen. 0 by default
  * @return the position of the point of the object that is between the labele and the camera. Return NULL if the label is not hidden.
 */
-osgUtil::PolytopeIntersector::Intersection* LGAnimation::intersectCameraLabel(Node* node, NodeVisitor* nv, int Xmin, int Ymin, int Xmax, int Ymax)
+osgUtil::PolytopeIntersector::Intersection* lgAnimation::intersectCameraLabel(Node* node, NodeVisitor* nv, int Xmin, int Ymin, int Xmax, int Ymax)
 {
     //Get the label linked to the node
     ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));

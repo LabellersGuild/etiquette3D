@@ -30,13 +30,13 @@
 #include <osgText/Text>
 #include "lgLabel.h"
 
-class LGInteraction : public osgGA::GUIEventHandler
+class lgInteraction : public osgGA::GUIEventHandler
 {
     public:
        /** Constructor
         * @param l : vector<lgLabel*> : list of lgLabels created.
         */
-        LGInteraction(std::vector<lgLabel*> l);
+        lgInteraction(std::vector<lgLabel*> l);
 
        /** Automatically fires when an event is detected.
         * @param ea : osgGA::GUIEventAdapter

@@ -8,15 +8,15 @@
 #ifndef MYLGANIMATION2_H
 #define MYLGANIMATION2_H
 
-#include "LGAnimation.h"
+#include "lgAnimation.h"
 
 
-class myLGAnimation2 : public LGAnimation
+class myLGAnimation2 : public lgAnimation
 {
     public:
         /** Constructor : uses the constructor of LGAnimation
         */
-         myLGAnimation2(osgViewer::Viewer* viewer) : LGAnimation(viewer) {};
+         myLGAnimation2(osgViewer::Viewer* viewer) : lgAnimation(viewer) {};
 
         /** Override of operator()
          */

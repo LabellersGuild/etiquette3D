@@ -6,15 +6,15 @@
 #ifndef TESTLGANIMATION_H
 #define TESTLGANIMATION_H
 
-#include "LGAnimation.h"
+#include "lgAnimation.h"
 
 
-class testLGAnimation : public LGAnimation
+class testLGAnimation : public lgAnimation
 {
     public:
         /** Constructor : uses the constructor of LGAnimation
          */
-         testLGAnimation(osgViewer::Viewer* viewer) : LGAnimation(viewer) {};
+         testLGAnimation(osgViewer::Viewer* viewer) : lgAnimation(viewer) {};
 
          /** Override of operator()
           */

@@ -20,7 +20,7 @@
  * Author : Thomas Brunel
  */
 
- #include "../include/LGInteraction.h"
+ #include "../include/lgInteraction.h"
 
 using namespace osg;
 using namespace std;
@@ -28,7 +28,7 @@ using namespace std;
 /** Constructor
  * @param l : vector<lgLabel*> : list of lgLabels created.
  */
-LGInteraction::LGInteraction(vector<lgLabel*> l) : listLabels(l) {};
+lgInteraction::lgInteraction(vector<lgLabel*> l) : listLabels(l) {};
 
 
   /** Automatically fires when an event is detected.
@@ -37,7 +37,7 @@ LGInteraction::LGInteraction(vector<lgLabel*> l) : listLabels(l) {};
    * @return false : the return value tells if the event is treated.
    * If true is returned, OSG consider that the event is no longer needed to other handlers, and they will ignore it. The camera manipulator is on of these other handlers.
    */
-bool LGInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
+bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
 {
     // Ctrl + left click : label picking
     if (ea.getEventType()==osgGA::GUIEventAdapter::RELEASE && ea.getButton()==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON && ea.getModKeyMask()&osgGA::GUIEventAdapter::MODKEY_CTRL )
