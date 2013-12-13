@@ -32,7 +32,7 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model)
 {
 
     // Find the node with its ID :
-    cout << "Entrer l'id du noeud � �tiquetter :" << endl;
+    cout << "Entrer the id of the node that will be labelled :" << endl;
     string idNode;
     cin >> idNode;
     //string idNode = "ID_276003000001240";
@@ -41,17 +41,17 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model)
     model->accept(findNode);
 
     if(idNode==(findNode.getFirst())->getName()){
-        cout<<"Le noeud trouv� correspond "<<endl;
+        cout<<"Found the right node "<<endl;
     }else{
-        cout<<"mauvaisNoeud"<<endl;
+        cout<<"Wrong node"<<endl;
     }
 
     findNode.feedFoundPointList(*(findNode.getFirst()));
     vector<Vec3> points = findNode.getFoundPointList();
-    cout << "On a trouv� un liste de " << points.size() << " points" << endl;
+    cout << "A list of " << points.size() << " points have been found" << endl;
 
     Vec3 positionCalc = findNode.recommendedCoordinates();
-    cout << "Le point recommand� est : x:" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << endl;
+    cout << "The recommended position is : x=" << positionCalc.x() << " y=" << positionCalc.y() << " z=" << positionCalc.z() << endl;
 
     return findNode;
 }
@@ -64,7 +64,7 @@ lgNodeVisitor test::test_lgNodeVisitor_initialisation(Group* model)
 void test::test_label_setLinkNode(ref_ptr<Node> theLinkNode, lgLabel* theLabel)
 {
     if(theLinkNode.get()==(theLabel->getLinkNode()).get()){
-        cout<<"Le linkNode a bien �t� assign� � l'�tiquette"<<endl;
+        cout<<"The linkNode has been correctly linked to the label"<<endl;
     }
 }
 

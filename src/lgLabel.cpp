@@ -72,23 +72,6 @@ lgLabel::lgLabel(string text, ref_ptr<Node> linkedNode, Vec3 recoPos)
     setPositionInit(recoPos);
 }
 
-/** Constructor
- * @param filePath : string
- * @param idNode : string
- */
-lgLabel::lgLabel(string filePath, string idNode)
-{
-    hidingDistance = -1;
-    labelType = EXTERNAL;
-    internal = false;
-    seeInTransparency = false;
-    defaultDrawMode = osgText::Text::TEXT | osgText::Text::ALIGNMENT ;
-    previousDrawMode = defaultDrawMode;
-    changingWhenMouse = true;
-
-     // What to do with this constructor ?
-}
-
 /**
  * Set the param as linkNode attribute, then see if it got the
  * label in his children, if not it adds it (eventually creating a new
@@ -132,7 +115,6 @@ void lgLabel::setLinkNode(ref_ptr<Node> aNode, Vec3 recoPos)
     //adding the label as child of the geode
     if(targetGeode)
     {
-        //TODO deal with the case when we directly have a Geode
         bool alreadyChild = false;
         for (unsigned i = 0; i < targetGeode->getNumDrawables(); i++)
         {
@@ -712,8 +694,10 @@ MatrixTransform* lgLabel::getUpdatedMatrix() const
 /** adding an informative arrow under the label
  *  the arrow is a ShapeDrawable of a cylinder saved under the attribute infoArrow
  */
-void lgLabel::addArrow(){
-    if(updatedMatrix!=NULL){
+void lgLabel::addArrow()
+{
+    if(updatedMatrix!=NULL)
+    {
         ref_ptr<Cylinder> theArrow = new Cylinder(Vec3(0,0,-25),0.2,50);
         ref_ptr<ShapeDrawable> arrowDrawable = new ShapeDrawable(theArrow);
         ref_ptr<Geode> theGeode = new Geode();
@@ -728,6 +712,7 @@ void lgLabel::addArrow(){
 /** infoArrow getter, the info arrow is a ShapeDrawable of a cylinder
  * @return infoArrow : ref_ptr<ShapeDrawable>
  */
-ref_ptr<ShapeDrawable> lgLabel::getArrow(){
+ref_ptr<ShapeDrawable> lgLabel::getArrow()
+{
     return infoArrow;
 }

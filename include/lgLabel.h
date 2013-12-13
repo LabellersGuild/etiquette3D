@@ -48,12 +48,6 @@ class lgLabel : public osgText::Text {
          */
         lgLabel(std::string text, osg::ref_ptr<osg::Node> linkedNode, osg::Vec3 recoPos);
 
-        /** Constructor
-         * @param filePath : string
-         * @param idNode : string
-         */
-        lgLabel(std::string filePath, std::string idNode);
-
         /**
          * Set the param as linkNode attribute, then see if it got the
          * label in his children, if not it adds it (eventually creating a new
