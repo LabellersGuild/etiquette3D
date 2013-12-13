@@ -721,6 +721,7 @@ void lgLabel::addArrow(){
         updatedMatrix->addChild(theGeode);
         arrowDrawable->setColor(Vec4(0,0,0,1));
         infoArrow = arrowDrawable;
+        theGeode->setNodeMask( 0x1 );
     }
 }
 

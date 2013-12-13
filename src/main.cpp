@@ -75,7 +75,7 @@ int main()
     // You can change the name of the label, it is the 3rd argument of the next line
 
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, INTERNAL_FACE);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
