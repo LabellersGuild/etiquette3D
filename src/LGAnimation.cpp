@@ -32,11 +32,21 @@ void LGAnimation::operator()(Node* node, NodeVisitor* nv)
     if ( hidingDistance != -1 && hidingDistance < label->distanceCamera(view))
     {
         label->setDrawMode(0);
+        if (label->getArrow() != NULL)
+        {
+            ref_ptr<Switch> theSwitch = dynamic_cast<Switch*>(label->getArrow()->getParent(0)->getParent(0));
+            theSwitch->setValue(0,false);
+        }
     }
     else
     {
         //Get the drawMode before it was hidden, or the current drawMode if it is not hidden.
         label->setDrawMode(label->getPreviousDrawMode());
+        if (label->getArrow() != NULL)
+        {
+            ref_ptr<Switch> theSwitch = dynamic_cast<Switch*>(label->getArrow()->getParent(0)->getParent(0));
+            theSwitch->setValue(0,true);
+        }
     }
 }
 

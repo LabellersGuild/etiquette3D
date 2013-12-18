@@ -700,12 +700,17 @@ void lgLabel::addArrow()
     {
         ref_ptr<Cylinder> theArrow = new Cylinder(Vec3(0,0,-25),0.2,50);
         ref_ptr<ShapeDrawable> arrowDrawable = new ShapeDrawable(theArrow);
+        ref_ptr<Geode> emptyGeode = new Geode();
         ref_ptr<Geode> theGeode = new Geode();
+        ref_ptr<Switch> theSwitch = new Switch(); // used to hide the arrow
         theGeode->addDrawable(arrowDrawable);
-        updatedMatrix->addChild(theGeode);
+        theSwitch->addChild(theGeode, true);
+        theSwitch->addChild(emptyGeode,false);
+        theSwitch->setNewChildDefaultValue(true);
+        updatedMatrix->addChild(theSwitch);
         arrowDrawable->setColor(Vec4(0,0,0,1));
         infoArrow = arrowDrawable;
-        theGeode->setNodeMask( 0x1 );
+        theSwitch->setNodeMask( 0x1 );
     }
 }
 
