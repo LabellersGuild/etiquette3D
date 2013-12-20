@@ -80,6 +80,11 @@ int main()
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
 
+    //Info label
+    label1->setInfoLabel("Castle constructed in the XIV th century");
+
+    label1->addArrow();
+
     //Test of setSeeInTransparency :
     //label1->setSeeInTransparency(true);
 
@@ -91,13 +96,10 @@ int main()
     listLabels.push_back(label2.get());
 
     //Test of setTransparency :
-    label2->setTransparency(0.8);
-
-
-    //Indo label
-    label1->setInfoLabel("Castle constructed in the XIV th century");
+    //label2->setTransparency(0.8);
 
     label2->addArrow();
+
     //Info label
     label2->setInfoLabel("This is a well !");
 
@@ -105,7 +107,6 @@ int main()
     //addMoreLabel(findNode,listLabels,model,&viewer);
 
     // Create LGInteraction
-
     ref_ptr<lgInteraction> interaction = new lgInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
@@ -190,13 +191,17 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    label->setCharacterSize(5);
    label->setText(name, osgText::String::ENCODING_UTF8 );
 
-   label->setColor( Vec4(192.0f/255.0f,0,0,1.0f) );
-   label->setDrawMode(osgText::Text::TEXT | osgText::Text::ALIGNMENT);
+   label->setColor( Vec4(0.2,0.2,1,1.0f) );
+   label->setDrawMode(5); //To see the background of the label
+   label->setBoundingBoxColor(Vec4(255,255,255,1)); //Color of the background of the label
 
    //Record the draw mode
    label->setPreviousDrawMode(label->getDrawMode());
    label->setDefaultDrawMode(label->getDrawMode());
    label->setFontResolution(64,64);
+   // To change the font:
+   //label->setFont("/pathToTheFont/font.ttf");
+   label->setFont("/home/tbrunel/Téléchargements/OSG_data/OSG_data/fonts/arial.ttf");
 
    //testing that we can have absolute position
    cout << "label position" << endl;
