@@ -229,8 +229,25 @@ class lgLabel : public osgText::Text {
          */
         void setInfoLabel(std::string text);
 
+       /** adding an informative arrow under the label
+         *  the arrow is a ShapeDrawable of a cylinder saved under the attribute infoArrow
+         */
         void addArrow();
+
+        /** infoArrow getter, the info arrow is a ShapeDrawable of a cylinder
+         * @return infoArrow : ref_ptr<ShapeDrawable>
+         */
         osg::ref_ptr<osg::ShapeDrawable> getArrow();
+
+        /** Setter of the priority
+         * @param priority : int : the priority
+         */
+         void setPriority(int priority);
+
+         /** Getter of the priority
+          * @return int : the priority
+          */
+         int getPriority();
 
     protected :
         /**The node which is supposed to contain the label, if it is a group
@@ -285,6 +302,10 @@ class lgLabel : public osgText::Text {
           */
          osg::ref_ptr<osgText::Text> infoLabel;
          osg::ref_ptr<osg::ShapeDrawable> infoArrow;
+
+         /** A value to set a priority to the label
+          */
+         int priority;
 };
 
 #endif	/* LGLABEL_H */

@@ -73,8 +73,11 @@ bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                     stateSet->setRenderBinDetails(11, "DepthSortedBin");
 
                     //Bounding box
-                    selectedLabels.at(selectedLabels.size()-1)->setDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode() | osgText::Text::BOUNDINGBOX);
-                    selectedLabels.at(selectedLabels.size()-1)->setPreviousDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode());
+                    if (selectedLabels.at(selectedLabels.size()-1)->getDrawMode() < osgText::Text::BOUNDINGBOX )
+                    {
+                        selectedLabels.at(selectedLabels.size()-1)->setDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode() | osgText::Text::BOUNDINGBOX);
+                        selectedLabels.at(selectedLabels.size()-1)->setPreviousDrawMode(selectedLabels.at(selectedLabels.size()-1)->getDrawMode());
+                    }
                 }
                 else
                 {
@@ -83,9 +86,11 @@ bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                     for (unsigned i(0); i<selectedLabels.size();i++)
                     {
                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
-                        selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
-                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
-
+                         if (selectedLabels.at(i)->getPreviousDrawMode() <  osgText::Text::BOUNDINGBOX )
+                        {
+                            selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
+                            selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
+                        }
                     }
                     selectedLabels.clear();
                 }
@@ -97,8 +102,11 @@ bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                 for (unsigned i(0); i<selectedLabels.size();i++)
                 {
                         selectedLabels.at(i)->getParent(0)->getParent(0)->setStateSet(new StateSet());
-                        selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
-                        selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
+                        if (selectedLabels.at(i)->getPreviousDrawMode() <  osgText::Text::BOUNDINGBOX )
+                        {
+                            selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getPreviousDrawMode() - osgText::Text::BOUNDINGBOX);
+                            selectedLabels.at(i)->setDrawMode( selectedLabels.at(i)->getDefaultDrawMode());
+                        }
                 }
                 selectedLabels.clear();
             }
@@ -121,8 +129,11 @@ bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
             stateSet->setRenderBinDetails(11, "DepthSortedBin");
 
             //Bounding box :
-            selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
-            selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
+            if (selectedLabels.at(i)->getDrawMode() <  osgText::Text::BOUNDINGBOX )
+            {
+                selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getPreviousDrawMode() | osgText::Text::BOUNDINGBOX);
+                selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
+            }
         }
     }
     else
@@ -182,11 +193,13 @@ bool lgInteraction::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                     {
                         selectedLabels.at(i)->setDrawMode(0);
                         selectedLabels.at(i)->setPreviousDrawMode(0);
+                        if (selectedLabels.at(i)->getInfoLabel() !=NULL) selectedLabels.at(i)->getInfoLabel()->setDrawMode(0);
                     }
                     else
                     {
                         selectedLabels.at(i)->setDrawMode(selectedLabels.at(i)->getDefaultDrawMode() | osgText::Text::BOUNDINGBOX);
                         selectedLabels.at(i)->setPreviousDrawMode(selectedLabels.at(i)->getDrawMode());
+                        if (selectedLabels.at(i)->getInfoLabel() !=NULL) selectedLabels.at(i)->getInfoLabel()->setDrawMode(osgText::Text::TEXT);
                     }
                 }
                 break;

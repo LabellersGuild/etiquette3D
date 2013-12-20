@@ -721,3 +721,19 @@ ref_ptr<ShapeDrawable> lgLabel::getArrow()
 {
     return infoArrow;
 }
+
+/** Setter of the priority
+ * @param priority : int : the priority
+ */
+ void lgLabel::setPriority(int priority)
+ {
+     this->priority = priority;
+ }
+
+/** Getter of the priority
+ * @return int : the priority
+ */
+ int lgLabel::getPriority()
+ {
+     return priority;
+ }

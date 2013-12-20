@@ -75,7 +75,7 @@ int main()
     // You can change the name of the label, it is the 3rd argument of the next line
 
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), rootModel->getName(), positionCalc, &viewer, EXTERNAL);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, EXTERNAL);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
@@ -92,7 +92,7 @@ int main()
     lgNodeVisitor findNode2 = myTest.test_lgNodeVisitor_initialisation(model);
     ref_ptr<Node> rootModel2 = findNode2.getFirst();
     Vec3 positionCalc2 = findNode2.recommendedCoordinates();
-    ref_ptr<lgLabel> label2 = addTextLabel(rootModel2, rootModel2->getName(), rootModel2->getName(), positionCalc2, &viewer, EXTERNAL);
+    ref_ptr<lgLabel> label2 = addTextLabel(rootModel2, rootModel2->getName(), "The Magdalena", positionCalc2, &viewer, EXTERNAL);
     listLabels.push_back(label2.get());
 
     //Test of setTransparency :
@@ -101,6 +101,7 @@ int main()
     label2->addArrow();
 
     //Info label
+    label1->setInfoLabel("Constructed in the XIVth century");
     label2->setInfoLabel("This is a well !");
 
     //more label
@@ -193,7 +194,7 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
 
    label->setColor( Vec4(0.2,0.2,1,1.0f) );
    label->setDrawMode(5); //To see the background of the label
-   label->setBoundingBoxColor(Vec4(255,255,255,1)); //Color of the background of the label
+   label->setBoundingBoxColor(Vec4(255,255,255,0.5)); //Color of the background of the label
 
    //Record the draw mode
    label->setPreviousDrawMode(label->getDrawMode());
