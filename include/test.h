@@ -10,8 +10,8 @@
 #include "../include/lgNodeVisitor.h"
 #include "../include/lgNodeOverseer.h"
 #include "../include/lgLabel.h"
-#include "../include/LGAnimation.h"
-#include "../include/LGInteraction.h"
+#include "../include/lgAnimation.h"
+#include "../include/lgInteraction.h"
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
 #include <iostream>

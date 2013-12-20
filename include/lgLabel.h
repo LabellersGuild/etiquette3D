@@ -19,7 +19,7 @@
 #include <osgText/Text>
 #include <osg/ShapeDrawable>
 #include <osgViewer/Viewer>
-#include "LGAnimation.h"
+#include "lgAnimation.h"
 
 //Types of label
 enum lgType{
@@ -88,7 +88,7 @@ class lgLabel : public osgText::Text {
          * @param type : lgType : the type of label
          * @param animation : ref_ptr<LGAnimation> : the animation related to the label
          */
-        void setLabelType(lgType labelType, osg::ref_ptr<LGAnimation> animation);
+        void setLabelType(lgType labelType, osg::ref_ptr<lgAnimation> animation);
 
         /** *Set the initial position in the attribute positionInit
          * but also call the setPosition method with the same argument

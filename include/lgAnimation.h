@@ -21,13 +21,13 @@
 #include <osgText/TextBase>
 #include <osgText/Text>
 
-class LGAnimation : public osg::NodeCallback
+class lgAnimation : public osg::NodeCallback
 {
     public:
         /** Constructor
          * @param viewer : osgViewer::Viewer* : the viewer object of the main file.
          */
-        LGAnimation(osgViewer::Viewer* viewer) : view(viewer) {};
+        lgAnimation(osgViewer::Viewer* viewer) : view(viewer) {};
 
         /** Manages the label position
          * @param node : Node* : the node linked to the lgAnimation instance. It should be the matrix transformation of the label.

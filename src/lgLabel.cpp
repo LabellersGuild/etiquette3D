@@ -15,7 +15,7 @@
 #include <osgViewer/Viewer>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
-#include "../include/LGAnimation.h"
+#include "../include/lgAnimation.h"
 #include "../include/lgLabel.h"
 
 using namespace std;
@@ -620,7 +620,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
  * @param type : lgType : the type of label
  * @param animation : ref_ptr<LGAnimation> : the animation related to the label
  */
-void lgLabel::setLabelType(lgType type, ref_ptr<LGAnimation> animation){
+void lgLabel::setLabelType(lgType type, ref_ptr<lgAnimation> animation){
    this->labelType=labelType;
    updatedMatrix->setUpdateCallback(animation);
    labelType = type;

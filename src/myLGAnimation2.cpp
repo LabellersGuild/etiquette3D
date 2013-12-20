@@ -13,7 +13,7 @@ using namespace osg;
  */
 void myLGAnimation2::operator()(Node* node, NodeVisitor* nv)
 {
-    LGAnimation::operator()(node, nv);
+    lgAnimation::operator()(node, nv);
 
      //Label
     ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));

@@ -11,8 +11,8 @@
 #include "../include/lgNodeOverseer.h"
 #include "../include/lgLabel.h"
 #include "../include/test.h"
-#include "../include/LGAnimation.h"
-#include "../include/LGInteraction.h"
+#include "../include/lgAnimation.h"
+#include "../include/lgInteraction.h"
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
 #include "../include/testLGAnimation.h"
@@ -106,7 +106,7 @@ int main()
 
     // Create LGInteraction
 
-    ref_ptr<LGInteraction> interaction = new LGInteraction(listLabels);
+    ref_ptr<lgInteraction> interaction = new lgInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
 
     viewer.setSceneData(root);
@@ -173,14 +173,14 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    }
    else if (type == INTERNAL_TOP)
    {
-       ref_ptr<LGAnimation> animation = new LGAnimation(viewer);
+       ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
 
    }
    else //INTERNAL_FACE
    {
-       ref_ptr<LGAnimation> animation = new LGAnimation(viewer);
+       ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
        label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
    }
