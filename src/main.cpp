@@ -16,6 +16,8 @@
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
 #include "../include/testLGAnimation.h"
+#include "../include/Evaluator.h"
+#include "../include/LabelVisitor.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -45,10 +47,10 @@ int main()
    // Does not work for every citygml file.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
 
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
-//    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+//    cout << "Entrer le path du fichier .citygml :" << endl;
+//    string pathFile;
+//    cin >> pathFile;
+    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
     model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -128,12 +130,17 @@ int main()
     Vec4 bounds = label1->compute2dBox(pView);
     cout<<"bounds "<<bounds.x()<<" "<<bounds.y()<<" "<<bounds.z()<<" "<<bounds.w()<<endl;
 
+    cout<<"\n \n debug label visitor"<<endl;
+    LabelVisitor recenseur;
+    model->accept(recenseur);
+    cout<<"On a trouvé "<<recenseur.getLabelList().size()<<" étiquettes"<<endl;
+    recenseur.getLabelList().at(0)->setText("J'ai change!");
+    cout<<"debug exit label visitor \n \n"<<endl;
 
     //Translate label test:
     myTest.test_label_translateLabel(label1);
-    clock_t start;
-    double timer;
-    float fps;
+    Evaluator* testeur = new Evaluator();
+    testeur->realTime_init();
     while (!viewer.done())
     {
         //a2dBox = label1->distance2dBox(pView,label2);
@@ -145,10 +152,7 @@ int main()
         //myTest.test_label_compute2dCenter(&viewer, label1);
 
         //fps calc
-        timer = (clock() - start) / (double) CLOCKS_PER_SEC;
-        start = clock();
-        fps = 1/timer;
-        cout<<"fps :"<<fps<<endl;
+        testeur->realTime_iter();
         //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
@@ -202,7 +206,7 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
    label->setFontResolution(64,64);
    // To change the font:
    //label->setFont("/pathToTheFont/font.ttf");
-   label->setFont("/home/tbrunel/Téléchargements/OSG_data/OSG_data/fonts/arial.ttf");
+//   label->setFont("/home/tbrunel/Téléchargements/OSG_data/OSG_data/fonts/arial.ttf");
 
    //testing that we can have absolute position
    cout << "label position" << endl;
