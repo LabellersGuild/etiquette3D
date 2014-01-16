@@ -616,6 +616,117 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
     return bbox;
 }
 
+/** Calculate the coordinates of the bounding box of the object attached to the label on the screen
+ * @param view : ref_ptr<osgViewer> : the viewer object of the main file
+ * @return Vec4 : coordinates (xMin, yMin, xMax, yMax) of the bounding box.
+ */
+Vec4 lgLabel::computeObject2dBBox(ref_ptr<osgViewer::Viewer> view)
+{
+    //Bounding box of the object :
+    BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0));
+
+    // 8 Corners of the bbox :
+    Vec4 xyz = Vec4(bbox.xMin(),bbox.yMin(),bbox.zMin(),1) ;
+    Vec4 Xyz = Vec4(bbox.xMax(),bbox.yMin(),bbox.zMin(),1) ;
+    Vec4 xYz = Vec4(bbox.xMin(),bbox.yMax(),bbox.zMin(),1) ;
+    Vec4 xyZ = Vec4(bbox.xMin(),bbox.yMin(),bbox.zMax(),1) ;
+    Vec4 XYz = Vec4(bbox.xMax(),bbox.yMax(),bbox.zMin(),1) ;
+    Vec4 XyZ = Vec4(bbox.xMax(),bbox.yMin(),bbox.zMax(),1) ;
+    Vec4 xYZ = Vec4(bbox.xMin(),bbox.yMax(),bbox.zMax(),1) ;
+    Vec4 XYZ = Vec4(bbox.xMax(),bbox.yMax(),bbox.zMax(),1) ;
+
+    // Absolute position of the 8 corners :
+
+    MatrixList matricesList = updatedMatrix->getParent(0)->getWorldMatrices();
+    for (unsigned i=0;i<matricesList.size();i++)
+    {
+        xyz = xyz*matricesList[i];
+        Xyz = Xyz*matricesList[i];
+        xYz = xYz*matricesList[i];
+        xyZ = xyZ*matricesList[i];
+        XYz = XYz*matricesList[i];
+        XyZ = XyZ*matricesList[i];
+        xYZ = xYZ*matricesList[i];
+        XYZ = XYZ*matricesList[i];
+    }
+
+    //Matrix to change world coordinates in windows coordinates
+    Matrix modelView = view->getCamera()->getViewMatrix();
+    Matrix projection = view->getCamera()->getProjectionMatrix();
+    Matrix window = view->getCamera()->getViewport()->computeWindowMatrix();
+    Matrix MVPW = modelView * projection * window;
+
+   //Projection of the 8 corners of the bounding box  :
+    Vec3 screenxyz = (Vec3(xyz.x(),xyz.y(),xyz.z())) * MVPW;
+    Vec3 screenXyz = (Vec3(Xyz.x(),Xyz.y(),Xyz.z())) * MVPW;
+    Vec3 screenxYz = (Vec3(xYz.x(),xYz.y(),xYz.z())) * MVPW;
+    Vec3 screenxyZ = (Vec3(xyZ.x(),xyZ.y(),xyZ.z())) * MVPW;
+    Vec3 screenXYz = (Vec3(XYz.x(),XYz.y(),XYz.z())) * MVPW;
+    Vec3 screenXyZ = (Vec3(XyZ.x(),XyZ.y(),XyZ.z())) * MVPW;
+    Vec3 screenxYZ = (Vec3(xYZ.x(),xYZ.y(),xYZ.z())) * MVPW;
+    Vec3 screenXYZ = (Vec3(XYZ.x(),XYZ.y(),XYZ.z())) * MVPW;
+
+    //cout << screenxyz.x() << " " << screenxyz.y() << " " << screenxyz.z() << endl;
+    //cout << screenXYZ.x() << " " << screenXYZ.y() << " " << screenXYZ.z() << endl;
+
+    float minx = min(screenxyz.x(),
+                     min(screenXyz.x(),
+                         min(screenxYz.x(),
+                             min(screenxyZ.x(),
+                                 min(screenXYz.x(),
+                                     min(screenXyZ.x(),
+                                         min( screenxYZ.x(), screenXYZ.x())
+                                         )
+                                     )
+                                 )
+                             )
+                         )
+                     );
+    float miny = min(screenxyz.y(),
+                     min(screenXyz.y(),
+                         min(screenxYz.y(),
+                             min(screenxyZ.y(),
+                                 min(screenXYz.y(),
+                                     min(screenXyZ.y(),
+                                         min( screenxYZ.y(), screenXYZ.y())
+                                         )
+                                     )
+                                 )
+                             )
+                         )
+                     );
+    float maxx = max(screenxyz.x(),
+                     max(screenXyz.x(),
+                         max(screenxYz.x(),
+                             max(screenxyZ.x(),
+                                 max(screenXYz.x(),
+                                     max(screenXyZ.x(),
+                                         max( screenxYZ.x(), screenXYZ.x())
+                                         )
+                                     )
+                                 )
+                             )
+                         )
+                     );
+
+    float maxy = max(screenxyz.y(),
+                     max(screenXyz.y(),
+                         max(screenxYz.y(),
+                             max(screenxyZ.y(),
+                                 max(screenXYz.y(),
+                                     max(screenXyZ.y(),
+                                         max( screenxYZ.y(), screenXYZ.y())
+                                         )
+                                     )
+                                 )
+                             )
+                         )
+                     );
+
+    Vec4 bounds = Vec4(minx, miny, maxx, maxy);
+
+    return bounds;
+}
 /** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
  * @param type : lgType : the type of label
  * @param animation : ref_ptr<LGAnimation> : the animation related to the label

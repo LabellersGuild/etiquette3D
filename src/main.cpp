@@ -150,6 +150,8 @@ int main()
         fps = 1/timer;
         cout<<"fps :"<<fps<<endl;
         //cout<<"distance 2d "<<a2dBox<<endl;
+        //Vec4 object2dBBOx = label1->computeObject2dBBox(&viewer);
+        //cout<< object2dBBOx.x() << " " << object2dBBOx.y() << " " << object2dBBOx.z() << " " << object2dBBOx.w() << endl;
         viewer.frame();
     }
 }
