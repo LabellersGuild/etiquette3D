@@ -92,3 +92,41 @@ int Evaluator::lisibility_checkAlignement(){
     }
     return wrongLabel;             
 }
+
+int Evaluator::computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > etiquettes)
+{
+        int sum = 0;
+        int compteur = 0;
+
+        for(size_t i = 0; i<etiquettes.size(); i++)
+        {
+            lgLabel* label1 = etiquettes[i].get();
+            if(label1->getLabelType() == EXTERNAL)
+            {
+                    Vec4 box1 = label1->compute2dBox(view);
+                    float minsize1 = std::min(box1.z()-box1.x(), box1.w()-box1.y());
+                    for(size_t j = i+1; j<etiquettes.size(); j++)
+                    {
+                        lgLabel* label2 = etiquettes[j].get();
+                            if(label2->getLabelType() == EXTERNAL)
+                            {
+                                    Vec4 box2 = label2->compute2dBox(view);
+                                    float minsize2 = std::min(box2.z()-box2.x(), box2.w()-box2.y());
+                                    float minsize = std::min(minsize1, minsize2);
+                                    float distance = label1->distance2dBox(view, label2);
+                                    if( distance < 0)
+                                    {
+                                            if(distance*(-1) > minsize/10){
+                                                    sum+=distance*(-1);
+                                                    compteur++;
+                                            }
+                                    }
+                            }
+                    }
+                }
+        }
+        if(compteur>0){
+            cout<<compteur<<" étiquettes se chevauchent"<<endl;
+        }
+        return compteur>0 ? sum/compteur : 0;
+}

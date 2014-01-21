@@ -106,7 +106,7 @@ int main()
     label2->setInfoLabel("This is a well !");
 
     //more label
-    //addMoreLabel(findNode,listLabels,model,&viewer);
+    addMoreLabel(findNode,listLabels,model,&viewer);
 
     // Create LGInteraction
     ref_ptr<lgInteraction> interaction = new lgInteraction(listLabels);
@@ -135,7 +135,6 @@ int main()
     cout<<"On a trouvé "<<recenseur.getLabelList().size()<<" étiquettes"<<endl;
     recenseur.getLabelList().at(0)->setText("J'ai change!");
     cout<<"debug exit label visitor \n \n"<<endl;
-    label1->setAxisAlignment(osgText::Text::XY_PLANE);
     //Translate label test:
     myTest.test_label_translateLabel(label1);
     Evaluator* testeur = new Evaluator();
@@ -154,6 +153,7 @@ int main()
 
         //fps calc
         testeur->realTime_iter();
+        cout<<"Moyenne : "<<testeur->computeLabelCollision(pView, recenseur.getLabelList())<<endl;;
         //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }

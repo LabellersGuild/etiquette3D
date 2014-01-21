@@ -33,6 +33,7 @@ public:
     //return the number of poorly designed labels
     int lisibility_checkAlignement();
     
+    static int computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > labels);
     
 protected:
     clock_t realTime_startClock;
