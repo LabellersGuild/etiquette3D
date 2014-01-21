@@ -15,6 +15,7 @@
 #include "../include/lgInteraction.h"
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
+#include "../include/InternalLabelAnimation.h"
 #include "../include/testLGAnimation.h"
 #include <osgGA/TrackballManipulator>
 
@@ -45,10 +46,11 @@ int main()
    // Does not work for every citygml file.
     osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options("");
 
-    cout << "Entrer le path du fichier .citygml :" << endl;
-    string pathFile;
-    cin >> pathFile;
+//    cout << "Entrer the path of .citygml file:" << endl;
+//    string pathFile;
+//    cin >> pathFile;
 //    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
+      string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/Castle_Herten_v1.0.0/Castle_Herten_v1.0.0.citygml";
     model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -75,7 +77,7 @@ int main()
     // You can change the name of the label, it is the 3rd argument of the next line
 
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, EXTERNAL);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, INTERNAL_FACE);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
@@ -83,7 +85,7 @@ int main()
     //Info label
     label1->setInfoLabel("Castle constructed in the XIV th century");
 
-    label1->addArrow();
+    //label1->addArrow();
 
     //Test of setSeeInTransparency :
     //label1->setSeeInTransparency(true);
@@ -145,10 +147,12 @@ int main()
         //myTest.test_label_compute2dCenter(&viewer, label1);
 
         //fps calc
+        /*
         timer = (clock() - start) / (double) CLOCKS_PER_SEC;
         start = clock();
         fps = 1/timer;
         cout<<"fps :"<<fps<<endl;
+        */
         //cout<<"distance 2d "<<a2dBox<<endl;
         //Vec4 object2dBBOx = label1->computeObject2dBBox(&viewer);
         //cout<< object2dBBOx.x() << " " << object2dBBOx.y() << " " << object2dBBOx.z() << " " << object2dBBOx.w() << endl;
@@ -168,24 +172,24 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
 
    if (type == EXTERNAL)
    {
+       label->setLinkNode(linkToNode, recoPos);
        // Test of the LGAnimation : use of testLGAnimation class
        //ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
        ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
-       label->setLinkNode(linkToNode, recoPos);
        label->setLabelType(type, animation);
 
    }
    else if (type == INTERNAL_TOP)
    {
-       ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
        label->setLinkNode(linkToNode, recoPos);
+       ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
        label->setLabelType(type, animation);
 
    }
    else //INTERNAL_FACE
    {
-       ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
        label->setLinkNode(linkToNode, recoPos);
+       ref_ptr<InternalLabelAnimation> animation = new InternalLabelAnimation(viewer, label);
        label->setLabelType(type, animation);
    }
    test myTest=test();
