@@ -84,9 +84,8 @@ int main()
 
     //Info label
     label1->setInfoLabel("Castle constructed in the XIV th century");
-
+    label1->setFontResolution(120,120);
     label1->addArrow();
-
     //Test of setSeeInTransparency :
     //label1->setSeeInTransparency(true);
 
@@ -136,10 +135,12 @@ int main()
     cout<<"On a trouvé "<<recenseur.getLabelList().size()<<" étiquettes"<<endl;
     recenseur.getLabelList().at(0)->setText("J'ai change!");
     cout<<"debug exit label visitor \n \n"<<endl;
-
+    label1->setAxisAlignment(osgText::Text::XY_PLANE);
     //Translate label test:
     myTest.test_label_translateLabel(label1);
     Evaluator* testeur = new Evaluator();
+    testeur->setLabelList(recenseur.getLabelList());
+    testeur->lisibility_checkAlignement();
     testeur->realTime_init();
     while (!viewer.done())
     {

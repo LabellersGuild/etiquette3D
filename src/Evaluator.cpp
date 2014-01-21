@@ -8,6 +8,7 @@
 #include <time.h>
 #include <vector>
 #include <iostream>
+#include <osgText/TextBase>
 #include "../include/Evaluator.h"
 
 Evaluator::Evaluator() {
@@ -62,4 +63,32 @@ double Evaluator::realTime_averageFPS(){
     }
     average = sum / realTime_listFPS.size();
     return average;
+}
+
+void Evaluator::setLabelList(vector<ref_ptr<lgLabel> > labelList){
+    this->labelList = labelList;
+}
+
+vector<ref_ptr<lgLabel> > Evaluator::getLabelList(){
+    return labelList;
+}
+
+int Evaluator::lisibility_checkAlignement(){
+    int nonInternalLabel = 0;
+    int wrongLabel = 0;
+    for (size_t i = 0; i<labelList.size(); i++){
+        lgType type = labelList[i].get()->getLabelType();
+        if(type!=INTERNAL_TOP || type != INTERNAL_FACE){
+            nonInternalLabel++;
+            if(labelList[i].get()->getAxisAlignment()!=osgText::Text::SCREEN){
+                wrongLabel++;
+            }
+        }
+    }
+    if(wrongLabel>0){
+        cout<<"Il y a "<<wrongLabel<<" étiquettes pauvrement orient(ées) parmis les "<<nonInternalLabel<<" étiquettes non internes"<<endl;
+    } else {
+        cout<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
+    }
+    return wrongLabel;             
 }

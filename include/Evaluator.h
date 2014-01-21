@@ -7,8 +7,9 @@
 
 #ifndef EVALUATOR_H
 #define	EVALUATOR_H
-
+#include "lgLabel.h"
 using namespace std;
+using namespace osg;
 
 class Evaluator {
 public:
@@ -16,10 +17,22 @@ public:
     Evaluator(const Evaluator& orig);
     virtual ~Evaluator();
     
+    //fonction d'initialisation pour le calcul des FPS
     void realTime_init();
+    //fonction à appeler à chaque itération du viewer
     void realTime_iter();
+    //fonctions pour calculer les FPS moyens
     void realTime_calcFPS(double timer);
     double realTime_averageFPS();
+    
+    
+    void setLabelList(vector<ref_ptr<lgLabel> > labelList);
+    vector<ref_ptr<lgLabel> > getLabelList();
+    
+    //check if non internal label are screen aligned
+    //return the number of poorly designed labels
+    int lisibility_checkAlignement();
+    
     
 protected:
     clock_t realTime_startClock;
@@ -28,6 +41,9 @@ protected:
     vector<double> realTime_listFPS; 
     int realTime_listPointer;
     bool realTime_offset;
+    
+    vector<ref_ptr<lgLabel> > labelList;
+    
 
 };
 
