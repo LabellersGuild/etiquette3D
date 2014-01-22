@@ -103,9 +103,10 @@ void InternalLabelAnimation::operator()(Node* node, NodeVisitor* nv)
         cameraFaceVectors.push_back(Vec3(positionCamera-(aCorners[faceCorners[i][0]]+aCorners[faceCorners[i][1]]+aCorners[faceCorners[i][2]]+aCorners[faceCorners[i][3]])/4));
 
     //Orientations
-    vector<double> orientations;
+    map<double,int> orientations;
     for(int i=0;i<5;i++)
-         orientations.push_back(acos((cameraFaceVectors[i]*normals[i])/(cameraFaceVectors[i].length()*normals[i].length())));
+         orientations.insert(acos((cameraFaceVectors[i]*normals[i])/(cameraFaceVectors[i].length()*normals[i].length())), i);
+
 
     //Sort the corners of the faces
     int cornersSorted[5][4];
