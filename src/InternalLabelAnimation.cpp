@@ -19,7 +19,7 @@ InternalLabelAnimation::InternalLabelAnimation(osgViewer::Viewer* viewer, ref_pt
      //Bounding box of the object
     this->bbox = label->computeObjectBBox(label->getUpdatedMatrix()->getParent(0),BoundingBox(0,0,0,0,0,0) );
 
-    //Corners of the boundingbx, local :
+    //Corners of the boundingbx, local position in lCorners:
     lCorners[0]=Vec3(bbox.xMin(),bbox.yMin(),bbox.zMin());
     lCorners[1]=Vec3(bbox.xMin(),bbox.yMin(),bbox.zMax());
     lCorners[2]=Vec3(bbox.xMin(),bbox.yMax(),bbox.zMin());
@@ -42,7 +42,7 @@ InternalLabelAnimation::InternalLabelAnimation(osgViewer::Viewer* viewer, ref_pt
              extendedlCorners[j] = extendedlCorners[j]*matricesList[i];
     }
 
-    //Absolute position
+    //Absolute position in aCorners
     for (int i=0;i<8;i++)
         aCorners[i]= Vec3(extendedlCorners[i].x(), extendedlCorners[i].y(), extendedlCorners[i].z());
 
@@ -59,22 +59,27 @@ InternalLabelAnimation::InternalLabelAnimation(osgViewer::Viewer* viewer, ref_pt
         normals[i]=planesFaces[i].getNormal();
 
     //corners linked to each face,
+    //face 1
     faceCorners[0][0] = 3;
     faceCorners[0][1] = 7;
     faceCorners[0][2] = 6;
     faceCorners[0][3] = 2;
+    //face 2
     faceCorners[1][0] = 7;
     faceCorners[1][1] = 5;
     faceCorners[1][2] = 4;
     faceCorners[1][3] = 6;
+    //face 3
     faceCorners[2][0] = 5;
     faceCorners[2][1] = 1;
     faceCorners[2][2] = 0;
     faceCorners[2][3] = 4;
+    //face 4
     faceCorners[3][0] = 1;
     faceCorners[3][1] = 3;
     faceCorners[3][2] = 2;
     faceCorners[3][3] = 0;
+    //face 5 (top one))
     faceCorners[4][0] = 7;
     faceCorners[4][1] = 3;
     faceCorners[4][2] = 1;
@@ -138,6 +143,8 @@ void InternalLabelAnimation::operator()(Node* node, NodeVisitor* nv)
     Vec3 endFreePosition;
     Vec3 localBeginningFreePosition;
     Vec3 localEndFreePosition;
+    int candidatei=0;
+    int candidatej=0;
 
     //Calculate the occlusions
     // Find the line which have the more consecutive free points. If there are several lines with this maximum, take the first one. The higher the label, the better
@@ -158,21 +165,32 @@ void InternalLabelAnimation::operator()(Node* node, NodeVisitor* nv)
                 if ( !(intersector->containsIntersections()) || (intersector->containsIntersections() && (*(intersector->getIntersections().begin())).drawable == label))
                 {
                     freePoints++;
-                    if (maxFreePoints<freePoints)
+                    //
+                    if(j=jMax && maxFreePoints<freePoints)
                     {
                         maxFreePoints=freePoints;
-
-                        beginningFreePosition = ((aCorners[cornersSorted[k][0]])*(iMax-i)*(jMax-j+maxFreePoints-1) + (aCorners[cornersSorted[k][1]])*(iMax-i)*(j-maxFreePoints+1) + (aCorners[cornersSorted[k][2]])*i*(jMax-j+maxFreePoints-1) + (aCorners[cornersSorted[k][3]])*i*(j-maxFreePoints+1))/(iMax*jMax);
-                        endFreePosition = currentPoint;
-
-                        localBeginningFreePosition = ((lCorners[cornersSorted[k][0]])*(iMax-i)*(jMax-j+maxFreePoints-1) + (lCorners[cornersSorted[k][1]])*(iMax-i)*(j-maxFreePoints+1) + (lCorners[cornersSorted[k][2]])*i*(jMax-j+maxFreePoints-1) + (lCorners[cornersSorted[k][3]])*i*(j-maxFreePoints+1))/(iMax*jMax);
-                        localEndFreePosition = ((lCorners[cornersSorted[k][0]]) * (iMax-i)*(jMax-j) + (lCorners[cornersSorted[k][1]]) * (iMax-i)*j + (lCorners[cornersSorted[k][2]]) * i*(jMax-j) + (lCorners[cornersSorted[k][3]])*i*j)/(iMax*jMax);
+                        candidatei=i;
+                        candidatej=j;
                     }
                 }
-                else
+                else{
+                    if (freePoints>0 && maxFreePoints<freePoints)
+                    {
+                        maxFreePoints=freePoints;
+                        candidatei=i;
+                        candidatej=j-1;
+                    }
                     freePoints=0;
+                    if((jMax-j)<=maxFreePoints){
+                        break;
+                    }
+                }
             }
+            beginningFreePosition = ((aCorners[cornersSorted[k][0]])*(iMax-candidatei)*(jMax-candidatej+maxFreePoints-1) + (aCorners[cornersSorted[k][1]])*(iMax-candidatei)*(candidatej-maxFreePoints+1) + (aCorners[cornersSorted[k][2]])*candidatei*(jMax-candidatej+maxFreePoints-1) + (aCorners[cornersSorted[k][3]])*candidatei*(candidatej-maxFreePoints+1))/(iMax*jMax);
+            endFreePosition =  ((aCorners[cornersSorted[k][0]]) * (iMax-candidatei)*(jMax-candidatej) + (aCorners[cornersSorted[k][1]]) * (iMax-candidatei)*candidatej + (aCorners[cornersSorted[k][2]]) * candidatei*(jMax-candidatej) + (aCorners[cornersSorted[k][3]])*candidatei*candidatej)/(iMax*jMax);
 
+            localBeginningFreePosition = ((lCorners[cornersSorted[k][0]])*(iMax-candidatei)*(jMax-candidatej+maxFreePoints-1) + (lCorners[cornersSorted[k][1]])*(iMax-candidatei)*(candidatej-maxFreePoints+1) + (lCorners[cornersSorted[k][2]])*candidatei*(jMax-candidatej+maxFreePoints-1) + (lCorners[cornersSorted[k][3]])*candidatei*(candidatej-maxFreePoints+1))/(iMax*jMax);
+            localEndFreePosition = ((lCorners[cornersSorted[k][0]]) * (iMax-candidatei)*(jMax-candidatej) + (lCorners[cornersSorted[k][1]]) * (iMax-candidatei)*candidatej + (lCorners[cornersSorted[k][2]]) * candidatei*(jMax-candidatej) + (lCorners[cornersSorted[k][3]])*candidatei*candidatej)/(iMax*jMax);
         }
 
         // There is a minimum size on screen between left and right points of the maxFreePoints
