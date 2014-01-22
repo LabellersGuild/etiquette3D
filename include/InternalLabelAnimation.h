@@ -27,7 +27,7 @@ class InternalLabelAnimation : public lgAnimation
      */
     osg::ref_ptr<lgLabel> label;
 
-    /** Bounding box of the label
+    /** Bounding box of the object
      */
     osg::BoundingBox bbox;
 
