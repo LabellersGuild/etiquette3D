@@ -30,8 +30,8 @@ public:
     vector<ref_ptr<lgLabel> > getLabelList();
     
     //check if non internal label are screen aligned
-    //return the number of poorly designed labels
-    int lisibility_checkAlignement();
+    //return the percentage of well oriented labels among non internal labels
+    float lisibility_checkAlignement();
     
     static int computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > labels);
     

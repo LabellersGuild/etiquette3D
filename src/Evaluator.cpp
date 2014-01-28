@@ -73,7 +73,8 @@ vector<ref_ptr<lgLabel> > Evaluator::getLabelList(){
     return labelList;
 }
 
-int Evaluator::lisibility_checkAlignement(){
+
+float Evaluator::lisibility_checkAlignement(){
     int nonInternalLabel = 0;
     int wrongLabel = 0;
     for (size_t i = 0; i<labelList.size(); i++){
@@ -90,7 +91,7 @@ int Evaluator::lisibility_checkAlignement(){
     } else {
         cout<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
     }
-    return wrongLabel;             
+    return 100-((float) wrongLabel/(float) nonInternalLabel)*100;             
 }
 
 int Evaluator::computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > etiquettes)
@@ -126,7 +127,7 @@ int Evaluator::computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref
                 }
         }
         if(compteur>0){
-            cout<<compteur<<" étiquettes se chevauchent"<<endl;
+            cout<<"Il y a "<<compteur<<" chevauchement d'étiquettes"<<endl;
         }
         return compteur>0 ? sum/compteur : 0;
 }
