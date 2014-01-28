@@ -155,7 +155,7 @@ int main()
 
         //fps calc
         testeur->realTime_iter();
-        cout<<"Moyenne : "<<testeur->computeLabelCollision(pView, recenseur.getLabelList())<<endl;;
+        testeur->computeLabelCollision(pView, recenseur.getLabelList());
         //cout<<"distance 2d "<<a2dBox<<endl;
         viewer.frame();
     }
@@ -279,16 +279,16 @@ void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* mod
     listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
 
 
-    string nodeName="ID_276003000001194_";
-    char numstr[21];
-    for (int j=1;j<19;j++)
-    {
-        sprintf(numstr, "%d", j);
-        idNode=nodeName+numstr;
-        visitor.setNameToFind(idNode);
-        model->accept(visitor);
-        aNode = visitor.getFirst();
-        visitor.feedFoundPointList(*(aNode));
-        listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
-    }
+//    string nodeName="ID_276003000001194_";
+//    char numstr[21];
+//    for (int j=1;j<19;j++)
+//    {
+//        sprintf(numstr, "%d", j);
+//        idNode=nodeName+numstr;
+//        visitor.setNameToFind(idNode);
+//        model->accept(visitor);
+//        aNode = visitor.getFirst();
+//        visitor.feedFoundPointList(*(aNode));
+//        listLabels.push_back(addTextLabel(visitor.getFirst(),aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer, EXTERNAL));
+//    }
 }

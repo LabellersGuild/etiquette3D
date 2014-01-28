@@ -33,7 +33,9 @@ public:
     //return the percentage of well oriented labels among non internal labels
     float lisibility_checkAlignement();
     
-    static int computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > labels);
+    void computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > labels);
+    
+    void analyseLabelCollision();
     
 protected:
     clock_t realTime_startClock;
@@ -42,6 +44,11 @@ protected:
     vector<double> realTime_listFPS; 
     int realTime_listPointer;
     bool realTime_offset;
+    
+    vector<int> collision_listNumber;
+    vector<int> collision_listDepth;
+    int collision_listPointer;
+    int collision_frameCounter;
     
     vector<ref_ptr<lgLabel> > labelList;
     
