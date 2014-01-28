@@ -37,6 +37,8 @@ public:
     
     void analyseLabelCollision();
     
+    void visibilityFilterCalculator();
+    
 protected:
     clock_t realTime_startClock;
     clock_t realTime_previousClock;

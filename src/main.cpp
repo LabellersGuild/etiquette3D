@@ -139,9 +139,13 @@ int main()
     myTest.test_label_translateLabel(label1);
     Evaluator* testeur = new Evaluator();
     testeur->setLabelList(recenseur.getLabelList());
+    
     label1->setAxisAlignment(osgText::Text::XY_PLANE);
+    label2->setHidingDistance(300);
+    
     float percentVisible = testeur->lisibility_checkAlignement();
     cout<<"Pourcentage bien orienté : "<<percentVisible<<endl;
+    testeur->visibilityFilterCalculator();
     testeur->realTime_init();
     while (!viewer.done())
     {

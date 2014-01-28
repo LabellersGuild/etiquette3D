@@ -9,6 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <osgText/TextBase>
+#include <numeric>
 #include "../include/Evaluator.h"
 
 Evaluator::Evaluator() {
@@ -167,4 +168,29 @@ void Evaluator::analyseLabelCollision() {
     cout << "Maximum des profondeur de collision : " << maxDepth << endl;
     cout << "Moyenne du nombre de collision : " << averageNumber << endl;
     cout << "Maximum du nombre de collision : " << maxNumber << endl;
+}
+
+void Evaluator::visibilityFilterCalculator(){
+    int nbFilter = 0;
+    int maxHidingDistance = 0;
+    vector<int> distanceVector;
+    float averageHidingDistance = 0;
+    
+    for (size_t i = 0; i<labelList.size(); i++){
+        if(labelList[i].get()->getHidingDistance()!=-1){
+            nbFilter++;
+            distanceVector.push_back(labelList[i].get()->getHidingDistance());
+            if(labelList[i].get()->getHidingDistance() > maxHidingDistance){
+                maxHidingDistance = labelList[i].get()->getHidingDistance();
+            }
+        }
+    }
+    float percent = ((float)nbFilter/(float)labelList.size())*100; 
+    cout<<"Pourcentage d'étiquettes filtrés à distance : "<<percent<<endl;
+    
+    if(nbFilter>0){
+        averageHidingDistance = (float) std::accumulate(distanceVector.begin(), distanceVector.end(), 0) / (float) distanceVector.size();
+        cout<<"Distance d'occultation moyenne "<<averageHidingDistance<<endl;
+        cout<<"Distance d'occultation maximale "<<maxHidingDistance<<endl;
+    }
 }
