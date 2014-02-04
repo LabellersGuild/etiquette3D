@@ -578,7 +578,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
             //Look at the drawables that are not a lgLabel, and adapt the bbox
             for(unsigned j=0;j< child->getNumDrawables();j++)
             {
-                if (! child->getDrawable(i)->isSameKindAs(new lgLabel()))
+                if (! child->getDrawable(j)->isSameKindAs(new lgLabel()))
                 {
                     BoundingBox childbbox = child->getDrawable(j)->getBound();
 
@@ -729,14 +729,11 @@ Vec4 lgLabel::computeObject2dBBox(ref_ptr<osgViewer::Viewer> view)
 }
 /** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
  * @param type : lgType : the type of label
- * @param animation : ref_ptr<LGAnimation> : the animation related to the label
  */
-void lgLabel::setLabelType(lgType type, ref_ptr<lgAnimation> animation){
-   this->labelType=labelType;
-   updatedMatrix->setUpdateCallback(animation);
-   labelType = type;
+void lgLabel::setLabelType(lgType type){
+   this->labelType= type;
 
-   if (type == EXTERNAL)
+   if (type == EXTERNAL || type == SWITCH)
    {
        setAxisAlignment(osgText::Text::SCREEN);
        setAlignment(osgText::Text::CENTER_BOTTOM);
@@ -755,7 +752,7 @@ void lgLabel::setLabelType(lgType type, ref_ptr<lgAnimation> animation){
        //Put the label on the object
        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,(bbox.yMax()+bbox.yMin())/2, bbox.zMax()));
    }
-   else //INTERNAL_FACE
+   else if (type == INTERNAL_FACE)
    {
        setAxisAlignment(osgText::Text::XZ_PLANE);
        setAlignment(osgText::Text::CENTER_CENTER);

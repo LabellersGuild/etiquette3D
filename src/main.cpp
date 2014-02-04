@@ -17,6 +17,7 @@
 #include "../include/myLGAnimation2.h"
 #include "../include/InternalLabelAnimation.h"
 #include "../include/testLGAnimation.h"
+#include "../include/InExSwitch.h"
 #include <osgGA/TrackballManipulator>
 
 #include <osgText/Font>
@@ -77,7 +78,7 @@ int main()
     // You can change the name of the label, it is the 3rd argument of the next line
 
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, INTERNAL_FACE);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, SWITCH);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
@@ -170,27 +171,39 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
 
    ref_ptr<lgLabel> label = new lgLabel();
 
+  label->setLinkNode(linkToNode, recoPos);
+
    if (type == EXTERNAL)
    {
-       label->setLinkNode(linkToNode, recoPos);
        // Test of the LGAnimation : use of testLGAnimation class
        //ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
+       label->setLabelType(type);
        ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
-       label->setLabelType(type, animation);
+       label->getUpdatedMatrix()->setUpdateCallback(animation);
 
    }
    else if (type == INTERNAL_TOP)
    {
-       label->setLinkNode(linkToNode, recoPos);
+       label->setLabelType(type);
        ref_ptr<lgAnimation> animation = new lgAnimation(viewer);
-       label->setLabelType(type, animation);
+       label->getUpdatedMatrix()->setUpdateCallback(animation);
 
    }
-   else //INTERNAL_FACE
+   else if ( type == INTERNAL_FACE)
    {
-       label->setLinkNode(linkToNode, recoPos);
+       label->setLabelType(type);
        ref_ptr<InternalLabelAnimation> animation = new InternalLabelAnimation(viewer, label);
-       label->setLabelType(type, animation);
+       label->getUpdatedMatrix()->setUpdateCallback(animation);
+
+   }
+   else if (type == SWITCH)
+   {
+       label->setLabelType(INTERNAL_FACE);
+       ref_ptr<InternalLabelAnimation> internalAnimation = new InternalLabelAnimation(viewer, label);
+       label->setLabelType(SWITCH);
+       ref_ptr<myLGAnimation2> myLGAnimation2Animation = new myLGAnimation2(viewer);
+       ref_ptr<InExSwitch> animation = new InExSwitch(viewer, internalAnimation, myLGAnimation2Animation);
+       label->getUpdatedMatrix()->setUpdateCallback(animation);
    }
    test myTest=test();
    myTest.test_label_setLinkNode(linkToNode,label);

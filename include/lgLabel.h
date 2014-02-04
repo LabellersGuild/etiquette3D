@@ -25,7 +25,8 @@
 enum lgType{
     INTERNAL_TOP,
     INTERNAL_FACE,
-    EXTERNAL
+    EXTERNAL,
+    SWITCH
 };
 
 
@@ -86,9 +87,8 @@ class lgLabel : public osgText::Text {
 
         /** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
          * @param type : lgType : the type of label
-         * @param animation : ref_ptr<LGAnimation> : the animation related to the label
          */
-        void setLabelType(lgType labelType, osg::ref_ptr<lgAnimation> animation);
+        void setLabelType(lgType labelType);
 
         /** *Set the initial position in the attribute positionInit
          * but also call the setPosition method with the same argument
