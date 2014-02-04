@@ -229,3 +229,76 @@ void Evaluator::visibilityOutOfCamera(ref_ptr<osgViewer::Viewer> view){
         OOCFrameCounter++;
     }
 }
+
+/** Compute the 2D distance between the BoundingBox of the Label and the one of the linked Object.
+ * used in computeLabelObjectDistance.
+ * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+ * @param etiquette : ref_ptr<lgLabel> : the label
+ * @return float : the distance
+ */
+float Evaluator::distanceLabelObject(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> etiquette) {
+    Vec4 ObjectBox = etiquette->computeObject2dBBox(view);
+    Vec4 LabelBox = etiquette->compute2dBox(view);
+
+    Vec4 leftBox, rightBox;
+    if (ObjectBox.x() < LabelBox.x()) {
+        leftBox = ObjectBox;
+        rightBox = LabelBox;
+    } else {
+        leftBox = LabelBox;
+        rightBox = ObjectBox;
+    }
+    //we deduce the box to the top
+    Vec4 topBox, botBox;
+    if (ObjectBox.y() < LabelBox.y()) {
+        topBox = LabelBox;
+        botBox = ObjectBox;
+    } else {
+        topBox = ObjectBox;
+        botBox = LabelBox;
+    }
+    //we then calculate the delta for both abs and ord
+    float deltaX = rightBox.x() - leftBox.z();
+    float deltaY = topBox.y() - botBox.w();
+    float distance;
+    //if box touch themselves, we set the distance as negative and a translation from
+    // this distance as absolute value should fix the problem
+    if (deltaX < 0 && deltaY < 0) {
+        distance = -sqrt(pow(deltaX, 2.0) + pow(deltaY, 2.0));
+    }
+    if (deltaX < 0 && deltaY > 0) {
+        distance = deltaY;
+    }
+    if (deltaX > 0 && deltaY < 0) {
+        distance = deltaX;
+    }
+    if (deltaX > 0 && deltaY > 0) {
+        distance = sqrt(pow(deltaX, 2.0) + pow(deltaY, 2.0));
+    }
+    return distance;
+}
+
+/** Compute the average 2D distance between the BoundingBox of the Label and the one of the linked Object.
+ * Should be used in the main loop.
+ * @param view : ref_ptr<osgViewer::Viewer> : viewer object of the main file
+ * @param etiquettes : vector<ref_ptr<lgLabel>> : list of labels
+ * @return float : the average distance
+ */
+float Evaluator::computeLabelObjectDistance(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > etiquettes) {
+    int sum = 0;
+    int compteur = 0;
+
+    for (size_t i = 0; i < etiquettes.size(); i++) {
+        lgLabel* label1 = etiquettes[i].get();
+        if (label1->getLabelType() == EXTERNAL) {
+            float distance = distanceLabelObject(view, label1);
+            if(distance>0)
+            {
+                sum += distance;
+                compteur++;
+            }
+        }
+    }
+
+    return (0 == compteur) ? 0 : sum / (float) compteur;
+}

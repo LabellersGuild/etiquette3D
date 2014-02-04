@@ -219,6 +219,12 @@ class lgLabel : public osgText::Text {
          */
         osg::BoundingBox computeObjectBBox(osg::ref_ptr<osg::Group> node, osg::BoundingBox bbox) const;
 
+        /** Calculate the coordinates of the bounding box of the object attached to the label on the screen
+        * @param view : ref_ptr<osgViewer> : the viewer object of the main file
+        * @return Vec4 : coordinates (xMin, yMin, xMax, yMax) of the bounding box.
+        */
+        osg::Vec4 computeObject2dBBox(osg::ref_ptr<osgViewer::Viewer> view);
+
         /** infoLabel getter
          * @return osgText::Text* : the infoLabel
          */

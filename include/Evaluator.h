@@ -47,6 +47,9 @@ public:
     //call it inside the viewer loop
     void visibilityOutOfCamera(ref_ptr<osgViewer::Viewer> view);
     
+    float distanceLabelObject(ref_ptr<osgViewer::Viewer> view, ref_ptr<lgLabel> etiquette);
+    float computeLabelObjectDistance(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > etiquettes);
+    
 protected:
     clock_t realTime_startClock;
     clock_t realTime_previousClock;

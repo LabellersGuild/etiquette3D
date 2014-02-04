@@ -15,6 +15,7 @@
 #include "../include/lgInteraction.h"
 #include "../include/myLGAnimation.h"
 #include "../include/myLGAnimation2.h"
+#include "../include/InternalLabelAnimation.h"
 #include "../include/testLGAnimation.h"
 #include "../include/Evaluator.h"
 #include "../include/LabelVisitor.h"
@@ -77,7 +78,7 @@ int main()
     // You can change the name of the label, it is the 3rd argument of the next line
 
     vector<lgLabel*> listLabels = vector<lgLabel*>();
-    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, EXTERNAL);
+    ref_ptr<lgLabel> label1 = addTextLabel(rootModel, rootModel->getName(), "Castle Herten", positionCalc, &viewer, INTERNAL_FACE);
 
     //Tests of the hiding distance, and setSeeInTransparency
     label1->setHidingDistance(1000);
@@ -141,7 +142,7 @@ int main()
     testeur->setLabelList(recenseur.getLabelList());
     
     label1->setAxisAlignment(osgText::Text::XY_PLANE);
-    label2->setHidingDistance(300);
+    label2->setHidingDistance(800);
     
     float percentVisible = testeur->lisibility_checkAlignement(true);
     cout<<"Pourcentage bien orienté : "<<percentVisible<<endl;
@@ -160,10 +161,9 @@ int main()
         //fps calc
         testeur->realTime_iter();
         testeur->computeLabelCollision(pView, recenseur.getLabelList());
-        //cout<<"distance 2d "<<a2dBox<<endl;
         testeur->visibilityOutOfCamera(pView);
-        
-        
+        float avDist = testeur->computeLabelObjectDistance(pView, recenseur.getLabelList());
+        cout<<"Distance moyenne au bâtiment à l'écran "<<avDist<<endl;
         viewer.frame();
     }
 }
