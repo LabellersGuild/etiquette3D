@@ -15,11 +15,15 @@
 Evaluator::Evaluator() {
     collision_listPointer = 0;
     collision_frameCounter = 0;
+    OOCPointer = 0;
+    OOCFrameCounter = 0;
 }
 
 Evaluator::Evaluator(const Evaluator& orig) {
     collision_listPointer = orig.collision_listPointer;
     collision_frameCounter = orig.collision_frameCounter;
+    OOCPointer = orig.OOCPointer;
+    OOCFrameCounter = orig.OOCFrameCounter;
 }
 
 Evaluator::~Evaluator() {
@@ -79,7 +83,7 @@ vector<ref_ptr<lgLabel> > Evaluator::getLabelList(){
 }
 
 
-float Evaluator::lisibility_checkAlignement(){
+float Evaluator::lisibility_checkAlignement(bool debug){
     int nonInternalLabel = 0;
     int wrongLabel = 0;
     for (size_t i = 0; i<labelList.size(); i++){
@@ -91,10 +95,12 @@ float Evaluator::lisibility_checkAlignement(){
             }
         }
     }
-    if(wrongLabel>0){
-        cout<<"Il y a "<<wrongLabel<<" étiquettes pauvrement orient(ées) parmis les "<<nonInternalLabel<<" étiquettes non internes"<<endl;
-    } else {
-        cout<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
+    if(debug){
+        if(wrongLabel>0){
+            cout<<"Il y a "<<wrongLabel<<" étiquettes pauvrement orient(ées) parmis les "<<nonInternalLabel<<" étiquettes non internes"<<endl;
+        } else {
+            cout<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
+        }
     }
     return 100-((float) wrongLabel/(float) nonInternalLabel)*100;             
 }
@@ -192,5 +198,34 @@ void Evaluator::visibilityFilterCalculator(){
         averageHidingDistance = (float) std::accumulate(distanceVector.begin(), distanceVector.end(), 0) / (float) distanceVector.size();
         cout<<"Distance d'occultation moyenne "<<averageHidingDistance<<endl;
         cout<<"Distance d'occultation maximale "<<maxHidingDistance<<endl;
+    }
+}
+
+void Evaluator::visibilityOutOfCamera(ref_ptr<osgViewer::Viewer> view){
+    //we only process after a certain amount of frames
+    if(OOCFrameCounter>15){
+        int camHeight = view->getCamera()->getViewport()->height();
+        int camWidht = view->getCamera()->getViewport()->width();
+        int sum = 0;
+        for (size_t i = 0; i < labelList.size(); i++) {
+            Vec4 boundings = labelList[i].get()->compute2dBox(view);
+            if(boundings.x()<0 || boundings.y()<0 || boundings.z()>camWidht || boundings.w()>camHeight){
+                sum ++;
+            }
+        }
+        if(OOCNumber.size()<2000){
+            OOCNumber.push_back(sum);
+        } else {
+            OOCNumber.insert(OOCNumber.begin() + OOCPointer, sum);
+            OOCPointer = (OOCPointer + 1) % 1999;
+        }
+        int sumOOC = 0;
+        for(int i = 0; i<OOCNumber.size();i++){
+            sumOOC += OOCNumber[i];
+        }
+        float average = ((float)sumOOC)/((float)OOCNumber.size()*labelList.size())*100;
+        cout<<"Pourcentage d'étiquettes hors camera moyen: "<<average<<endl;
+    } else {
+        OOCFrameCounter++;
     }
 }

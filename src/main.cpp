@@ -143,7 +143,7 @@ int main()
     label1->setAxisAlignment(osgText::Text::XY_PLANE);
     label2->setHidingDistance(300);
     
-    float percentVisible = testeur->lisibility_checkAlignement();
+    float percentVisible = testeur->lisibility_checkAlignement(true);
     cout<<"Pourcentage bien orienté : "<<percentVisible<<endl;
     testeur->visibilityFilterCalculator();
     testeur->realTime_init();
@@ -161,6 +161,9 @@ int main()
         testeur->realTime_iter();
         testeur->computeLabelCollision(pView, recenseur.getLabelList());
         //cout<<"distance 2d "<<a2dBox<<endl;
+        testeur->visibilityOutOfCamera(pView);
+        
+        
         viewer.frame();
     }
 }

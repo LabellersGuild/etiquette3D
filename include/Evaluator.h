@@ -25,19 +25,27 @@ public:
     void realTime_calcFPS(double timer);
     double realTime_averageFPS();
     
-    
+    //function to set the list of labels that will be the target of evaluation
     void setLabelList(vector<ref_ptr<lgLabel> > labelList);
     vector<ref_ptr<lgLabel> > getLabelList();
     
     //check if non internal label are screen aligned
     //return the percentage of well oriented labels among non internal labels
-    float lisibility_checkAlignement();
+    //call it outside the viewer loop
+    //set debug to true to print details
+    float lisibility_checkAlignement(bool debug);
     
     void computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > labels);
     
     void analyseLabelCollision();
     
+    //print some numbers about labels being occluded at a particular distance
+    //call this function out of the viewer loop
     void visibilityFilterCalculator();
+    
+    //print the average percentage of out of camera labels
+    //call it inside the viewer loop
+    void visibilityOutOfCamera(ref_ptr<osgViewer::Viewer> view);
     
 protected:
     clock_t realTime_startClock;
@@ -52,6 +60,10 @@ protected:
     int collision_listPointer;
     int collision_frameCounter;
     
+    //number of labels out of camera's sight
+    vector<int> OOCNumber;
+    int OOCPointer;
+    int OOCFrameCounter;
     vector<ref_ptr<lgLabel> > labelList;
     
 
