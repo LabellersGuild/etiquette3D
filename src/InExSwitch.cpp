@@ -40,11 +40,11 @@ void InExSwitch::operator()(Node* node, NodeVisitor* nv)
     else if (!thereIsEnoughSpace && (label->getLabelType() == INTERNAL_TOP || label->getLabelType() == INTERNAL_FACE))
     {
         label->setLabelType(SWITCH);
-        mylGAnimation2->operator()(node, nv);
+        mylGAnimation2->operatorForSwitch(node, nv);
     }
     else if (!thereIsEnoughSpace &&label->getLabelType() == SWITCH)
     {
-      mylGAnimation2->operator()(node, nv);
+      mylGAnimation2->operatorForSwitch(node, nv);
     }
 
     //Allow OSG to continue the node traversal

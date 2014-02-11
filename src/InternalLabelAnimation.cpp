@@ -297,8 +297,6 @@ bool InternalLabelAnimation::enoughSpace(Node* node, NodeVisitor* nv)
  */
 void InternalLabelAnimation::operatorForSwitch(Node* node, NodeVisitor* nv)
 {
-    lgAnimation::operator()(node, nv);
-
      //top of the bounding box
     if (lCorners[cornersSorted[chosenFace][0]].z() == lCorners[cornersSorted[chosenFace][1]].z() && lCorners[cornersSorted[chosenFace][1]].z() == lCorners[cornersSorted[chosenFace][2]].z() && lCorners[cornersSorted[chosenFace][2]].z() == lCorners[cornersSorted[chosenFace][3]].z())
     {
@@ -346,6 +344,4 @@ void InternalLabelAnimation::operatorForSwitch(Node* node, NodeVisitor* nv)
           cerr << "error with the faces definition of the bounding box an object linked to a label. The faces are not on (XY), (YZ) ot (XY) planes." << endl;
       }
     }
-    //Allow OSG to continue the node traversal
-    traverse(node, nv);
 }

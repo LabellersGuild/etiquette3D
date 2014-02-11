@@ -21,6 +21,10 @@ class myLGAnimation2 : public lgAnimation
         /** Override of operator()
          */
          virtual void operator()(osg::Node* node, osg::NodeVisitor* nv) ;
+
+         /** operator for Switch
+          */
+         void operatorForSwitch(osg::Node* node, osg::NodeVisitor* nv);
 };
 
 #endif // MYLGANIMATION2_H
