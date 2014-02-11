@@ -159,11 +159,11 @@ int main()
         //myTest.test_label_compute2dCenter(&viewer, label1);
 
         //fps calc
+        *(testeur->stream()) << endl;
         testeur->realTime_iter();
         testeur->computeLabelCollision(pView, recenseur.getLabelList());
         testeur->visibilityOutOfCamera(pView);
         float avDist = testeur->computeLabelObjectDistance(pView, recenseur.getLabelList());
-        cout<<"Distance moyenne au bâtiment à l'écran "<<avDist<<endl;
         viewer.frame();
     }
 }
