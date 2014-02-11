@@ -138,7 +138,7 @@ int main()
     cout<<"debug exit label visitor \n \n"<<endl;
     //Translate label test:
     myTest.test_label_translateLabel(label1);
-    Evaluator* testeur = new Evaluator();
+    Evaluator* testeur = new Evaluator(true);
     testeur->setLabelList(recenseur.getLabelList());
     
     label1->setAxisAlignment(osgText::Text::XY_PLANE);

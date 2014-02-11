@@ -8,6 +8,7 @@
 #ifndef EVALUATOR_H
 #define	EVALUATOR_H
 #include "lgLabel.h"
+#include <fstream>
 using namespace std;
 using namespace osg;
 

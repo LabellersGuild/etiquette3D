@@ -299,6 +299,7 @@ float Evaluator::distanceLabelObject(ref_ptr<osgViewer::Viewer> view, ref_ptr<lg
     if (deltaX > 0 && deltaY > 0) {
         distance = sqrt(pow(deltaX, 2.0) + pow(deltaY, 2.0));
     }
+    *stream()<<"Distance moyenne au bâtiment à l'écran "<<distance<<endl;
     return distance;
 }
 
