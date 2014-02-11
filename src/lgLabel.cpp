@@ -605,7 +605,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
                     }
                 }
             }
-            return bbox;
+
         }
         //If the child is a group, call this function on it
         else if (node->getChild(i)->isSameKindAs(new Group()))
@@ -759,6 +759,7 @@ void lgLabel::setLabelType(lgType type){
 
        //Bounding box of the linked object
        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
+      cout <<"bouding box " << bbox.xMin() <<" " << bbox.xMax() << " "<< bbox.yMin()<<" "<<bbox.yMax()<<" "<<bbox.zMin()<<" "<<bbox.zMax()<< endl;
 
        //Put the label on one of the faces of the bounding box.
        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,bbox.yMin(), (bbox.zMax()+bbox.zMin())/2));

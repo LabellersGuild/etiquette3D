@@ -26,6 +26,10 @@ class InternalLabelAnimation : public lgAnimation
       */
       bool enoughSpace(osg::Node* node, osg::NodeVisitor* nv);
 
+      /**
+      * operator used for InExSwitch
+      */
+      void operatorForSwitch(osg::Node* node, osg::NodeVisitor* nv);
 
     protected :
 

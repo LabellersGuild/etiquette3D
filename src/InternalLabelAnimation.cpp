@@ -222,12 +222,7 @@ bool InternalLabelAnimation::enoughSpace(Node* node, NodeVisitor* nv)
         //top of the bounding box
         if (lCorners[cornersSorted[k][0]].z() == lCorners[cornersSorted[k][1]].z() && lCorners[cornersSorted[k][1]].z() == lCorners[cornersSorted[k][2]].z() && lCorners[cornersSorted[k][2]].z() == lCorners[cornersSorted[k][3]].z())
         {
-            //double factor = (1.0-sortedOrientations[k]/PI);
-
-            //cout << "factor :" << factor << endl;
-
-            //if (factor < GOOD)
-            if (sortedOrientations[k]<PI/4.0 && cameraFaceVectors[k].length() < TOOFAR)
+            if (sortedOrientations[k]<PI/3.0 && cameraFaceVectors[k].length() < TOOFAR)
             {
               space = true;
               chosenFace = k;
@@ -282,13 +277,7 @@ bool InternalLabelAnimation::enoughSpace(Node* node, NodeVisitor* nv)
 
                   double spaceLabel = label->getCharacterHeight()*label->getText().size()*0.6;
 
-
-                  //double factor = (1.0-sortedOrientations[k]/PI)*(1.0-space3D/spaceLabel);
-
-                  //cout << "factor :" << factor << endl;
-
-                  //if (factor < GOOD)
-                  if (spaceLabel<space3D && sortedOrientations[k]<PI/4.0 && cameraFaceVectors[k].length() < TOOFAR)
+                  if (spaceLabel<space3D && sortedOrientations[k]<PI/3.0 && cameraFaceVectors[k].length() < TOOFAR)
                   {
                     space = true;
                     chosenFace = k;
@@ -301,5 +290,62 @@ bool InternalLabelAnimation::enoughSpace(Node* node, NodeVisitor* nv)
         }
     }
     return space;
+}
 
+/**
+ * operator used for InExSwitch
+ */
+void InternalLabelAnimation::operatorForSwitch(Node* node, NodeVisitor* nv)
+{
+    lgAnimation::operator()(node, nv);
+
+     //top of the bounding box
+    if (lCorners[cornersSorted[chosenFace][0]].z() == lCorners[cornersSorted[chosenFace][1]].z() && lCorners[cornersSorted[chosenFace][1]].z() == lCorners[cornersSorted[chosenFace][2]].z() && lCorners[cornersSorted[chosenFace][2]].z() == lCorners[cornersSorted[chosenFace][3]].z())
+    {
+         //Change position of the label
+          label->getUpdatedMatrix()->setMatrix(Matrixd::translate((lCorners[cornersSorted[chosenFace][0]]+lCorners[cornersSorted[chosenFace][1]]+lCorners[cornersSorted[chosenFace][2]]+lCorners[cornersSorted[chosenFace][3]])/4));
+
+          label->setAxisAlignment(osgText::TextBase::XY_PLANE);
+
+          float alpha=atan(cameraFaceVectors[chosenFace].y()/cameraFaceVectors[chosenFace].x())-PI/2;
+          if (cameraFaceVectors[chosenFace].x()>0 && cameraFaceVectors[chosenFace].y()>0)
+          {
+              alpha -=PI;
+          }
+          if (cameraFaceVectors[chosenFace].x()>0 && cameraFaceVectors[chosenFace].y()<0)
+          {
+               alpha -=PI;
+          }
+          Matrix updatedMatrix = label->getUpdatedMatrix()->getMatrix();
+          label->getUpdatedMatrix()->setMatrix(Matrixd::rotate(alpha,0,0,1)*updatedMatrix);
+
+    }
+    //Face
+    else
+    {
+        //Change position of the label
+      label->getUpdatedMatrix()->setMatrix(Matrixd::translate((localBeginningFreePosition+localEndFreePosition)/2));
+
+      //Alignment of the label according to the face used.
+      if (lCorners[cornersSorted[chosenFace][0]].x() == lCorners[cornersSorted[chosenFace][1]].x() && lCorners[cornersSorted[chosenFace][1]].x() == lCorners[cornersSorted[chosenFace][2]].x() && lCorners[cornersSorted[chosenFace][2]].x() == lCorners[cornersSorted[chosenFace][3]].x())
+      {
+          if (lCorners[cornersSorted[chosenFace][0]].x() == bbox.xMin())
+              label->setAxisAlignment(osgText::TextBase::REVERSED_YZ_PLANE);
+          else
+              label->setAxisAlignment(osgText::TextBase::YZ_PLANE);
+      }
+      else if (lCorners[cornersSorted[chosenFace][0]].y() ==lCorners[cornersSorted[chosenFace][1]].y() && lCorners[cornersSorted[chosenFace][1]].y() == lCorners[cornersSorted[chosenFace][2]].y() && lCorners[cornersSorted[chosenFace][2]].y() == lCorners[cornersSorted[chosenFace][3]].y())
+      {
+          if ( lCorners[cornersSorted[chosenFace][0]].y() == bbox.yMin())
+              label->setAxisAlignment(osgText::TextBase::XZ_PLANE);
+          else
+              label->setAxisAlignment(osgText::TextBase::REVERSED_XZ_PLANE);
+      }
+      else
+      {
+          cerr << "error with the faces definition of the bounding box an object linked to a label. The faces are not on (XY), (YZ) ot (XY) planes." << endl;
+      }
+    }
+    //Allow OSG to continue the node traversal
+    traverse(node, nv);
 }

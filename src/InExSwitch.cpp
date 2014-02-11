@@ -24,20 +24,27 @@ void InExSwitch::operator()(Node* node, NodeVisitor* nv)
 
      //Label
     ref_ptr<lgLabel> label = dynamic_cast<lgLabel*>(dynamic_cast<Geode*>(dynamic_cast<MatrixTransform*>(node)->getChild(0))->getDrawable(0));
-
     bool thereIsEnoughSpace = internalLabelAnimation->enoughSpace(node, nv);
 
     //cout << "labelType : "<< label->getLabelType() << " enough space : "<< thereIsEnoughSpace << endl;
 
-    if (thereIsEnoughSpace && label->getLabelType() == SWITCH)
+    if (thereIsEnoughSpace && (label->getLabelType() == INTERNAL_TOP || label->getLabelType() == INTERNAL_FACE))
+    {
+        internalLabelAnimation->operatorForSwitch(node, nv);
+    }
+    else if (thereIsEnoughSpace && label->getLabelType() == SWITCH)
     {
         label->setLabelType(INTERNAL_FACE);
-        internalLabelAnimation->operator()( node, nv);
+        internalLabelAnimation->operatorForSwitch(node, nv);
     }
     else if (!thereIsEnoughSpace && (label->getLabelType() == INTERNAL_TOP || label->getLabelType() == INTERNAL_FACE))
     {
         label->setLabelType(SWITCH);
         mylGAnimation2->operator()(node, nv);
+    }
+    else if (!thereIsEnoughSpace &&label->getLabelType() == SWITCH)
+    {
+      mylGAnimation2->operator()(node, nv);
     }
 
     //Allow OSG to continue the node traversal
