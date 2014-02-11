@@ -14,8 +14,11 @@ using namespace osg;
 class Evaluator {
 public:
     Evaluator();
+	Evaluator(bool file_output_mode);
     Evaluator(const Evaluator& orig);
     virtual ~Evaluator();
+
+	std::ostream* stream();
     
     //fonction d'initialisation pour le calcul des FPS
     void realTime_init();
@@ -51,6 +54,10 @@ public:
     float computeLabelObjectDistance(ref_ptr<osgViewer::Viewer> view, vector<ref_ptr<lgLabel> > etiquettes);
     
 protected:
+
+	bool file_output;
+	ofstream filestream;
+
     clock_t realTime_startClock;
     clock_t realTime_previousClock;
     double realTime_timer;

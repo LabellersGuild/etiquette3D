@@ -11,12 +11,29 @@
 #include <osgText/TextBase>
 #include <numeric>
 #include "../include/Evaluator.h"
+#include <fstream>
 
 Evaluator::Evaluator() {
     collision_listPointer = 0;
     collision_frameCounter = 0;
     OOCPointer = 0;
     OOCFrameCounter = 0;
+	file_output = false;
+}
+
+Evaluator::Evaluator(bool file_output_mode) {
+    collision_listPointer = 0;
+    collision_frameCounter = 0;
+    OOCPointer = 0;
+    OOCFrameCounter = 0;
+	file_output = file_output_mode;
+	if(file_output){
+		filestream.open ("Evaluation.txt");
+		if(NULL == filestream){
+			cerr << "Cannot open Evaluator output file";
+			file_output = false;
+		}
+	}
 }
 
 Evaluator::Evaluator(const Evaluator& orig) {
@@ -27,6 +44,13 @@ Evaluator::Evaluator(const Evaluator& orig) {
 }
 
 Evaluator::~Evaluator() {
+}
+
+std::ostream* Evaluator::stream(){
+	if(file_output){
+		return &filestream;
+	}
+	return &std::cout;
 }
 
 //invoke before the loop on viewer
@@ -61,7 +85,7 @@ void Evaluator::realTime_calcFPS(double timer){
         realTime_listFPS.insert(realTime_listFPS.begin()+realTime_listPointer, FPS);
         realTime_listPointer = (realTime_listPointer+1)%99; 
     }
-    cout<<"FPS moyen: "<<realTime_averageFPS()<<endl;
+	*stream()<<"FPS moyen: "<<realTime_averageFPS()<<endl;
 }
 
 double Evaluator::realTime_averageFPS(){
@@ -97,9 +121,9 @@ float Evaluator::lisibility_checkAlignement(bool debug){
     }
     if(debug){
         if(wrongLabel>0){
-            cout<<"Il y a "<<wrongLabel<<" étiquettes pauvrement orient(ées) parmis les "<<nonInternalLabel<<" étiquettes non internes"<<endl;
+            *stream()<<"Il y a "<<wrongLabel<<" étiquettes pauvrement orient(ées) parmis les "<<nonInternalLabel<<" étiquettes non internes"<<endl;
         } else {
-            cout<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
+            *stream()<<"Pas de problème d'orientation dans les étiquettes non internes"<<endl;
         }
     }
     return 100-((float) wrongLabel/(float) nonInternalLabel)*100;             
@@ -135,7 +159,7 @@ void Evaluator::computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<re
             }
         }
         if (compteur > 0) {
-            cout << "Il y a " << compteur << " chevauchement d'étiquettes" << endl;
+            *stream() << "Il y a " << compteur << " chevauchement d'étiquettes" << endl;
         }
         if (collision_listDepth.size() < 2000) {
             collision_listDepth.push_back(compteur > 0 ? sum / compteur : 0);
@@ -170,10 +194,10 @@ void Evaluator::analyseLabelCollision() {
     double averageDepth = sumDepth / (double) collision_listDepth.size();
     double averageNumber = sumNumber / (double) collision_listNumber.size();
 
-    cout << "Moyenne des profondeur de collision : " << averageDepth << endl;
-    cout << "Maximum des profondeur de collision : " << maxDepth << endl;
-    cout << "Moyenne du nombre de collision : " << averageNumber << endl;
-    cout << "Maximum du nombre de collision : " << maxNumber << endl;
+    *stream() << "Moyenne des profondeur de collision : " << averageDepth << endl;
+    *stream() << "Maximum des profondeur de collision : " << maxDepth << endl;
+    *stream() << "Moyenne du nombre de collision : " << averageNumber << endl;
+    *stream() << "Maximum du nombre de collision : " << maxNumber << endl;
 }
 
 void Evaluator::visibilityFilterCalculator(){
@@ -192,12 +216,12 @@ void Evaluator::visibilityFilterCalculator(){
         }
     }
     float percent = ((float)nbFilter/(float)labelList.size())*100; 
-    cout<<"Pourcentage d'étiquettes filtrés à distance : "<<percent<<endl;
+    *stream()<<"Pourcentage d'étiquettes filtrés à distance : "<<percent<<endl;
     
     if(nbFilter>0){
         averageHidingDistance = (float) std::accumulate(distanceVector.begin(), distanceVector.end(), 0) / (float) distanceVector.size();
-        cout<<"Distance d'occultation moyenne "<<averageHidingDistance<<endl;
-        cout<<"Distance d'occultation maximale "<<maxHidingDistance<<endl;
+        *stream()<<"Distance d'occultation moyenne "<<averageHidingDistance<<endl;
+        *stream()<<"Distance d'occultation maximale "<<maxHidingDistance<<endl;
     }
 }
 
@@ -224,7 +248,7 @@ void Evaluator::visibilityOutOfCamera(ref_ptr<osgViewer::Viewer> view){
             sumOOC += OOCNumber[i];
         }
         float average = ((float)sumOOC)/((float)OOCNumber.size()*labelList.size())*100;
-        cout<<"Pourcentage d'étiquettes hors camera moyen: "<<average<<endl;
+        *stream()<<"Pourcentage d'étiquettes hors camera moyen: "<<average<<endl;
     } else {
         OOCFrameCounter++;
     }
