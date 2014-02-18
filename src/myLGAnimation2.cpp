@@ -8,6 +8,9 @@
 #include "../include/lgLabel.h"
 
 using namespace osg;
+using namespace std;
+
+map<ref_ptr<Drawable>, vector<ref_ptr<lgLabel> > > * myLGAnimation2::mapLabel = new map<ref_ptr<Drawable>, vector<ref_ptr<lgLabel> > >() ;
 
 /** Override of operator()
  */
@@ -73,9 +76,12 @@ void myLGAnimation2::operatorForSwitch(Node* node, NodeVisitor* nv)
 
     if (intersection != NULL)
     {
+        if (typeid(intersection->drawable) == typeid(ref_ptr<lgLabel>)){
+
+          mapLabel->at(intersection->drawable).push_back(label);
+        }
         //Position of the intersection
         Vec4 intersectionPoint = Vec4(intersection->localIntersectionPoint.x(), intersection->localIntersectionPoint.y(), intersection->localIntersectionPoint.z(), 1);
-
         //getting the list of transposed transformation matrices, from node to root
         MatrixList matricesList = intersection->drawable->getParent(0)->getWorldMatrices();
         for (unsigned i=0;i<matricesList.size();i++){
@@ -98,6 +104,12 @@ void myLGAnimation2::operatorForSwitch(Node* node, NodeVisitor* nv)
         float deltaZLabel = deltaZ * label->distanceCamera(view) / distanceIntersectionCamera;
 
         label->translateLabel(0,0,deltaZLabel);
+
+        for (int i=0;i< mapLabel->at(label).size() ;i++)
+        {
+
+          mapLabel->at(label)[i]->translateLabel(0,0,deltaZLabel);
+        }
     }
     else //If the label is not hidden, we look at its initial position and test if we can put it there without being hidden
     {
@@ -106,4 +118,19 @@ void myLGAnimation2::operatorForSwitch(Node* node, NodeVisitor* nv)
             label->setUpdatedMatrixMatrix(Matrixd::translate(label->getPositionInit()));
         }
     }
+
+}
+
+/** Setter of the mapLabel
+*/
+void myLGAnimation2::setMapLabel(std::map<osg::ref_ptr<Drawable>, std::vector<osg::ref_ptr<lgLabel> > > *mapLabel)
+{
+  this->mapLabel = mapLabel;
+}
+
+/** Getter of the mapLabel
+*/
+map<ref_ptr<Drawable>, vector<ref_ptr<lgLabel> > > * myLGAnimation2::getMapLabel()
+{
+  return mapLabel;
 }

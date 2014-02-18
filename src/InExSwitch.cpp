@@ -36,11 +36,18 @@ void InExSwitch::operator()(Node* node, NodeVisitor* nv)
     {
         label->setLabelType(INTERNAL_FACE);
         internalLabelAnimation->operatorForSwitch(node, nv);
+        if (label->getArrow() != NULL)
+        {
+        }
     }
     else if (!thereIsEnoughSpace && (label->getLabelType() == INTERNAL_TOP || label->getLabelType() == INTERNAL_FACE))
     {
         label->setLabelType(SWITCH);
         mylGAnimation2->operatorForSwitch(node, nv);
+        if (label->getArrow() != NULL)
+        {
+
+        }
     }
     else if (!thereIsEnoughSpace &&label->getLabelType() == SWITCH)
     {

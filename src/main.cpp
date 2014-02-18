@@ -33,7 +33,7 @@ using namespace osg;
 
 lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string nom_id, string nom, Vec3 recoPos, ref_ptr<osgViewer::Viewer> viewer, lgType type);
 void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
-void addBuildingLabel(string id, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
+ref_ptr<lgLabel> addBuildingLabel(string id, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer);
 
 int main()
 {
@@ -52,8 +52,10 @@ int main()
 //    string pathFile;
 //    cin >> pathFile;
 //    string pathFile = "/home/paulyves/OpenSceneGraph-Data/Munich_v_1_0_0.citygml";
-      string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/GTA-Munich-1_0_0/Munich_v_1_0_0.citygml";
+//      string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/GTA-Munich-1_0_0/Munich_v_1_0_0.citygml";
 //       string pathFile =  "/home/tbrunel/Documents/Cartes3D-CityGML/Castle_Herten_v1.0.0/Castle_Herten_v1.0.0.citygml";
+      string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/waldbruecke_v0.4.0.citygml";
+
     model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -112,22 +114,29 @@ int main()
 
     //more label
     //addMoreLabel(findNode,listLabels,model,&viewer);
-*/
+    */
 
     //create building labels
-    addBuildingLabel("ID_276003000001240", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000001379", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000992", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000001000", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000594", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000741", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000768", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000752", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000725", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000002982", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000000856", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000001194", listLabels, model, &viewer);
-    addBuildingLabel("ID_276003000004343", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label1 = addBuildingLabel("b_12529I1", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label2 =addBuildingLabel("b_12529I2", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label3 =addBuildingLabel("b_12530I1", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label4 =addBuildingLabel("b_12530I2", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label5 =addBuildingLabel("b_12531I1", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label6 =addBuildingLabel("b_12531I2", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label7 =addBuildingLabel("b_12532I1", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label8 =addBuildingLabel("b_12532I2", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label9 =addBuildingLabel("b_12835I1", listLabels, model, &viewer);
+    ref_ptr<lgLabel> label10 =addBuildingLabel("b_12586-1I1", listLabels, model, &viewer);
+    label1->addArrow();
+    label2->addArrow();
+    label3->addArrow();
+    label4->addArrow();
+    label5->addArrow();
+    label6->addArrow();
+    label7->addArrow();
+    label8->addArrow();
+    label9->addArrow();
+    label10->addArrow();
 
     // Create LGInteraction
     ref_ptr<lgInteraction> interaction = new lgInteraction(listLabels);
@@ -199,6 +208,11 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
        //ref_ptr<testLGAnimation> animation = new testLGAnimation(viewer);
        label->setLabelType(type);
        ref_ptr<myLGAnimation2> animation = new myLGAnimation2(viewer);
+       animation->getMapLabel()
+        ->insert(std::pair<
+                osg::ref_ptr<Drawable>,
+                std::vector<osg::ref_ptr<lgLabel> >
+                >(label, vector<ref_ptr<lgLabel> >()));
        label->getUpdatedMatrix()->setUpdateCallback(animation);
 
    }
@@ -214,6 +228,14 @@ lgLabel* addTextLabel(ref_ptr<Node> linkToNode, string name_id, string name, Vec
       label->setLabelType(INTERNAL_FACE);
       ref_ptr<InternalLabelAnimation> internalAnimation = new InternalLabelAnimation(viewer, label);
       ref_ptr<myLGAnimation2> myLGAnimation2Animation = new myLGAnimation2(viewer);
+
+       myLGAnimation2Animation->getMapLabel()
+        ->insert(std::pair<
+                osg::ref_ptr<Drawable>,
+                std::vector<osg::ref_ptr<lgLabel> >
+                >(label, vector<ref_ptr<lgLabel> >()));
+
+       label->getUpdatedMatrix()->setUpdateCallback(myLGAnimation2Animation);
       ref_ptr<InExSwitch> animation = new InExSwitch(viewer, internalAnimation, myLGAnimation2Animation);
       label->getUpdatedMatrix()->setUpdateCallback(animation);
 
@@ -319,7 +341,7 @@ void addMoreLabel(lgNodeVisitor visitor, vector<lgLabel*> listLabels, Group* mod
     }
 }
 
-void addBuildingLabel(string id, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer)
+ref_ptr<lgLabel> addBuildingLabel(string id, vector<lgLabel*> listLabels, Group* model, osgViewer::Viewer* viewer)
 {
   lgNodeVisitor visitor(id);
   visitor.setNameToFind(id);
@@ -328,5 +350,6 @@ void addBuildingLabel(string id, vector<lgLabel*> listLabels, Group* model, osgV
   visitor.feedFoundPointList(*(aNode));
   ref_ptr<lgLabel> label = addTextLabel(aNode,aNode->getName(),aNode->getName(),visitor.recommendedCoordinates(), viewer,INTERNAL_FACE);
   listLabels.push_back(label);
+  return label;
 }
 

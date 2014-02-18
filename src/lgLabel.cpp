@@ -813,13 +813,14 @@ void lgLabel::addArrow()
         ref_ptr<Geode> theGeode = new Geode();
         ref_ptr<Switch> theSwitch = new Switch(); // used to hide the arrow
         theGeode->addDrawable(arrowDrawable);
-        theSwitch->addChild(theGeode, true);
-        theSwitch->addChild(emptyGeode,false);
+        theSwitch->insertChild(0,theGeode, true);
+        theSwitch->insertChild(1,emptyGeode,false);
         theSwitch->setNewChildDefaultValue(true);
         updatedMatrix->addChild(theSwitch);
         arrowDrawable->setColor(Vec4(0,0,0,1));
         infoArrow = arrowDrawable;
         theSwitch->setNodeMask( 0x1 );
+        arrowSwitcher = theSwitch;
     }
 }
 
@@ -846,3 +847,10 @@ ref_ptr<ShapeDrawable> lgLabel::getArrow()
  {
      return priority;
  }
+
+/**
+*/
+ref_ptr<osg::Switch> lgLabel::getArrowSwitcher()
+{
+  return arrowSwitcher;
+}

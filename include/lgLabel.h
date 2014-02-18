@@ -255,6 +255,10 @@ class lgLabel : public osgText::Text {
           */
          int getPriority();
 
+         /**
+         */
+         osg::ref_ptr<osg::Switch> getArrowSwitcher();
+
     protected :
         /**The node which is supposed to contain the label, if it is a group
          * it has a geode child containing the label
@@ -308,7 +312,7 @@ class lgLabel : public osgText::Text {
           */
          osg::ref_ptr<osgText::Text> infoLabel;
          osg::ref_ptr<osg::ShapeDrawable> infoArrow;
-
+         osg::ref_ptr<osg::Switch> arrowSwitcher;
          /** A value to set a priority to the label
           */
          int priority;
