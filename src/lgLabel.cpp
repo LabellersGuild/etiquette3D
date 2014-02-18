@@ -578,7 +578,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
             //Look at the drawables that are not a lgLabel, and adapt the bbox
             for(unsigned j=0;j< child->getNumDrawables();j++)
             {
-                if (! child->getDrawable(i)->isSameKindAs(new lgLabel()))
+                if (! child->getDrawable(j)->isSameKindAs(new lgLabel()))
                 {
                     BoundingBox childbbox = child->getDrawable(j)->getBound();
 
@@ -605,7 +605,7 @@ BoundingBox lgLabel::computeObjectBBox(ref_ptr<Group> node, BoundingBox bbox) co
                     }
                 }
             }
-            return bbox;
+
         }
         //If the child is a group, call this function on it
         else if (node->getChild(i)->isSameKindAs(new Group()))
@@ -729,14 +729,11 @@ Vec4 lgLabel::computeObject2dBBox(ref_ptr<osgViewer::Viewer> view)
 }
 /** Set the labelType of the label (EXTERNAL, INTERNAL_TOP, INTERNAL_FACE)
  * @param type : lgType : the type of label
- * @param animation : ref_ptr<LGAnimation> : the animation related to the label
  */
-void lgLabel::setLabelType(lgType type, ref_ptr<lgAnimation> animation){
-   this->labelType=labelType;
-   updatedMatrix->setUpdateCallback(animation);
-   labelType = type;
+void lgLabel::setLabelType(lgType type){
+   this->labelType= type;
 
-   if (type == EXTERNAL)
+   if (type == EXTERNAL || type == SWITCH)
    {
        setAxisAlignment(osgText::Text::SCREEN);
        setAlignment(osgText::Text::CENTER_BOTTOM);
@@ -755,13 +752,14 @@ void lgLabel::setLabelType(lgType type, ref_ptr<lgAnimation> animation){
        //Put the label on the object
        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,(bbox.yMax()+bbox.yMin())/2, bbox.zMax()));
    }
-   else //INTERNAL_FACE
+   else if (type == INTERNAL_FACE)
    {
        setAxisAlignment(osgText::Text::XZ_PLANE);
        setAlignment(osgText::Text::CENTER_CENTER);
 
        //Bounding box of the linked object
        BoundingBox bbox = computeObjectBBox(updatedMatrix->getParent(0),BoundingBox(0,0,0,0,0,0) );
+      cout <<"bouding box " << bbox.xMin() <<" " << bbox.xMax() << " "<< bbox.yMin()<<" "<<bbox.yMax()<<" "<<bbox.zMin()<<" "<<bbox.zMax()<< endl;
 
        //Put the label on one of the faces of the bounding box.
        updatedMatrix->setMatrix(Matrixd::translate((bbox.xMax()+bbox.xMin())/2.0,bbox.yMin(), (bbox.zMax()+bbox.zMin())/2));
@@ -815,13 +813,14 @@ void lgLabel::addArrow()
         ref_ptr<Geode> theGeode = new Geode();
         ref_ptr<Switch> theSwitch = new Switch(); // used to hide the arrow
         theGeode->addDrawable(arrowDrawable);
-        theSwitch->addChild(theGeode, true);
-        theSwitch->addChild(emptyGeode,false);
+        theSwitch->insertChild(0,theGeode, true);
+        theSwitch->insertChild(1,emptyGeode,false);
         theSwitch->setNewChildDefaultValue(true);
         updatedMatrix->addChild(theSwitch);
         arrowDrawable->setColor(Vec4(0,0,0,1));
         infoArrow = arrowDrawable;
         theSwitch->setNodeMask( 0x1 );
+        arrowSwitcher = theSwitch;
     }
 }
 
@@ -848,3 +847,10 @@ ref_ptr<ShapeDrawable> lgLabel::getArrow()
  {
      return priority;
  }
+
+/**
+*/
+ref_ptr<osg::Switch> lgLabel::getArrowSwitcher()
+{
+  return arrowSwitcher;
+}
