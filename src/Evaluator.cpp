@@ -138,12 +138,12 @@ void Evaluator::computeLabelCollision(ref_ptr<osgViewer::Viewer> view, vector<re
         for (size_t i = 0; i < etiquettes.size(); i++) {
             
             lgLabel* label1 = etiquettes[i].get();
-            if (label1->getLabelType() == EXTERNAL) {
+            if (label1->getLabelType() == EXTERNAL || label1->getLabelType() == SWITCH) {
                 Vec4 box1 = label1->compute2dBox(view);
                 float minsize1 = std::min(box1.z() - box1.x(), box1.w() - box1.y());
                 for (size_t j = i + 1; j < etiquettes.size(); j++) {
                     lgLabel* label2 = etiquettes[j].get();
-                    if (label2->getLabelType() == EXTERNAL) {
+                    if (label2->getLabelType() == EXTERNAL || label1->getLabelType() == SWITCH) {
                         Vec4 box2 = label2->compute2dBox(view);
                         float minsize2 = std::min(box2.z() - box2.x(), box2.w() - box2.y());
                         float minsize = std::min(minsize1, minsize2);
@@ -314,7 +314,7 @@ float Evaluator::computeLabelObjectDistance(ref_ptr<osgViewer::Viewer> view, vec
 
     for (size_t i = 0; i < etiquettes.size(); i++) {
         lgLabel* label1 = etiquettes[i].get();
-        if (label1->getLabelType() == EXTERNAL) {
+        if (label1->getLabelType() == EXTERNAL || label1->getLabelType() == SWITCH) {
             float distance = distanceLabelObject(view, label1);
             if(distance>0)
             {
