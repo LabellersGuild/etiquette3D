@@ -734,7 +734,6 @@ void lgLabel::setLabelType(lgType type){
    this->labelType= type;
 
    if (type == EXTERNAL || type == SWITCH)
-   if (type == EXTERNAL || type == SWITCH)
    {
        setAxisAlignment(osgText::Text::SCREEN);
        setAlignment(osgText::Text::CENTER_BOTTOM);
