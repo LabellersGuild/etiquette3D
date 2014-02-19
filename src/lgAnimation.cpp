@@ -34,8 +34,7 @@ void lgAnimation::operator()(Node* node, NodeVisitor* nv)
         label->setDrawMode(0);
         if (label->getArrow() != NULL)
         {
-            ref_ptr<Switch> theSwitch = dynamic_cast<Switch*>(label->getArrow()->getParent(0)->getParent(0));
-            theSwitch->setValue(0,false);
+          label->getArrowSwitcher()->setValue(0,false);
         }
     }
     else

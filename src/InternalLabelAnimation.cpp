@@ -7,7 +7,7 @@
 #include "../include/lgLabel.h"
 #define PI 3.14159265359
 #define GOOD 0.0
-#define TOOFAR 10000.0
+#define TOOFAR 1000.0
 
 using namespace osg;
 using namespace std;

@@ -39,7 +39,7 @@ ref_ptr<lgLabel> addBuildingLabel(string id, vector<lgLabel*> listLabels, Group*
 int main()
 {
     bool test = true;
-    
+
    // Declare a group for the root of our tree and a group for the model
    ref_ptr<Group> root = new Group();
    ref_ptr<Group> model = NULL;
@@ -55,7 +55,8 @@ int main()
 //    string pathFile;
 //    cin >> pathFile;
     string pathFile = "/home/paulyves/OpenSceneGraph-Data/waldbruecke_v0.4.0.citygml";
-    
+//      string pathFile = "/home/tbrunel/Documents/Cartes3D-CityGML/waldbruecke_v0.4.0.citygml";
+
     model = dynamic_cast<Group*> (osgDB::readNodeFile(pathFile, options));
 
    // quit if we didn't successfully load the model
@@ -73,6 +74,7 @@ int main()
 
     //create building labels
     ref_ptr<lgLabel> label1 = addBuildingLabel("b_12529I1", listLabels, model, &viewer);
+
     ref_ptr<lgLabel> label2 =addBuildingLabel("b_12529I2", listLabels, model, &viewer);
     ref_ptr<lgLabel> label3 =addBuildingLabel("b_12530I1", listLabels, model, &viewer);
     ref_ptr<lgLabel> label4 =addBuildingLabel("b_12530I2", listLabels, model, &viewer);
@@ -82,8 +84,9 @@ int main()
     ref_ptr<lgLabel> label8 =addBuildingLabel("b_12532I2", listLabels, model, &viewer);
     ref_ptr<lgLabel> label9 =addBuildingLabel("b_12835I1", listLabels, model, &viewer);
     ref_ptr<lgLabel> label10 =addBuildingLabel("b_12586-1I1", listLabels, model, &viewer);
-    
+
     label1->addArrow();
+
     label2->addArrow();
     label3->addArrow();
     label4->addArrow();
@@ -93,6 +96,7 @@ int main()
     label8->addArrow();
     label9->addArrow();
     label10->addArrow();
+
     // Create LGInteraction
     ref_ptr<lgInteraction> interaction = new lgInteraction(listLabels);
     viewer.addEventHandler(interaction.get());
@@ -103,7 +107,7 @@ int main()
 
     ref_ptr<osgViewer::Viewer> pView = &viewer;
 
-    
+
     LabelVisitor recenseur;
     Evaluator* testeur;
     if(test){
@@ -130,7 +134,7 @@ int main()
             testeur->computeLabelObjectDistance(pView, recenseur.getLabelList());
             testeur->lisibility_checkAlignement(true);
         }
-        
+
         viewer.frame();
     }
 }
